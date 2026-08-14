@@ -73,15 +73,19 @@
                             ECOHOME NHƠN BÌNH 
                             <span class="bg-emerald-100 text-brand-700 text-xs px-2 py-0.5 rounded-full font-semibold border border-brand-500/20">2026</span>
                         </div>
-                        <p class="text-xs text-slate-500 font-medium">Hội Nghị Nhà Chung Cư Thường Niên</p>
+                        <p class="text-xs text-slate-500 font-medium">Kết nối – Văn minh – Bền vững</p>
                     </div>
                 </div>
 
                 <!-- Status Badge -->
                 <div class="hidden md:flex items-center gap-3">
-                    <div class="bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-lg text-xs font-semibold border border-emerald-200 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-info text-brand-600"></i>
-                        <span>Nội dung theo dõi & Biểu quyết HNNCC</span>
+                    <div id="cloudStatusBadge" class="bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-lg text-xs font-semibold border border-emerald-300 flex items-center gap-2">
+                        <i id="cloudStatusIcon" class="fa-solid fa-cloud text-emerald-600 animate-pulse"></i>
+                        <span>Firebase Live: <strong id="cloudStatusText">Đang kết nối...</strong></span>
+                    </div>
+                    <div class="bg-amber-50 text-amber-900 px-3 py-1.5 rounded-lg text-xs font-semibold border border-amber-300 flex items-center gap-2">
+                        <i class="fa-solid fa-building-user text-amber-600"></i>
+                        <span>By PVC - BQT Ecohome Nhơn Bình</span>
                     </div>
                 </div>
             </div>
@@ -121,11 +125,11 @@
             </div>
             <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
-                    <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-2 text-emerald-100 border border-white/20">
-                        <i class="fa-solid fa-calendar-check text-amber-300"></i> Sự kiện chính thức năm 2026
+                    <div class="inline-flex items-center gap-2 bg-amber-400 text-slate-900 px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-sm">
+                        <i class="fa-solid fa-calendar-star"></i> Sự kiện chính thức: Chủ nhật, 30/08/2026
                     </div>
                     <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">HỘI NGHỊ NHÀ CHUNG CƯ THƯỜNG NIÊN 2026</h1>
-                    <p class="text-emerald-100 text-sm mt-1 max-w-2xl">Chung cư Nhà ở Xã hội Ecohome Nhơn Bình - Phường Nhơn Bình, TP. Quy Nhơn, Tỉnh Bình Định</p>
+                    <p class="text-emerald-100 text-sm mt-1 max-w-2xl">Chung cư Ecohome Nhơn Bình | Khẩu hiệu: <strong>"Kết nối – Văn minh – Bền vững"</strong></p>
                 </div>
                 <div class="flex flex-wrap sm:flex-nowrap gap-3 w-full md:w-auto">
                     <button onclick="switchTab('voting')" class="flex-1 md:flex-none px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold rounded-xl text-sm shadow transition flex items-center justify-center gap-2">
@@ -144,12 +148,13 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Info Box 1 -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl mb-3">
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-3">
                         <i class="fa-regular fa-clock"></i>
                     </div>
                     <h3 class="font-bold text-slate-800 text-base">Thời gian tổ chức</h3>
-                    <p class="text-sm text-slate-600 mt-1">8:00 AM, Chủ Nhật, Ngày 15 tháng 03 năm 2026</p>
-                    <span class="inline-block mt-3 text-xs bg-blue-100 text-blue-700 font-semibold px-2.5 py-1 rounded-md">Đang mở đăng ký</span>
+                    <p class="text-sm font-semibold text-brand-700 mt-1">07:30 – 11:30</p>
+                    <p class="text-xs text-slate-600">Chủ nhật, ngày 30 tháng 08 năm 2026</p>
+                    <span class="inline-block mt-3 text-xs bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-md">Chính thức</span>
                 </div>
 
                 <!-- Info Box 2 -->
@@ -158,18 +163,19 @@
                         <i class="fa-solid fa-location-dot"></i>
                     </div>
                     <h3 class="font-bold text-slate-800 text-base">Địa điểm tổ chức</h3>
-                    <p class="text-sm text-slate-600 mt-1">Sảnh Sinh hoạt Cộng đồng - Tầng 1, Chung cư Ecohome Nhơn Bình</p>
-                    <span class="inline-block mt-3 text-xs bg-emerald-100 text-brand-700 font-semibold px-2.5 py-1 rounded-md">Trực tiếp & Trực tuyến</span>
+                    <p class="text-sm text-slate-700 mt-1 font-medium">Phòng Sinh hoạt cộng đồng Chung cư Ecohome Nhơn Bình</p>
+                    <span class="inline-block mt-3 text-xs bg-emerald-100 text-brand-700 font-semibold px-2.5 py-1 rounded-md">Trực tiếp & Biểu quyết Online</span>
                 </div>
 
                 <!-- Info Box 3 -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-3">
-                        <i class="fa-solid fa-users"></i>
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl mb-3">
+                        <i class="fa-solid fa-building-shield"></i>
                     </div>
-                    <h3 class="font-bold text-slate-800 text-base">Thành phần tham dự</h3>
-                    <p class="text-sm text-slate-600 mt-1">Toàn thể Chủ sở hữu căn hộ / Cư dân đại diện pháp lý chung cư</p>
-                    <span class="inline-block mt-3 text-xs bg-amber-100 text-amber-800 font-semibold px-2.5 py-1 rounded-md">Quyền biểu quyết theo diện tích</span>
+                    <h3 class="font-bold text-slate-800 text-base">Đơn vị tổ chức</h3>
+                    <p class="text-sm font-bold text-slate-900 mt-1">N&H Real Estate Management</p>
+                    <p class="text-xs text-slate-500">Ban Quản Trị & Ban Quản Lý Chung cư</p>
+                    <span class="inline-block mt-3 text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-md">Quản lý & Vận hành</span>
                 </div>
             </div>
 
@@ -279,14 +285,6 @@
             </div>
         </div>
 
-        <!-- TAB 2: ONLINE VOTING (11 ITEMS) -->
-        <div id="content-voting" class="tab-content hidden space-y-6">
-            <!-- Voting Header Notice -->
-            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm text-blue-900">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shrink-0">
-                        <i class="fa-solid fa-info-circle text-lg"></i>
-                    </div>
         <!-- TAB 2: VOTING CONTENT & INSTRUCTION LINKS -->
         <div id="content-voting" class="tab-content hidden space-y-6">
             <!-- Voting Header Notice -->
@@ -451,74 +449,81 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-amber-950">Bảng Điều Khiển Ban Quản Trị Ecohome Nhơn Bình</h3>
-                            <p class="text-xs text-amber-800">Quyền truy cập: Admin [215151365] - Quản lý biểu quyết & upload tài liệu đính kèm.</p>
+                            <p class="text-xs text-amber-800">Quyền truy cập: Admin [215151365] - Quản lý biểu quyết, thêm/sửa/xóa mục & upload file.</p>
                         </div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="adminLogout()" class="px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-900 text-xs font-bold rounded-lg transition">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="resetDefaultItems()" class="px-3 py-1.5 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 text-xs font-semibold rounded-lg transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate-left"></i> Khôi phục 11 mục mặc định
+                        </button>
+                        <button onclick="adminLogout()" class="px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-900 text-xs font-bold rounded-lg transition flex items-center gap-1.5">
                             <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
                         </button>
                     </div>
                 </div>
 
-                <!-- Admin Action Tabs -->
+                <!-- Admin Action Tabs / Forms Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left: Upload/Change Document & Voting Link -->
+                    <!-- Left: Add / Edit Item Form -->
                     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                        <h4 class="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-cloud-arrow-up text-brand-600"></i> Cập Nhật Link Biểu Quyết & File
-                        </h4>
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 id="adminFormHeader" class="font-bold text-slate-900 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-plus-circle text-brand-600"></i> Thêm Mục Biểu Quyết Mới
+                            </h4>
+                            <button id="cancelEditBtn" onclick="resetAdminForm()" class="hidden text-xs text-slate-500 hover:text-slate-800 underline">
+                                Hủy sửa
+                            </button>
+                        </div>
 
-                        <form onsubmit="handleAdminUploadFile(event)" class="space-y-4">
+                        <form onsubmit="handleAdminSaveItem(event)" class="space-y-4">
+                            <input type="hidden" id="adminEditItemId" value="">
+
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Mục Biểu Quyết / Tài Liệu Cần Cập Nhật</label>
-                                <select id="adminDocTargetItem" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
-                                    <option value="1">Mục 1: Chương trình Hội nghị 2026</option>
-                                    <option value="2">Mục 2: Quy chế tổ chức & điều hành</option>
-                                    <option value="3">Mục 3: Báo cáo công tác QLVH</option>
-                                    <option value="4">Mục 4: Báo cáo hoạt động BQT</option>
-                                    <option value="5">Mục 5: Báo cáo kinh phí bảo trì</option>
-                                    <option value="6">Mục 6: Kế hoạch QLVH 2026 - 2027</option>
-                                    <option value="7">Mục 7: Kế hoạch bảo trì sửa chữa</option>
-                                    <option value="8">Mục 8: Dự toán kinh phí bảo trì</option>
-                                    <option value="9">Mục 9: KH sử dụng kinh phí bảo trì</option>
-                                    <option value="10">Mục 10: Vách ngăn lũ Ramp hầm</option>
-                                    <option value="11">Mục 11: Trạm kích sóng tầng mái</option>
-                                    <option value="general">Tài liệu chung / Khác</option>
-                                </select>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tiêu Đề Mục Biểu Quyết *</label>
+                                <input type="text" id="adminItemTitle" placeholder="VD: Thông qua Báo cáo kiểm toán..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Mô Tả Nội Dung Chi Tiết</label>
+                                <textarea id="adminItemDesc" rows="3" placeholder="Nhập tóm tắt ngắn gọn nội dung cần xin ý kiến cư dân..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
                             </div>
 
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Đường Link Biểu Quyết Trực Tuyến (Google Form / Link khảo sát)</label>
-                                <input type="url" id="adminDocVoteUrl" placeholder="https://forms.google.com/r/example..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                                <p class="text-[10px] text-amber-700 mt-1">*Cư dân sẽ bấm vào liên kết này để biểu quyết cho mục đã chọn.</p>
+                                <input type="url" id="adminItemVoteUrl" placeholder="https://forms.google.com/r/example..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <p class="text-[10px] text-amber-700 mt-1">*Nút "Mở Link Biểu Quyết" sẽ mở liên kết này.</p>
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tên Tờ Trình / File Hiển Thị</label>
-                                <input type="text" id="adminDocTitle" placeholder="VD: To_Trinh_Muc_10_Vach_Ngan_Lu.pdf" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tên Tờ Trình / File Tải Về</label>
+                                <input type="text" id="adminItemDocName" placeholder="VD: To_Trinh_So_01_Chuong_Trinh_HNNCC.pdf" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Đường Link File Tài Liệu Đính Kèm (PDF / Drive / DOCX)</label>
-                                <input type="text" id="adminDocUrl" placeholder="https://drive.google.com/... hoặc đường dẫn file PDF" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Đường Link File Đính Kèm (PDF / Drive / DOCX)</label>
+                                <input type="text" id="adminItemDocUrl" placeholder="https://drive.google.com/... hoặc link file" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
                             </div>
 
-                            <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs shadow transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-floppy-disk"></i> Lưu Cập Nhật Link & Tài Liệu
-                            </button>
+                            <div class="pt-2 flex gap-2">
+                                <button type="submit" id="adminSubmitBtn" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs shadow transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-floppy-disk"></i> <span id="adminSubmitBtnText">Thêm Mục Mới</span>
+                                </button>
+                            </div>
                         </form>
                     </div>
 
-                    <!-- Right: Manage 11 Items Config & Status -->
+                    <!-- Right: Manage Items Control List -->
                     <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                         <div class="flex justify-between items-center mb-4">
                             <h4 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                                <i class="fa-solid fa-sliders text-amber-600"></i> Quản Lý 11 Mục Biểu Quyết
+                                <i class="fa-solid fa-sliders text-amber-600"></i> Danh Sách Quản Lý Mục Biểu Quyết (<span id="adminItemCount">11</span> mục)
                             </h4>
+                            <button onclick="prepareAddNewItem()" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold rounded-lg transition flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> Tạo mục mới
+                            </button>
                         </div>
 
-                        <div id="adminVotingItemsControlList" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-1">
+                        <div id="adminVotingItemsControlList" class="space-y-3 max-h-[550px] overflow-y-auto custom-scrollbar pr-1">
                             <!-- Dynamic Admin Control items -->
                         </div>
                     </div>
@@ -527,6 +532,27 @@
         </div>
 
     </main>
+
+    <!-- Custom Confirm Delete Modal -->
+    <div id="customConfirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+            <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-xl mx-auto">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-900 text-base">Xác nhận xóa mục biểu quyết?</h3>
+                <p id="deleteConfirmText" class="text-xs text-slate-500 mt-1">Hành động này sẽ xóa vĩnh viễn mục biểu quyết đã chọn khỏi hệ thống.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeDeleteModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition">
+                    Hủy bỏ
+                </button>
+                <button id="confirmDeleteBtn" onclick="executeDelete()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition shadow">
+                    Đồng ý xóa
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Notification Toast -->
     <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
@@ -539,39 +565,158 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4">
-            <p class="font-semibold text-slate-700">BAN QUẢN TRỊ CHUNG CƯ ECOHOME NHƠN BÌNH - QUY NHƠN</p>
-            <p class="mt-1">Hệ thống Thông tin & Biểu quyết Hội nghị Nhà Chung cư Thường Niên 2026</p>
+            <p class="font-semibold text-slate-700">BAN QUẢN TRỊ CHUNG CƯ ECOHOME NHƠN BÌNH - GIA LAI</p>
+            <p class="mt-1">Hệ thống Thông tin & Biểu quyết Hội nghị Nhà Chung cư Thường Niên 2026 (Đồng bộ Firebase Cloud)</p>
         </div>
     </footer>
 
-    <script>
-        // Default 11 Items with vote links
+    <!-- Firebase Script Module -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration provided by user
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyCElrP0tYWzrEzDhywvo254qA9lvp9t_8M",
+            authDomain: "hnncc-bieu-quyet.firebaseapp.com",
+            projectId: "hnncc-bieu-quyet",
+            storageBucket: "hnncc-bieu-quyet.firebasestorage.app",
+            messagingSenderId: "876099697118",
+            appId: "1:876099697118:web:c98f490e28ff8175ec054f",
+            measurementId: "G-PCBN9XV7NK"
+        };
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ecohome-nhon-binh-2026';
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Default 11 Items for initial cloud seeding if empty
         const DEFAULT_VOTING_ITEMS = [
-            { id: 1, title: "Thông qua Chương trình Hội nghị Nhà chung cư năm 2026", desc: "Chương trình chi tiết gồm 6 phần kéo dài 180 phút.", voteUrl: "https://forms.google.com/", docName: "Chuong_Trinh_HNNCC_2026.pdf", docUrl: "#" },
-            { id: 2, title: "Thông qua Quy chế tổ chức và điều hành Hội nghị", desc: "Quy định nguyên tắc biểu quyết, tư cách đại biểu và nguyên tắc kiểm phiếu.", voteUrl: "https://forms.google.com/", docName: "Quy_Che_To_Chuc_Dieu_Hanh_2026.pdf", docUrl: "#" },
-            { id: 3, title: "Thông qua Báo cáo công tác quản lý vận hành trong kỳ báo cáo", desc: "Báo cáo tổng kết quản lý tòa nhà, chất lượng dịch vụ an ninh, vệ sinh.", voteUrl: "https://forms.google.com/", docName: "Bao_Cao_Quan_Ly_Van_Hanh.pdf", docUrl: "#" },
-            { id: 4, title: "Thông qua Báo cáo hoạt động Ban quản trị", desc: "Tổng kết công tác giám sát, thực hiện nghị quyết năm cũ của BQT.", voteUrl: "https://forms.google.com/", docName: "Bao_Cao_Hoat_Dong_BQT_2025_2026.pdf", docUrl: "#" },
-            { id: 5, title: "Thông qua Báo cáo tình hình sử dụng và quản lý kinh phí bảo trì", desc: "Báo cáo số dư tài khoản kinh phí bảo trì, lãi tiền gửi và các khoản đã chi.", voteUrl: "https://forms.google.com/", docName: "Bao_Cao_Thu_Chi_Kinh_Phi_Bao_Tri.pdf", docUrl: "#" },
-            { id: 6, title: "Thông qua kế hoạch quản lý vận hành và các nhiệm vụ trọng tâm năm 2026 – 2027", desc: "Phương hướng nâng cao chất lượng dịch vụ, chỉ tiêu hoạt động năm tới.", voteUrl: "https://forms.google.com/", docName: "Ke_Hoach_QLVH_2026_2027.pdf", docUrl: "#" },
-            { id: 7, title: "Thông qua kế hoạch bảo trì, sửa chữa các hạng mục thuộc phần sở hữu chung", desc: "Bảo trì định kỳ thang máy, máy bơm, hệ thống PCCC và sơn sửa hư hỏng.", voteUrl: "https://forms.google.com/", docName: "Ke_Hoach_Bao_Tri_So_Huu_Chung.pdf", docUrl: "#" },
-            { id: 8, title: "Thông qua dự toán kinh phí bảo trì năm 2026 – 2027", desc: "Bảng phân bổ ngân sách dự kiến cho các hạng mục bảo trì tòa nhà.", voteUrl: "https://forms.google.com/", docName: "Du_Toan_Kinh_Phi_Bao_Tri_2026_2027.pdf", docUrl: "#" },
-            { id: 9, title: "Thông qua kế hoạch sử dụng kinh phí bảo trì theo nội dung trình Hội nghị", desc: "Quy trình giải ngân và giám sát sử dụng quỹ bảo trì theo quy định.", voteUrl: "https://forms.google.com/", docName: "KH_Su_Dung_Kinh_Phi_Bao_Tri.pdf", docUrl: "#" },
-            { id: 10, title: "Thông qua kế hoạch triển khai vách ngăn lũ tại 02 đầu vào và ra ramp dốc hầm", desc: "Trang bị hệ thống vách chắn chống ngập lụt tại 2 lối ramp dốc hầm.", voteUrl: "https://forms.google.com/", docName: "To_Trinh_Vach_Ngan_Lu_Ramp_Ham.pdf", docUrl: "#" },
-            { id: 11, title: "Thông qua kế hoạch triển khai lắp đặt trạm kích sóng tại tầng mái (outdoor)", desc: "Lắp đặt trạm phát kích sóng di động ngoài trời tầng mái cải thiện tín hiệu.", voteUrl: "https://forms.google.com/", docName: "To_Trinh_Lap_Dat_Tram_Kich_Song.pdf", docUrl: "#" }
+            { id: "1", title: "Thông qua Chương trình Hội nghị Nhà chung cư năm 2026", desc: "Chương trình chi tiết hội nghị thường niên bao gồm 6 nội dung kéo dài từ 07:30 đến 11:30.", voteUrl: "https://forms.google.com/", docName: "Chuong_Trinh_HNNCC_2026.pdf", docUrl: "#", order: 1 },
+            { id: "2", title: "Thông qua Quy chế tổ chức và điều hành Hội nghị", desc: "Quy định chi tiết về tư cách tham dự, nguyên tắc thảo luận và hình thức biểu quyết.", voteUrl: "https://forms.google.com/", docName: "Quy_Che_To_Chuc_Dieu_Hanh_2026.pdf", docUrl: "#", order: 2 },
+            { id: "3", title: "Thông qua Báo cáo công tác quản lý vận hành trong kỳ báo cáo", desc: "Báo cáo đánh giá chất lượng dịch vụ an ninh, vệ sinh, cây xanh và kỹ thuật tòa nhà.", voteUrl: "https://forms.google.com/", docName: "Bao_Cao_Quan_Ly_Van_Hanh.pdf", docUrl: "#", order: 3 },
+            { id: "4", title: "Thông qua Báo cáo hoạt động Ban quản trị", desc: "Tổng kết công tác giám sát vận hành và thực hiện các Nghị quyết Hội nghị chung cư.", voteUrl: "https://forms.google.com/", docName: "Bao_Cao_Hoat_Dong_BQT_2025_2026.pdf", docUrl: "#", order: 4 },
+            { id: "5", title: "Thông qua Báo cáo tình hình sử dụng và quản lý kinh phí bảo trì", desc: "Báo cáo chi tiết thu chi, số dư quỹ bảo trì phần sở hữu chung tòa nhà.", voteUrl: "https://forms.google.com/", docName: "Bao_Cao_Thu_Chi_Kinh_Phi_Bao_Tri.pdf", docUrl: "#", order: 5 },
+            { id: "6", title: "Thông qua kế hoạch quản lý vận hành và các nhiệm vụ trọng tâm năm 2026 – 2027", desc: "Phương hướng nâng cao chất lượng dịch vụ vận hành chung cư thời gian tới.", voteUrl: "https://forms.google.com/", docName: "Ke_Hoach_QLVH_2026_2027.pdf", docUrl: "#", order: 6 },
+            { id: "7", title: "Thông qua kế hoạch bảo trì, sửa chữa các hạng mục thuộc phần sở hữu chung", desc: "Kế hoạch bảo trì định kỳ hệ thống PCCC, thang máy, máy bơm và cơ sở hạ tầng.", voteUrl: "https://forms.google.com/", docName: "Ke_Hoach_Bao_Tri_So_Huu_Chung.pdf", docUrl: "#", order: 7 },
+            { id: "8", title: "Thông qua dự toán kinh phí bảo trì năm 2026 – 2027", desc: "Bảng phân bổ dự toán chi phí thực hiện kế hoạch bảo trì các hạng mục dùng chung.", voteUrl: "https://forms.google.com/", docName: "Du_Toan_Kinh_Phi_Bao_Tri_2026_2027.pdf", docUrl: "#", order: 8 },
+            { id: "9", title: "Thông qua kế hoạch sử dụng kinh phí bảo trì theo nội dung trình Hội nghị", desc: "Quy trình rút và giải ngân kinh phí bảo trì theo quy định pháp luật hiện hành.", voteUrl: "https://forms.google.com/", docName: "KH_Su_Dung_Kinh_Phi_Bao_Tri.pdf", docUrl: "#", order: 9 },
+            { id: "10", title: "Thông qua kế hoạch triển khai vách ngăn lũ tại 02 đầu vào và ra ramp dốc hầm", desc: "Trang bị vách chắn chống ngập lụt tại lối ramp hầm nhằm bảo vệ tài sản xe cộ cư dân.", voteUrl: "https://forms.google.com/", docName: "To_Trinh_Vach_Ngan_Lu_Ramp_Ham.pdf", docUrl: "#", order: 10 },
+            { id: "11", title: "Thông qua kế hoạch triển khai lắp đặt trạm kích sóng tại tầng mái (outdoor)", desc: "Lắp đặt trạm kích sóng ngoài trời tầng mái giúp triệt để xử lý tình trạng yếu/mất sóng di động.", voteUrl: "https://forms.google.com/", docName: "To_Trinh_Lap_Dat_Tram_Kich_Song.pdf", docUrl: "#", order: 11 }
         ];
 
         // Default mock QA list
         const DEFAULT_QA_LIST = [
-            { id: 1, name: "Trần Văn Nam", room: "A-05.12", topic: "Vách ngăn lũ", content: "Cho tôi hỏi thời gian thi công vách ngăn lũ ramp hầm dự kiến kéo dài bao lâu và có ảnh hưởng đến việc đi lại của cư dân không?", time: "10:15 - 14/08/2026", reply: "BQT phản hồi: Thi công trong 3 ngày cuối tuần, lắp đặt thử nghiệm ngoài giờ cao điểm nên sẽ không ảnh hưởng đến việc di chuyển của xe cư dân." },
-            { id: 2, name: "Lê Thị Thu", room: "B-12.04", topic: "Trạm kích sóng", content: "Việc lắp đặt trạm kích sóng di động tại tầng mái có phát sinh chi phí từ quỹ cư dân hay do nhà mạng tài trợ?", time: "09:30 - 14/08/2026", reply: "BQT phản hồi: Do nhà mạng tài trợ 100% kinh phí lắp đặt và vận hành, cư dân không phải đóng thêm khoản phí nào." }
+            { id: "1", name: "Trần Văn Nam", room: "A-05.12", topic: "Vách ngăn lũ", content: "Cho tôi hỏi thời gian thi công vách ngăn lũ ramp hầm dự kiến kéo dài bao lâu và có ảnh hưởng đến việc đi lại của cư dân không?", time: "10:15 - 30/08/2026", timestamp: 1788062100000, reply: "BQT phản hồi: Thi công trong 3 ngày cuối tuần, lắp đặt thử nghiệm ngoài giờ cao điểm nên sẽ không ảnh hưởng đến việc di chuyển của xe cư dân." },
+            { id: "2", name: "Lê Thị Thu", room: "B-12.04", topic: "Trạm kích sóng", content: "Việc lắp đặt trạm kích sóng di động tại tầng mái có phát sinh chi phí từ quỹ cư dân hay do nhà mạng tài trợ?", time: "09:30 - 30/08/2026", timestamp: 1788059400000, reply: "BQT phản hồi: Do nhà mạng tài trợ 100% kinh phí lắp đặt và vận hành, cư dân không phải đóng thêm khoản phí nào." }
         ];
 
-        // State Storage
+        // Application State
         let state = {
-            items: JSON.parse(localStorage.getItem('ecohome_voting_items') || JSON.stringify(DEFAULT_VOTING_ITEMS)),
-            qaList: JSON.parse(localStorage.getItem('ecohome_qa_list') || JSON.stringify(DEFAULT_QA_LIST)),
-            isAdmin: false
+            items: [],
+            qaList: [],
+            isAdmin: false,
+            pendingDeleteId: null
         };
+
+        // Cloud status UI update
+        function updateCloudStatus(connected) {
+            const statusText = document.getElementById('cloudStatusText');
+            const statusIcon = document.getElementById('cloudStatusIcon');
+            if (statusText) statusText.innerText = connected ? "Đã kết nối" : "Ngoại tuyến";
+            if (statusIcon) {
+                statusIcon.className = connected ? "fa-solid fa-cloud text-emerald-600" : "fa-solid fa-cloud-slash text-rose-500";
+            }
+        }
+
+        // Auth initialization
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Firebase Auth failed, trying anonymous fallback:", err);
+                try { await signInAnonymously(auth); } catch (e) { console.error("Anonymous auth failed:", e); }
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                updateCloudStatus(true);
+                subscribeFirestoreData();
+            } else {
+                updateCloudStatus(false);
+            }
+        });
+
+        initAuth();
+
+        function subscribeFirestoreData() {
+            if (!auth.currentUser) return;
+
+            // Voting Items Realtime Subscription
+            const votingColRef = collection(db, 'artifacts', appId, 'public', 'data', 'voting_items');
+            onSnapshot(votingColRef, async (snapshot) => {
+                if (snapshot.empty) {
+                    await seedDefaultVotingItems();
+                    return;
+                }
+                state.items = [];
+                snapshot.forEach((docSnap) => {
+                    state.items.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                state.items.sort((a, b) => (parseInt(a.order || a.id) || 0) - (parseInt(b.order || b.id) || 0));
+                
+                renderVotingItems();
+                renderDocuments();
+                if (state.isAdmin) renderAdminControls();
+            }, (error) => {
+                console.error("Lỗi đồng bộ voting items:", error);
+                showToast("Lỗi kết nối CSDL biểu quyết!", "warning");
+            });
+
+            // QA Realtime Subscription
+            const qaColRef = collection(db, 'artifacts', appId, 'public', 'data', 'qa_items');
+            onSnapshot(qaColRef, async (snapshot) => {
+                if (snapshot.empty) {
+                    await seedDefaultQA();
+                    return;
+                }
+                state.qaList = [];
+                snapshot.forEach((docSnap) => {
+                    state.qaList.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                state.qaList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                renderQA();
+            }, (error) => {
+                console.error("Lỗi đồng bộ QA:", error);
+            });
+        }
+
+        async function seedDefaultVotingItems() {
+            if (!auth.currentUser) return;
+            for (let i = 0; i < DEFAULT_VOTING_ITEMS.length; i++) {
+                const item = DEFAULT_VOTING_ITEMS[i];
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voting_items', String(item.id));
+                await setDoc(docRef, item);
+            }
+        }
+
+        async function seedDefaultQA() {
+            if (!auth.currentUser) return;
+            for (const qa of DEFAULT_QA_LIST) {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'qa_items', String(qa.id));
+                await setDoc(docRef, qa);
+            }
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -597,9 +742,21 @@
 
         function renderVotingItems() {
             const container = document.getElementById('votingItemsContainer');
+            if (!container) return;
             container.innerHTML = '';
 
-            state.items.forEach((item) => {
+            if (state.items.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-8 border border-slate-200 text-center text-slate-500">
+                        <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-2"></i>
+                        <p class="text-sm font-medium">Chưa có mục biểu quyết nào. Ban Quản Trị vui lòng thêm mục mới trong Admin.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            state.items.forEach((item, index) => {
+                const itemNum = index + 1;
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-2xl border border-slate-200 p-5 shadow-sm transition hover:border-slate-300 space-y-3";
                 
@@ -608,25 +765,24 @@
                         <div class="space-y-1.5 max-w-3xl">
                             <div class="flex items-center gap-2.5">
                                 <span class="w-7 h-7 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shrink-0 shadow-sm">
-                                    ${item.id}
+                                    ${itemNum}
                                 </span>
                                 <h3 class="font-bold text-slate-900 text-base leading-snug">${item.title}</h3>
                             </div>
-                            <p class="text-xs text-slate-600 pl-9">${item.desc}</p>
+                            <p class="text-xs text-slate-600 pl-9">${item.desc || 'Chưa có mô tả chi tiết'}</p>
                             
                             ${item.docName ? `
                                 <div class="pl-9 pt-0.5">
-                                    <a href="${item.docUrl}" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline">
+                                    <a href="${item.docUrl || '#'}" target="_blank" class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-brand-600 hover:text-brand-700 hover:underline">
                                         <i class="fa-solid fa-file-pdf text-rose-500"></i> Xem Tờ trình đính kèm: ${item.docName}
                                     </a>
                                 </div>
                             ` : ''}
                         </div>
 
-                        <!-- Direct Link Action Button -->
                         <div class="pl-9 lg:pl-0 shrink-0">
                             <a href="${item.voteUrl || '#'}" target="_blank" class="w-full sm:w-auto px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-pen-to-square"></i> Mở Link Biểu Quyết Mục ${item.id} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                <i class="fa-solid fa-pen-to-square"></i> Mở Link Biểu Quyết Mục ${itemNum} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                             </a>
                         </div>
                     </div>
@@ -638,9 +794,16 @@
 
         function renderDocuments() {
             const container = document.getElementById('documentListContainer');
+            if (!container) return;
             container.innerHTML = '';
 
-            state.items.forEach(item => {
+            if (state.items.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 col-span-2 text-center py-6">Chưa có tài liệu đính kèm nào.</p>`;
+                return;
+            }
+
+            state.items.forEach((item, index) => {
+                const itemNum = index + 1;
                 const docCard = document.createElement('div');
                 docCard.className = "bg-slate-50 rounded-xl p-4 border border-slate-200 flex items-start justify-between gap-3 hover:border-brand-500 transition";
                 docCard.innerHTML = `
@@ -649,12 +812,12 @@
                             <i class="fa-solid fa-file-pdf"></i>
                         </div>
                         <div>
-                            <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Mục ${item.id}</span>
+                            <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Mục ${itemNum}</span>
                             <h4 class="font-bold text-slate-800 text-xs sm:text-sm mt-1 leading-snug">${item.title}</h4>
-                            <p class="text-[11px] text-slate-500 mt-1">File: <span class="font-semibold text-slate-700">${item.docName || 'To_Trinh_Dinh_Kem.pdf'}</span></p>
+                            <p class="text-[11px] text-slate-500 mt-1">File: <span class="font-semibold text-slate-700">${item.docName || 'Tài liệu chưa cập nhật'}</span></p>
                         </div>
                     </div>
-                    <a href="${item.docUrl}" target="_blank" download class="shrink-0 px-3 py-1.5 bg-white border border-slate-300 hover:bg-brand-600 hover:text-white hover:border-brand-600 text-slate-700 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm">
+                    <a href="${item.docUrl || '#'}" target="_blank" download class="shrink-0 px-3 py-1.5 bg-white border border-slate-300 hover:bg-brand-600 hover:text-white hover:border-brand-600 text-slate-700 font-bold text-xs rounded-lg transition flex items-center gap-1 shadow-sm">
                         <i class="fa-solid fa-download"></i> Tải về
                     </a>
                 `;
@@ -662,70 +825,275 @@
             });
         }
 
+        function renderQA() {
+            const container = document.getElementById('qaListContainer');
+            const badge = document.getElementById('qaTotalBadge');
+            if (badge) badge.innerText = `${state.qaList.length} câu hỏi`;
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (state.qaList.length === 0) {
+                container.innerHTML = `<div class="p-6 bg-slate-50 text-center text-slate-500 rounded-xl text-xs">Chưa có câu hỏi nào. Hãy gửi câu hỏi đầu tiên!</div>`;
+                return;
+            }
+
+            state.qaList.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2";
+                div.innerHTML = `
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-900">${item.name || 'Cư dân'}</span>
+                            <span class="bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded-md text-[10px]">${item.room || ''}</span>
+                            <span class="bg-brand-100 text-brand-800 font-medium px-2 py-0.5 rounded-md text-[10px]">${item.topic || 'Chủ đề'}</span>
+                        </div>
+                        <span class="text-slate-400 text-[11px]">${item.time || ''}</span>
+                    </div>
+                    <p class="text-xs text-slate-700 font-medium leading-relaxed">${item.content}</p>
+                    ${item.reply ? `
+                        <div class="mt-2 p-3 bg-emerald-50 border border-emerald-200/60 rounded-xl text-xs text-emerald-900">
+                            <p class="font-bold text-emerald-800 flex items-center gap-1 mb-0.5">
+                                <i class="fa-solid fa-reply text-emerald-600"></i> ${item.reply.startsWith('BQT') ? item.reply : 'BQT phản hồi: ' + item.reply}
+                            </p>
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function handleQuestionSubmit(e) {
+            e.preventDefault();
+            if (!auth.currentUser) {
+                showToast("Đang kết nối CSDL Cloud, vui lòng thử lại!", "warning");
+                return;
+            }
+
+            const roomInput = document.getElementById('qaApartment').value.trim();
+            const topic = document.getElementById('qaTopic').value;
+            const content = document.getElementById('qaContent').value.trim();
+
+            if (!roomInput || !content) return;
+
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} - ${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth()+1).padStart(2, '0')}/${now.getFullYear()}`;
+
+            const parts = roomInput.split('-');
+            const name = parts.length > 1 ? parts.slice(1).join('-').trim() : "Cư dân";
+            const roomNo = parts[0].trim();
+
+            const newQA = {
+                name: name || "Cư dân",
+                room: roomNo || roomInput,
+                topic: topic,
+                content: content,
+                time: timeStr,
+                timestamp: Date.now(),
+                reply: "BQT phản hồi: Ý kiến đã được ghi nhận và sẽ giải đáp trực tiếp tại Hội nghị."
+            };
+
+            try {
+                const qaColRef = collection(db, 'artifacts', appId, 'public', 'data', 'qa_items');
+                await addDoc(qaColRef, newQA);
+
+                document.getElementById('qaApartment').value = '';
+                document.getElementById('qaContent').value = '';
+                showToast("Đã gửi câu hỏi & lưu vào CSDL Firebase!");
+            } catch (err) {
+                console.error("Lỗi gửi QA:", err);
+                showToast("Lỗi khi gửi câu hỏi lên Cloud!", "warning");
+            }
+        }
+
         function filterDocuments() {
-            const query = document.getElementById('docSearchInput').value.toLowerCase();
-            const cards = document.querySelectorAll('#documentListContainer > div');
-            cards.forEach(card => {
+            const query = (document.getElementById('docSearchInput')?.value || '').toLowerCase().trim();
+            const container = document.getElementById('documentListContainer');
+            if (!container) return;
+
+            const cards = container.children;
+            for (let card of cards) {
                 const text = card.innerText.toLowerCase();
                 if (text.includes(query)) {
                     card.classList.remove('hidden');
                 } else {
                     card.classList.add('hidden');
                 }
-            });
+            }
         }
 
-        function renderQA() {
-            const container = document.getElementById('qaListContainer');
+        function renderAdminControls() {
+            const container = document.getElementById('adminVotingItemsControlList');
+            const countEl = document.getElementById('adminItemCount');
+            if (countEl) countEl.innerText = state.items.length;
+            if (!container) return;
             container.innerHTML = '';
 
-            document.getElementById('qaTotalBadge').innerText = `${state.qaList.length} câu hỏi`;
+            if (state.items.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">Danh sách trống. Vui lòng bấm nút "Thêm Mục Mới" để tạo.</p>`;
+                return;
+            }
 
-            state.qaList.forEach(qa => {
+            state.items.forEach((item, index) => {
+                const itemNum = index + 1;
                 const card = document.createElement('div');
-                card.className = "bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2";
+                card.className = "p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5 transition hover:border-slate-300";
                 card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-800 text-xs sm:text-sm">${qa.name} (${qa.room})</span>
-                            <span class="bg-brand-100 text-brand-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${qa.topic}</span>
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="space-y-1 flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-amber-500 text-slate-900 text-xs font-bold px-2 py-0.5 rounded-md">Mục ${itemNum}</span>
+                                <h5 class="font-bold text-slate-900 text-sm leading-snug">${item.title}</h5>
+                            </div>
+                            <p class="text-xs text-slate-500">${item.desc || 'Chưa có mô tả'}</p>
                         </div>
-                        <span class="text-[10px] text-slate-400">${qa.time}</span>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="editAdminItem('${item.id}')" class="px-2.5 py-1.5 bg-white border border-slate-300 hover:bg-amber-50 hover:border-amber-400 text-slate-700 text-xs font-semibold rounded-lg transition flex items-center gap-1">
+                                <i class="fa-solid fa-pen text-amber-600"></i> Sửa
+                            </button>
+                            <button onclick="openDeleteModal('${item.id}')" class="px-2.5 py-1.5 bg-white border border-rose-200 hover:bg-rose-50 hover:border-rose-400 text-rose-600 text-xs font-semibold rounded-lg transition flex items-center gap-1">
+                                <i class="fa-solid fa-trash-can"></i> Xóa
+                            </button>
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-700 leading-relaxed">${qa.content}</p>
-                    ${qa.reply ? `
-                        <div class="mt-2 bg-emerald-50 border-l-2 border-brand-600 p-2.5 rounded-r-lg text-xs text-slate-700">
-                            <span class="font-bold text-brand-700 block text-[11px] mb-0.5"><i class="fa-solid fa-reply mr-1"></i>Trả lời từ BQT:</span>
-                            ${qa.reply}
-                        </div>
-                    ` : ''}
+                    <div class="text-[11px] text-slate-600 bg-white p-2.5 rounded-lg border border-slate-100 space-y-1">
+                        <p><i class="fa-solid fa-link text-brand-600 mr-1.5"></i>Link biểu quyết: <a href="${item.voteUrl || '#'}" target="_blank" class="text-brand-700 underline font-semibold truncate hover:text-brand-800">${item.voteUrl || 'Chưa cập nhật link'}</a></p>
+                        <p><i class="fa-solid fa-file-pdf text-rose-500 mr-1.5"></i>File đính kèm: <strong class="text-slate-800">${item.docName || 'Chưa đính kèm file'}</strong></p>
+                    </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function handleQuestionSubmit(e) {
+        function prepareAddNewItem() {
+            resetAdminForm();
+            const titleInput = document.getElementById('adminItemTitle');
+            if (titleInput) titleInput.focus();
+        }
+
+        function resetAdminForm() {
+            document.getElementById('adminEditItemId').value = '';
+            document.getElementById('adminItemTitle').value = '';
+            document.getElementById('adminItemDesc').value = '';
+            document.getElementById('adminItemVoteUrl').value = '';
+            document.getElementById('adminItemDocName').value = '';
+            document.getElementById('adminItemDocUrl').value = '';
+
+            document.getElementById('adminFormHeader').innerHTML = `<i class="fa-solid fa-plus-circle text-brand-600"></i> Thêm Mục Biểu Quyết Mới`;
+            document.getElementById('adminSubmitBtnText').innerText = 'Thêm Mục Mới';
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        function editAdminItem(id) {
+            const item = state.items.find(i => String(i.id) === String(id));
+            if (!item) return;
+
+            document.getElementById('adminEditItemId').value = item.id;
+            document.getElementById('adminItemTitle').value = item.title || '';
+            document.getElementById('adminItemDesc').value = item.desc || '';
+            document.getElementById('adminItemVoteUrl').value = item.voteUrl || '';
+            document.getElementById('adminItemDocName').value = item.docName || '';
+            document.getElementById('adminItemDocUrl').value = item.docUrl || '';
+
+            document.getElementById('adminFormHeader').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> Chỉnh Sửa Mục Biểu Quyết`;
+            document.getElementById('adminSubmitBtnText').innerText = 'Lưu Thay Đổi Cloud';
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+            document.getElementById('adminItemTitle').focus();
+        }
+
+        async function handleAdminSaveItem(e) {
             e.preventDefault();
-            const aptName = document.getElementById('qaApartment').value.trim();
-            const topic = document.getElementById('qaTopic').value;
-            const content = document.getElementById('qaContent').value.trim();
+            if (!auth.currentUser) {
+                showToast("Lỗi kết nối CSDL Cloud!", "warning");
+                return;
+            }
 
-            const newQa = {
-                id: Date.now(),
-                name: aptName.split('-')[1] || aptName,
-                room: aptName.split('-')[0] || "Căn hộ",
-                topic: topic,
-                content: content,
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " - Hôm nay",
-                reply: "BQT đã ghi nhận câu hỏi và sẽ giải đáp tại Hội nghị."
-            };
+            const editId = document.getElementById('adminEditItemId').value;
+            const title = document.getElementById('adminItemTitle').value.trim();
+            const desc = document.getElementById('adminItemDesc').value.trim();
+            const voteUrl = document.getElementById('adminItemVoteUrl').value.trim();
+            const docName = document.getElementById('adminItemDocName').value.trim();
+            const docUrl = document.getElementById('adminItemDocUrl').value.trim();
 
-            state.qaList.unshift(newQa);
-            localStorage.setItem('ecohome_qa_list', JSON.stringify(state.qaList));
+            if (!title) return;
 
-            document.getElementById('qaContent').value = '';
-            renderQA();
-            showToast("Đã gửi thắc mắc tới Ban Quản Trị thành công!");
+            try {
+                if (editId) {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voting_items', String(editId));
+                    const existingItem = state.items.find(i => String(i.id) === String(editId));
+                    await setDoc(docRef, {
+                        id: String(editId),
+                        title,
+                        desc,
+                        voteUrl,
+                        docName,
+                        docUrl,
+                        order: existingItem?.order || Date.now()
+                    }, { merge: true });
+                    showToast("Đã cập nhật mục biểu quyết lên Firebase Cloud!");
+                } else {
+                    const newId = String(Date.now());
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voting_items', newId);
+                    await setDoc(docRef, {
+                        id: newId,
+                        title,
+                        desc,
+                        voteUrl,
+                        docName,
+                        docUrl,
+                        order: state.items.length + 1
+                    });
+                    showToast("Đã thêm mục biểu quyết mới lên Cloud!");
+                }
+                resetAdminForm();
+            } catch (err) {
+                console.error("Lỗi lưu Firestore:", err);
+                showToast("Có lỗi khi đồng bộ CSDL Firebase!", "warning");
+            }
+        }
+
+        function openDeleteModal(id) {
+            state.pendingDeleteId = id;
+            const item = state.items.find(i => String(i.id) === String(id));
+            if (item) {
+                document.getElementById('deleteConfirmText').innerText = `Bạn có chắc chắn muốn xóa "${item.title}" khỏi Cloud?`;
+            }
+            document.getElementById('customConfirmModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            state.pendingDeleteId = null;
+            document.getElementById('customConfirmModal').classList.add('hidden');
+        }
+
+        async function executeDelete() {
+            if (!state.pendingDeleteId || !auth.currentUser) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voting_items', String(state.pendingDeleteId));
+                await deleteDoc(docRef);
+                closeDeleteModal();
+                showToast("Đã xóa mục biểu quyết khỏi Firebase Cloud.", "warning");
+            } catch (err) {
+                console.error("Lỗi xóa doc:", err);
+                showToast("Không thể xóa dữ liệu Cloud!", "warning");
+            }
+        }
+
+        async function resetDefaultItems() {
+            if (!auth.currentUser) return;
+            try {
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'voting_items');
+                const snapshot = await getDocs(colRef);
+                for (const docSnap of snapshot.docs) {
+                    await deleteDoc(docSnap.ref);
+                }
+                await seedDefaultVotingItems();
+                resetAdminForm();
+                showToast("Đã khôi phục 11 mục mặc định lên Firebase!");
+            } catch (err) {
+                console.error("Lỗi khôi phục:", err);
+                showToast("Lỗi khi khôi phục dữ liệu!", "warning");
+            }
         }
 
         function handleAdminLogin(e) {
@@ -754,50 +1122,6 @@
             showToast("Đã đăng xuất khỏi tài khoản Quản trị.");
         }
 
-        function renderAdminControls() {
-            const container = document.getElementById('adminVotingItemsControlList');
-            container.innerHTML = '';
-
-            state.items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="font-bold text-slate-900">Mục ${item.id}: ${item.title}</span>
-                    </div>
-                    <div class="text-[11px] text-slate-600 space-y-1">
-                        <p><i class="fa-solid fa-link text-brand-600 mr-1"></i>Link biểu quyết: <a href="${item.voteUrl}" target="_blank" class="text-brand-700 underline font-semibold truncate block">${item.voteUrl || 'Chưa cập nhật'}</a></p>
-                        <p><i class="fa-solid fa-file-pdf text-rose-500 mr-1"></i>File đính kèm: <strong class="text-slate-800">${item.docName || 'Chưa có file'}</strong></p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function handleAdminUploadFile(e) {
-            e.preventDefault();
-            const targetId = document.getElementById('adminDocTargetItem').value;
-            const voteUrl = document.getElementById('adminDocVoteUrl').value.trim();
-            const docTitle = document.getElementById('adminDocTitle').value.trim();
-            const docUrl = document.getElementById('adminDocUrl').value.trim() || '#';
-
-            if (targetId !== 'general') {
-                const item = state.items.find(i => i.id === parseInt(targetId));
-                if (item) {
-                    if (voteUrl) item.voteUrl = voteUrl;
-                    if (docTitle) item.docName = docTitle;
-                    if (docUrl) item.docUrl = docUrl;
-                    localStorage.setItem('ecohome_voting_items', JSON.stringify(state.items));
-                }
-            }
-
-            showToast(`Đã cập nhật link biểu quyết & tài liệu cho Mục ${targetId}!`);
-            document.getElementById('adminDocVoteUrl').value = '';
-            document.getElementById('adminDocTitle').value = '';
-            document.getElementById('adminDocUrl').value = '';
-            renderAdminControls();
-        }
-
         function showToast(msg, type = 'success') {
             const toast = document.getElementById('toastNotification');
             const toastMsg = document.getElementById('toastMessage');
@@ -816,10 +1140,25 @@
             }, 3000);
         }
 
-        // Initialize App on window load
-        window.onload = function() {
-            renderVotingItems();
-        };
+        // Attach functions to global window object for HTML event handlers
+        window.switchTab = switchTab;
+        window.filterDocuments = filterDocuments;
+        window.handleQuestionSubmit = handleQuestionSubmit;
+        window.renderQA = renderQA;
+        window.renderVotingItems = renderVotingItems;
+        window.renderDocuments = renderDocuments;
+        window.renderAdminControls = renderAdminControls;
+        window.prepareAddNewItem = prepareAddNewItem;
+        window.resetAdminForm = resetAdminForm;
+        window.editAdminItem = editAdminItem;
+        window.handleAdminSaveItem = handleAdminSaveItem;
+        window.openDeleteModal = openDeleteModal;
+        window.closeDeleteModal = closeDeleteModal;
+        window.executeDelete = executeDelete;
+        window.resetDefaultItems = resetDefaultItems;
+        window.handleAdminLogin = handleAdminLogin;
+        window.adminLogout = adminLogout;
+        window.showToast = showToast;
     </script>
 </body>
 </html>
