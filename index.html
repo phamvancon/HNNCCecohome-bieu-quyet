@@ -296,7 +296,7 @@
                     <div class="space-y-1">
                         <h3 class="font-extrabold text-base text-amber-900">NỘI DUNG BIỂU QUYẾT HỘI NGHỊ 2026:</h3>
                         <p class="text-amber-800 leading-relaxed">
-                            Quý cư dân vui lòng theo dõi, đọc kỹ các nội dung Tờ trình và Kế hoạch dưới đây. Tại thời điểm tổ chức hoặc sau <strong>Hội Nghị Nhà Chung Cư 2026</strong>, cư dân có thể tiến hành biểu quyết bằng cách nhấp vào nút <strong class="text-amber-950 underline decoration-amber-500 underline-offset-2">"Mở Link Biểu Quyết"</strong> đính kèm ở từng mục.
+                            Quý cư dân vui lòng theo dõi, đọc kỹ các nội dung Tờ trình và Kế hoạch dưới đây. Tại thời điểm tổ chức hoặc sau <strong>Hội Nghị Nhà Chung Cư 2026</strong>, cư dân có thể xem chi tiết tài liệu bằng cách nhấp vào nút <strong class="text-amber-950 underline decoration-amber-500 underline-offset-2">"Mở link liên kết xem tài liệu"</strong> đính kèm ở từng mục.
                         </p>
                     </div>
                 </div>
@@ -476,12 +476,28 @@
                         </div>
 
                         <form onsubmit="handleAdminSaveItem(event)" class="space-y-4">
-                            <input type="hidden" id="adminEditItemId" value="">
+                        <input type="hidden" id="adminEditItemId" value="">
 
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tiêu Đề Mục Biểu Quyết *</label>
-                                <input type="text" id="adminItemTitle" placeholder="VD: Thông qua Báo cáo kiểm toán..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                            </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tiêu Đề Mục Biểu Quyết *</label>
+                            <input type="text" id="adminItemTitle" placeholder="VD: Thông qua Báo cáo kiểm toán..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Mô Tả Nội Dung Chi Tiết</label>
+                            <textarea id="adminItemDesc" rows="3" placeholder="Nhập tóm tắt ngắn gọn nội dung cần xin ý kiến cư dân..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Đường Link Liên Kết Xem Tài Liệu (Google Drive / Link tài liệu)</label>
+                            <input type="url" id="adminItemVoteUrl" placeholder="https://drive.google.com/file/d/..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <p class="text-[10px] text-amber-700 mt-1">*Nút "Mở link liên kết xem tài liệu" sẽ mở liên kết này.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tên Tờ Trình / File Tải Về</label>
+                            <input type="text" id="adminItemDocName" placeholder="VD: To_Trinh_So_01_Chuong_Trinh_HNNCC.pdf" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
 
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Mô Tả Nội Dung Chi Tiết</label>
@@ -781,8 +797,8 @@
                         </div>
 
                         <div class="pl-9 lg:pl-0 shrink-0">
-                            <a href="${item.voteUrl || '#'}" target="_blank" class="w-full sm:w-auto px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-pen-to-square"></i> Mở Link Biểu Quyết Mục ${itemNum} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            <a href="${item.voteUrl || item.docUrl || '#'}" target="_blank" class="w-full sm:w-auto px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-file-pdf"></i> Mở link liên kết xem tài liệu Mục ${itemNum} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                             </a>
                         </div>
                     </div>
@@ -956,7 +972,7 @@
                         </div>
                     </div>
                     <div class="text-[11px] text-slate-600 bg-white p-2.5 rounded-lg border border-slate-100 space-y-1">
-                        <p><i class="fa-solid fa-link text-brand-600 mr-1.5"></i>Link biểu quyết: <a href="${item.voteUrl || '#'}" target="_blank" class="text-brand-700 underline font-semibold truncate hover:text-brand-800">${item.voteUrl || 'Chưa cập nhật link'}</a></p>
+                        <p><i class="fa-solid fa-link text-brand-600 mr-1.5"></i>Link liên kết xem tài liệu: <a href="${item.voteUrl || '#'}" target="_blank" class="text-brand-700 underline font-semibold truncate hover:text-brand-800">${item.voteUrl || 'Chưa cập nhật link'}</a></p>
                         <p><i class="fa-solid fa-file-pdf text-rose-500 mr-1.5"></i>File đính kèm: <strong class="text-slate-800">${item.docName || 'Chưa đính kèm file'}</strong></p>
                     </div>
                 `;
