@@ -99,7 +99,7 @@
                         <i class="fa-solid fa-house"></i> Trang chủ
                     </button>
                     <button onclick="switchTab('voting')" id="tab-voting" class="nav-btn px-3.5 py-2 rounded-md whitespace-nowrap transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800">
-                        <i class="fa-solid fa-link"></i> Nội dung & Link biểu quyết <span class="bg-amber-500 text-slate-900 text-xs px-2 py-0.2 rounded-full font-bold">5 mục</span>
+                        <i class="fa-solid fa-link"></i> Nội dung & Link biểu quyết <span class="bg-amber-500 text-slate-900 text-xs px-2 py-0.2 rounded-full font-bold">11 mục</span>
                     </button>
                     <button onclick="switchTab('documents')" id="tab-documents" class="nav-btn px-3.5 py-2 rounded-md whitespace-nowrap transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800">
                         <i class="fa-solid fa-folder-open"></i> Tài liệu & Tờ trình
@@ -133,7 +133,7 @@
                 </div>
                 <div class="flex flex-wrap sm:flex-nowrap gap-3 w-full md:w-auto">
                     <button onclick="switchTab('voting')" class="flex-1 md:flex-none px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold rounded-xl text-sm shadow transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-list-check"></i> Xem Nội Dung Biểu Quyết
+                        <i class="fa-solid fa-list-check"></i> Xem 11 Nội Dung Biểu Quyết
                     </button>
                     <button onclick="switchTab('documents')" class="flex-1 md:flex-none px-4 py-2.5 bg-white text-brand-700 hover:bg-emerald-50 font-bold rounded-xl text-sm shadow transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-folder-open"></i> Tải Tài Liệu Tờ Trình
@@ -276,9 +276,9 @@
                             <i class="fa-solid fa-headset text-brand-600"></i> Hỗ trợ cư dân & Giải đáp
                         </h3>
                         <ul class="text-xs space-y-2 text-slate-600">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-phone text-slate-400"></i> Hotline BQT: <strong class="text-slate-800">0934.011.365</strong></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-phone text-slate-400"></i> Hotline BQT: <strong class="text-slate-800">0981.xxx.xxx</strong></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-building-shield text-slate-400"></i> BQL Ecohome: <strong class="text-slate-800">0256.xxx.xxx</strong></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-slate-400"></i> Email: <strong class="text-slate-800">bqtecohomenhonbinh20252028@gmail.com</strong></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-slate-400"></i> Email: <strong class="text-slate-800">bqt.ecohomenhonbinh@gmail.com</strong></li>
                         </ul>
                     </div>
                 </div>
@@ -464,11 +464,11 @@
 
                 <!-- Admin Action Tabs / Forms Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left: Add / Edit Item Form -->
+                    <!-- Left: Add / Edit Item & File Upload Form -->
                     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                         <div class="flex justify-between items-center mb-4">
                             <h4 id="adminFormHeader" class="font-bold text-slate-900 text-base flex items-center gap-2">
-                                <i class="fa-solid fa-plus-circle text-brand-600"></i> Thêm Mục Biểu Quyết Mới
+                                <i class="fa-solid fa-plus-circle text-brand-600"></i> Thêm Mục Biểu Quyết & Tài Liệu
                             </h4>
                             <button id="cancelEditBtn" onclick="resetAdminForm()" class="hidden text-xs text-slate-500 hover:text-slate-800 underline">
                                 Hủy sửa
@@ -476,28 +476,12 @@
                         </div>
 
                         <form onsubmit="handleAdminSaveItem(event)" class="space-y-4">
-                        <input type="hidden" id="adminEditItemId" value="">
+                            <input type="hidden" id="adminEditItemId" value="">
 
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tiêu Đề Mục Biểu Quyết *</label>
-                            <input type="text" id="adminItemTitle" placeholder="VD: Thông qua Báo cáo kiểm toán..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Mô Tả Nội Dung Chi Tiết</label>
-                            <textarea id="adminItemDesc" rows="3" placeholder="Nhập tóm tắt ngắn gọn nội dung cần xin ý kiến cư dân..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Đường Link Liên Kết Xem Tài Liệu (Google Drive / Link tài liệu)</label>
-                            <input type="url" id="adminItemVoteUrl" placeholder="https://drive.google.com/file/d/..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                            <p class="text-[10px] text-amber-700 mt-1">*Nút "Mở link liên kết xem tài liệu" sẽ mở liên kết này.</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tên Tờ Trình / File Tải Về</label>
-                            <input type="text" id="adminItemDocName" placeholder="VD: To_Trinh_So_01_Chuong_Trinh_HNNCC.pdf" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tiêu Đề Mục Biểu Quyết / Tài Liệu *</label>
+                                <input type="text" id="adminItemTitle" placeholder="VD: Thông qua Báo cáo kiểm toán..." required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
 
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">Mô Tả Nội Dung Chi Tiết</label>
@@ -505,19 +489,33 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Đường Link Biểu Quyết Trực Tuyến (Google Form / Link khảo sát)</label>
-                                <input type="url" id="adminItemVoteUrl" placeholder="https://forms.google.com/r/example..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                                <p class="text-[10px] text-amber-700 mt-1">*Nút "Mở Link Biểu Quyết" sẽ mở liên kết này.</p>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Đường Link Liên Kết Xem Tài Liệu (Google Drive / Cloud)</label>
+                                <input type="url" id="adminItemVoteUrl" placeholder="https://drive.google.com/file/d/..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <p class="text-[10px] text-amber-700 mt-1">*Nút "Mở link liên kết xem tài liệu" sẽ mở liên kết này.</p>
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tên Tờ Trình / File Tải Về</label>
-                                <input type="text" id="adminItemDocName" placeholder="VD: To_Trinh_So_01_Chuong_Trinh_HNNCC.pdf" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                            </div>
+                            <!-- Upload & Attach File Section -->
+                            <div class="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/80 space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <label class="block text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-file-arrow-up text-amber-600"></i> Upload / Đính Kèm Tờ Trình (PDF/DOCX)
+                                    </label>
+                                    <span id="fileStatusBadge" class="hidden text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-md">Đã nạp file</span>
+                                </div>
 
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Đường Link File Đính Kèm (PDF / Drive / DOCX)</label>
-                                <input type="text" id="adminItemDocUrl" placeholder="https://drive.google.com/... hoặc link file" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <div>
+                                    <input type="file" id="adminItemFileInput" onchange="handleAdminFileUpload(event)" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-900 hover:file:bg-amber-600 cursor-pointer">
+                                </div>
+
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">Tên Tờ Trình Hiển Thị</label>
+                                    <input type="text" id="adminItemDocName" placeholder="VD: To_Trinh_So_01_Chuong_Trinh_HNNCC.pdf" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                                </div>
+
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">Link File Tải Về Trực Tiếp (DataURL / Direct Link)</label>
+                                    <input type="text" id="adminItemDocUrl" placeholder="https://drive.google.com/... hoặc link trực tiếp" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                                </div>
                             </div>
 
                             <div class="pt-2 flex gap-2">
@@ -986,6 +984,41 @@
             if (titleInput) titleInput.focus();
         }
 
+        function handleAdminFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const nameInput = document.getElementById('adminItemDocName');
+            const urlInput = document.getElementById('adminItemDocUrl');
+            const statusBadge = document.getElementById('fileStatusBadge');
+
+            if (nameInput && !nameInput.value) {
+                nameInput.value = file.name;
+            } else if (nameInput) {
+                nameInput.value = file.name;
+            }
+
+            // If file size is reasonable (< 1.5MB), read as DataURL so residents can open/download directly
+            if (file.size <= 1500000) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    if (urlInput) urlInput.value = evt.target.result;
+                    if (statusBadge) {
+                        statusBadge.innerText = `Đã nạp file (${(file.size / 1024).toFixed(0)} KB)`;
+                        statusBadge.classList.remove('hidden');
+                    }
+                    showToast(`Đã đọc file "${file.name}" thành công!`);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                if (statusBadge) {
+                    statusBadge.innerText = "File lớn - hãy dùng link Drive";
+                    statusBadge.classList.remove('hidden');
+                }
+                showToast("File lớn (>1.5MB). Vui lòng dán link Google Drive/Cloud vào ô bên dưới!", "warning");
+            }
+        }
+
         function resetAdminForm() {
             document.getElementById('adminEditItemId').value = '';
             document.getElementById('adminItemTitle').value = '';
@@ -994,7 +1027,13 @@
             document.getElementById('adminItemDocName').value = '';
             document.getElementById('adminItemDocUrl').value = '';
 
-            document.getElementById('adminFormHeader').innerHTML = `<i class="fa-solid fa-plus-circle text-brand-600"></i> Thêm Mục Biểu Quyết Mới`;
+            const fileInput = document.getElementById('adminItemFileInput');
+            if (fileInput) fileInput.value = '';
+
+            const statusBadge = document.getElementById('fileStatusBadge');
+            if (statusBadge) statusBadge.classList.add('hidden');
+
+            document.getElementById('adminFormHeader').innerHTML = `<i class="fa-solid fa-plus-circle text-brand-600"></i> Thêm Mục Biểu Quyết & Tài Liệu`;
             document.getElementById('adminSubmitBtnText').innerText = 'Thêm Mục Mới';
             document.getElementById('cancelEditBtn').classList.add('hidden');
         }
@@ -1010,7 +1049,17 @@
             document.getElementById('adminItemDocName').value = item.docName || '';
             document.getElementById('adminItemDocUrl').value = item.docUrl || '';
 
-            document.getElementById('adminFormHeader').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> Chỉnh Sửa Mục Biểu Quyết`;
+            const statusBadge = document.getElementById('fileStatusBadge');
+            if (statusBadge) {
+                if (item.docName || item.docUrl) {
+                    statusBadge.innerText = "Có tài liệu đính kèm";
+                    statusBadge.classList.remove('hidden');
+                } else {
+                    statusBadge.classList.add('hidden');
+                }
+            }
+
+            document.getElementById('adminFormHeader').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> Sửa Mục Biểu Quyết & File Tài Liệu`;
             document.getElementById('adminSubmitBtnText').innerText = 'Lưu Thay Đổi Cloud';
             document.getElementById('cancelEditBtn').classList.remove('hidden');
 
@@ -1165,6 +1214,7 @@
         window.renderDocuments = renderDocuments;
         window.renderAdminControls = renderAdminControls;
         window.prepareAddNewItem = prepareAddNewItem;
+        window.handleAdminFileUpload = handleAdminFileUpload;
         window.resetAdminForm = resetAdminForm;
         window.editAdminItem = editAdminItem;
         window.handleAdminSaveItem = handleAdminSaveItem;
