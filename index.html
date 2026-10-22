@@ -1886,32 +1886,103 @@
             return clean;
         }
 
-        window.normalizePhone = function(str) {
+        /* Chuẩn hóa một số điện thoại đơn lẻ */
+        window.normalizeSinglePhone = function(str) {
             if (!str) return '';
             let p = str.toString().trim();
+
+            // Xử lý định dạng khoa học từ Excel nếu có (ví dụ 9.81234E+08 hoặc 8.4934E+10)
+            if (/[eE][+-]?\d+/.test(p)) {
+                try {
+                    const num = Number(p);
+                    if (!isNaN(num)) p = BigInt(Math.round(num)).toString();
+                } catch (e) {}
+            }
+
             // Xử lý số thực từ Excel nếu bị đọc dạng 84934011365.0
             p = p.replace(/\.0+$/, '');
-            // Xóa khoảng trắng và các ký tự phân cách thường gặp
+            // Xóa khoảng trắng và các ký tự phân cách
             p = p.replace(/[\s\-_.\(\)]/g, '');
-            // Nhận diện và chuyển đổi đầu +84 hoặc 84 thành 0
+
+            // Nhận diện và chuyển đổi đầu +84 hoặc 84 hoặc 840 thành 0
             if (p.startsWith('+84')) {
                 p = '0' + p.slice(3);
+            } else if (p.startsWith('840') && p.length >= 12) {
+                p = p.slice(2);
             } else if (p.startsWith('84') && p.length >= 11) {
                 p = '0' + p.slice(2);
             }
+
             // Chỉ giữ lại các chữ số
             p = p.replace(/[^\d]/g, '');
-            // Tự động thêm số 0 ở đầu nếu là số di động 9 chữ số bị khuyết 0
+
+            // Tự động thêm số 0 ở đầu nếu là số di động 9 chữ số bị Excel lược bỏ số 0
             if (p.length === 9 && !p.startsWith('0')) {
                 p = '0' + p;
             }
             return p;
         };
+
+        /* Tách danh sách số điện thoại nếu 1 ô có nhiều số (phân cách bởi / , ; - hoặc chữ vợ/chồng) */
+        window.extractPhoneList = function(str) {
+            if (!str) return [];
+            const text = str.toString();
+            // Tách theo các ký tự phân cách thông dụng
+            const parts = text.split(/[\/,;\n|]|(?:\s+-\s+)|(?:\s+(?:hoac|hoặc|va|và|&)\s+)/i);
+            const result = [];
+            for (let part of parts) {
+                const clean = window.normalizeSinglePhone(part);
+                if (clean && clean.length >= 9 && clean.length <= 12) {
+                    if (!result.includes(clean)) result.push(clean);
+                }
+            }
+            // Nếu không tách được theo ký tự phân cách, tìm các chuỗi số 9-11 chữ số
+            if (result.length === 0) {
+                const matches = text.match(/(?:\+?84|0)?[1-9]\d{8,9}/g);
+                if (matches) {
+                    for (let m of matches) {
+                        const clean = window.normalizeSinglePhone(m);
+                        if (clean && !result.includes(clean)) result.push(clean);
+                    }
+                }
+            }
+            return result;
+        };
+
+        window.normalizePhone = function(str) {
+            if (!str) return '';
+            const list = window.extractPhoneList(str);
+            if (list.length > 0) {
+                return list.join(' / ');
+            }
+            return window.normalizeSinglePhone(str);
+        };
         const normalizePhone = window.normalizePhone;
+
+        /* Kiểm tra đối soát số điện thoại người dùng nhập với dữ liệu đã lưu */
+        window.isPhoneMatch = function(inputPhone, dbPhone) {
+            if (!inputPhone || !dbPhone) return false;
+            const cleanInput = window.normalizeSinglePhone(inputPhone);
+            if (!cleanInput) return false;
+
+            const dbPhones = window.extractPhoneList(dbPhone);
+            if (dbPhones.includes(cleanInput)) return true;
+
+            const cleanDb = dbPhone.toString().replace(/[^\d]/g, '');
+            const cleanIn = cleanInput.replace(/[^\d]/g, '');
+            if (cleanDb.includes(cleanIn)) return true;
+            if (cleanIn.startsWith('0') && cleanDb.includes(cleanIn.slice(1))) return true;
+
+            return false;
+        };
 
         function maskPhone(p) {
             if (!p) return '***';
-            const s = normalizePhone(p);
+            const phones = window.extractPhoneList(p);
+            if (phones.length > 0) {
+                return phones.map(ph => ph.length >= 6 ? ph.substring(0, 3) + '****' + ph.substring(ph.length - 3) : ph).join(' / ');
+            }
+            const s = window.normalizeSinglePhone(p);
             if (s.length < 6) return s;
             return s.substring(0, 3) + '****' + s.substring(s.length - 3);
         }
@@ -2002,10 +2073,9 @@
             }
 
             const targetRoom = normalizeRoom(roomInput);
-            const targetPhone = normalizePhone(phoneInput);
 
             const match = state.residentsList.find(r => 
-                normalizeRoom(r.room) === targetRoom && normalizePhone(r.phone) === targetPhone
+                normalizeRoom(r.room) === targetRoom && window.isPhoneMatch(phoneInput, r.phone)
             );
 
             if (match) {
@@ -2036,10 +2106,9 @@
             }
 
             const targetRoom = normalizeRoom(room);
-            const targetPhone = normalizePhone(phone);
 
             const match = state.residentsList.find(r => 
-                normalizeRoom(r.room) === targetRoom && normalizePhone(r.phone) === targetPhone
+                normalizeRoom(r.room) === targetRoom && window.isPhoneMatch(phone, r.phone)
             );
 
             if (match) {
@@ -2974,6 +3043,7 @@
                         return str.toString()
                             .normalize('NFD')
                             .replace(/[\u0300-\u036f]/g, '')
+                            .replace(/[đĐ]/g, 'd')
                             .toLowerCase()
                             .trim();
                     }
@@ -2981,6 +3051,7 @@
                     // Tự động tìm sheet chứa dữ liệu danh sách căn hộ
                     let targetSheet = null;
                     let targetJson = [];
+                    let targetJsonRaw = [];
 
                     for (const sName of workbook.SheetNames) {
                         const ws = workbook.Sheets[sName];
@@ -2988,9 +3059,10 @@
                         if (rows && rows.length >= 2) {
                             const sampleText = rows.slice(0, 15).map(r => r.join(' ')).join(' ');
                             const sampleNorm = removeAccents(sampleText);
-                            if (sampleNorm.includes('can') || sampleNorm.includes('dien thoai') || sampleNorm.includes('so huu') || sampleNorm.includes('sdt')) {
+                            if (sampleNorm.includes('can') || sampleNorm.includes('dien thoai') || sampleNorm.includes('so huu') || sampleNorm.includes('sdt') || sampleNorm.includes('dt')) {
                                 targetSheet = ws;
                                 targetJson = rows;
+                                targetJsonRaw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: true });
                                 break;
                             }
                         }
@@ -2999,6 +3071,7 @@
                     if (!targetSheet) {
                         targetSheet = workbook.Sheets[workbook.SheetNames[0]];
                         targetJson = XLSX.utils.sheet_to_json(targetSheet, { header: 1, defval: '', raw: false });
+                        targetJsonRaw = XLSX.utils.sheet_to_json(targetSheet, { header: 1, defval: '', raw: true });
                     }
 
                     if (!targetJson || targetJson.length < 2) {
@@ -3027,24 +3100,60 @@
 
                     let colRoom = rawHeaders.findIndex(h => h.includes('ma can') || h.includes('can ho') || h.includes('so can') || h === 'can');
                     let colName = rawHeaders.findIndex(h => h.includes('chu so huu') || h.includes('ho ten') || h.includes('chu ho') || h.includes('ten chu') || h.includes('ho va ten'));
-                    let colArea = rawHeaders.findIndex(h => h.includes('dien tich') || h.includes('m2') || h.includes('dt'));
+                    let colArea = rawHeaders.findIndex(h => h.includes('dien tich') || h.includes('m2'));
                     let colNation = rawHeaders.findIndex(h => h.includes('quoc tich') || h.includes('nationality'));
                     let colGender = rawHeaders.findIndex(h => h.includes('gioi tinh') || h.includes('gender'));
-                    let colPhone = rawHeaders.findIndex(h => h.includes('dien thoai') || h.includes('sdt') || h.includes('so dien thoai') || h.includes('phone') || h.includes('mobile'));
+                    let colPhone = rawHeaders.findIndex(h => 
+                        h.includes('dien thoai') || 
+                        h.includes('sdt') || 
+                        h.includes('phone') || 
+                        h.includes('mobile') || 
+                        h.includes('tel') || 
+                        h.includes('so dt') || 
+                        h.includes('di dong') || 
+                        h.includes('lien he')
+                    );
                     let colRelation = rawHeaders.findIndex(h => h.includes('qh voi ch') || h.includes('quan he') || h.includes('qh') || h.includes('quan he voi'));
 
-                    // Fallback theo vị trí nếu không nhận diện được tiêu đề
+                    // Nếu colArea chưa nhận dạng được thì kiểm tra từ khóa ngắn hơn
+                    if (colArea === -1) {
+                        colArea = rawHeaders.findIndex(h => h === 'dt' || h.includes('dien tich'));
+                    }
+
+                    // Nhận diện thông minh tự động (Smart Auto-Detection) cho cột Số Điện Thoại nếu tiêu đề không khớp
+                    if (colPhone === -1) {
+                        let maxPhoneScore = 0;
+                        let bestCol = -1;
+                        const numCols = targetJson[headerIdx].length;
+                        for (let c = 0; c < numCols; c++) {
+                            if (c === colRoom || c === colName || c === colArea) continue;
+                            let score = 0;
+                            for (let r = headerIdx + 1; r < Math.min(headerIdx + 20, targetJson.length); r++) {
+                                const val = (targetJson[r] && targetJson[r][c] !== undefined) ? targetJson[r][c].toString() : '';
+                                const digits = val.replace(/[^\d]/g, '');
+                                if (digits.length >= 9 && digits.length <= 12) score++;
+                            }
+                            if (score > maxPhoneScore) {
+                                maxPhoneScore = score;
+                                bestCol = c;
+                            }
+                        }
+                        if (bestCol !== -1 && maxPhoneScore >= 2) {
+                            colPhone = bestCol;
+                        }
+                    }
+
+                    // Fallback theo vị trí thông dụng nếu vẫn chưa tìm thấy
                     if (colRoom === -1) colRoom = 0;
                     if (colName === -1 && targetJson[headerIdx].length > 1) colName = 1;
                     if (colArea === -1 && targetJson[headerIdx].length > 2) colArea = 2;
-                    if (colPhone === -1) {
-                        colPhone = rawHeaders.findIndex((_, idx) => idx !== colRoom && idx !== colName && idx !== colArea);
-                    }
+                    if (colPhone === -1 && targetJson[headerIdx].length > 5) colPhone = 5;
 
                     const parsedResidents = [];
 
                     for (let r = headerIdx + 1; r < targetJson.length; r++) {
                         const row = targetJson[r];
+                        const rowRaw = targetJsonRaw[r] || [];
                         if (!row || row.length === 0) continue;
 
                         let room = colRoom !== -1 ? row[colRoom] : (row[0] || row[1]);
@@ -3072,11 +3181,20 @@
                         let gender = colGender !== -1 ? row[colGender] : '';
                         gender = gender ? gender.toString().trim() : '';
 
-                        let rawPhone = colPhone !== -1 ? row[colPhone] : '';
-                        let phoneStr = '';
-                        if (rawPhone !== undefined && rawPhone !== null && rawPhone !== '') {
-                            phoneStr = normalizePhone(rawPhone);
+                        // Xử lý đọc số điện thoại: kết hợp chuỗi formatted và giá trị số raw
+                        let rawPhoneStr = colPhone !== -1 ? (row[colPhone] !== undefined ? row[colPhone].toString().trim() : '') : '';
+                        let rawPhoneNum = (colPhone !== -1 && rowRaw) ? rowRaw[colPhone] : null;
+
+                        // Nếu chuỗi formatted bị dạng khoa học hoặc rỗng nhưng raw là số nguyên/float
+                        if ((/[eE][+-]?\d+/.test(rawPhoneStr) || !rawPhoneStr) && typeof rawPhoneNum === 'number') {
+                            try {
+                                rawPhoneStr = BigInt(Math.round(rawPhoneNum)).toString();
+                            } catch (e) {
+                                rawPhoneStr = Math.round(rawPhoneNum).toString();
+                            }
                         }
+
+                        let phoneStr = normalizePhone(rawPhoneStr);
 
                         let relation = colRelation !== -1 ? row[colRelation] : 'Chủ hộ';
                         relation = relation ? relation.toString().trim() : 'Chủ hộ';
