@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hội Nghi Nhà Chung Cư Thường Niên 2026 - Ecohome Nhơn Bình</title>
+    <title>Hội Nghị Nhà Chung Cư Thường Niên 2026 - Ecohome Nhơn Bình</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (xlsx) for processing Excel Resident List -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -59,7 +61,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-    <!-- Navigation Header -->
     <header class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -85,7 +86,7 @@
                     </div>
                     <div class="bg-amber-50 text-amber-900 px-3 py-1.5 rounded-lg text-xs font-semibold border border-amber-300 flex items-center gap-2">
                         <i class="fa-solid fa-building-user text-amber-600"></i>
-                        <span>By PVC - BQT Ecohome Nhơn Bình</span>
+                        <span>By N&H Real Estate Management</span>
                     </div>
                 </div>
             </div>
@@ -100,6 +101,9 @@
                     </button>
                     <button onclick="switchTab('voting')" id="tab-voting" class="nav-btn px-3.5 py-2 rounded-md whitespace-nowrap transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800">
                         <i class="fa-solid fa-link"></i> Nội dung & Link biểu quyết
+                    </button>
+                    <button onclick="switchTab('evaluation')" id="tab-evaluation" class="nav-btn px-3.5 py-2 rounded-md whitespace-nowrap transition flex items-center gap-2 text-amber-300 hover:text-white hover:bg-slate-800 border border-amber-500/30">
+                        <i class="fa-solid fa-star"></i> Đánh giá BQL (Xác thực SĐT)
                     </button>
                     <button onclick="switchTab('documents')" id="tab-documents" class="nav-btn px-3.5 py-2 rounded-md whitespace-nowrap transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800">
                         <i class="fa-solid fa-folder-open"></i> Tài liệu & Tờ trình
@@ -143,7 +147,7 @@
                         <i class="fa-solid fa-chart-pie text-amber-300"></i> Xem % Tham Gia Trực Tiến <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
                     </a>
                     <button onclick="switchTab('voting')" class="flex-1 md:flex-none px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold rounded-xl text-sm shadow transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-list-check"></i> Xem Nội Dung
+                        <i class="fa-solid fa-list-check"></i> Xem 11 Nội Dung
                     </button>
                 </div>
             </div>
@@ -166,6 +170,8 @@
                         </div>
                         <h3 class="text-lg font-bold text-white mt-1">Số Lượng & Tỷ Lệ Cư Dân Tham Gia Trực Tiến</h3>
                         <p class="text-xs text-slate-300 mt-0.5">
+                            Hiện tại: <strong id="livePercentText" class="text-amber-400 font-extrabold text-sm">80.3%</strong> (<span id="liveCountText" class="font-semibold text-emerald-300">482 / 600</span> căn hộ tham dự)
+                        </p>
                     </div>
                 </div>
                 <div class="w-full md:w-auto shrink-0">
@@ -195,7 +201,7 @@
                     </div>
                     <h3 class="font-bold text-slate-800 text-base">Địa điểm tổ chức</h3>
                     <p class="text-sm text-slate-700 mt-1 font-medium">Phòng Sinh hoạt cộng đồng Chung cư Ecohome Nhơn Bình</p>
-                    <span class="inline-block mt-3 text-xs bg-emerald-100 text-brand-700 font-semibold px-2.5 py-1 rounded-md">Trực tiếp & Biểu quyết Online</span>
+                    <span class="inline-block mt-3 text-xs bg-emerald-100 text-brand-700 font-semibold px-2.5 py-1 rounded-md">Trực tiếp & Theo dõi Online</span>
                 </div>
 
                 <!-- Info Box 3 -->
@@ -203,8 +209,8 @@
                     <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl mb-3">
                         <i class="fa-solid fa-building-shield"></i>
                     </div>
-                    <h3 class="font-bold text-slate-800 text-base">Đơn vị tổ chức</h3>
-                    <p class="text-sm font-bold text-slate-900 mt-1">NMH Real Estate Management</p>
+                    <h3 class="font-bold text-slate-800 text-base">Đơn vị vận hành</h3>
+                    <p class="text-sm font-bold text-slate-900 mt-1">N&H Real Estate Management</p>
                     <p class="text-xs text-slate-500">Ban Quản Trị & Ban Quản Lý Chung cư</p>
                     <span class="inline-block mt-3 text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-md">Quản lý & Vận hành</span>
                 </div>
@@ -227,8 +233,8 @@
                             <div class="w-7 h-7 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center ring-4 ring-white z-10 shrink-0">1</div>
                             <div class="bg-slate-50 rounded-xl p-3.5 flex-grow border border-slate-100">
                                 <span class="text-xs font-semibold text-brand-600">07:30 - 08:30</span>
-                                <h4 class="font-bold text-slate-800 text-sm mt-0.5">Đón tiếp Đại biểu, Chủ sở hữu & Kiểm tra căn cước / Điểm danh</h4>
-                                <p class="text-xs text-slate-500 mt-1">Xác minh tỷ lệ quyền biểu quyết & phát phiếu / hướng dẫn app biểu quyết online.</p>
+                                <h4 class="font-bold text-slate-800 text-sm mt-0.5">Đón tiếp Đại biểu, Chủ sở hữu & Kiểm tra căn cước</h4>
+                                <p class="text-xs text-slate-500 mt-1">Xác minh tỷ lệ quyền biểu quyết & phát tài liệu hội nghị.</p>
                             </div>
                         </div>
                         <!-- Item 2 -->
@@ -236,7 +242,7 @@
                             <div class="w-7 h-7 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center ring-4 ring-white z-10 shrink-0">2</div>
                             <div class="bg-slate-50 rounded-xl p-3.5 flex-grow border border-slate-100">
                                 <span class="text-xs font-semibold text-brand-600">08:30 - 08:45</span>
-                                <h4 class="font-bold text-slate-800 text-sm mt-0.5">Tuyên bố lý do, Giới thiệu Đại biểu & Báo cáo số lượng tham dự</h4>
+                                <h4 class="font-bold text-slate-800 text-sm mt-0.5">Chào cờ, Tuyên bố lý do, Giới thiệu Đại biểu & Báo cáo số lượng tham dự</h4>
                                 <p class="text-xs text-slate-500 mt-1">Thông qua Chương trình & Quy chế làm việc của Hội nghị 2026.</p>
                             </div>
                         </div>
@@ -263,8 +269,8 @@
                             <div class="w-7 h-7 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center ring-4 ring-white z-10 shrink-0">5</div>
                             <div class="bg-slate-50 rounded-xl p-3.5 flex-grow border border-slate-100">
                                 <span class="text-xs font-semibold text-brand-600">10:30 - 11:15</span>
-                                <h4 class="font-bold text-slate-800 text-sm mt-0.5">Tiến hành Biểu quyết trực tiếp & Trực tuyến Nội dung Hội nghị</h4>
-                                <p class="text-xs text-slate-500 mt-1">Ban kiểm phiếu công bố kết quả biểu quyết tự động thông qua phần mềm.</p>
+                                <h4 class="font-bold text-slate-800 text-sm mt-0.5">Tiến hành Biểu quyết 11 Nội dung Hội nghị</h4>
+                                <p class="text-xs text-slate-500 mt-1">Cư dân theo dõi và biểu quyết theo link chính thức tại hội nghị.</p>
                             </div>
                         </div>
                         <!-- Item 6 -->
@@ -297,7 +303,7 @@
                             </div>
                         </div>
                         <button onclick="switchTab('voting')" class="mt-4 w-full py-2 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-xs rounded-lg transition text-center">
-                            Xem chi tiết & Biểu quyết
+                            Xem chi tiết & Link tài liệu
                         </button>
                     </div>
 
@@ -307,9 +313,9 @@
                             <i class="fa-solid fa-headset text-brand-600"></i> Hỗ trợ cư dân & Giải đáp
                         </h3>
                         <ul class="text-xs space-y-2 text-slate-600">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-phone text-slate-400"></i> Hotline BQT: <strong class="text-slate-800">0934.011.365</strong></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-phone text-slate-400"></i> Hotline BQT: <strong class="text-slate-800">0981.xxx.xxx</strong></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-building-shield text-slate-400"></i> BQL Ecohome: <strong class="text-slate-800">0256.xxx.xxx</strong></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-slate-400"></i> Email: <strong class="text-slate-800">bqtecohomenhonbinh20252028@gmail.com</strong></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-slate-400"></i> Email: <strong class="text-slate-800">bqt.ecohomenhonbinh@gmail.com</strong></li>
                         </ul>
                     </div>
                 </div>
@@ -318,6 +324,44 @@
 
         <!-- TAB 2: VOTING CONTENT & INSTRUCTION LINKS -->
         <div id="content-voting" class="tab-content hidden space-y-6">
+            <!-- Resident Verification Status Card for Voting -->
+            <div id="votingVerificationBox" class="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white rounded-2xl p-5 shadow-md border border-emerald-500/30">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500 text-slate-950">
+                            <i class="fa-solid fa-user-check"></i> Xác thực Quyền Biểu Quyết
+                        </div>
+                        <h3 class="text-base sm:text-lg font-bold">Kiểm Tra Tư Cách Tham Gia Biểu Quyết</h3>
+                        <p id="votingAuthSummaryText" class="text-xs text-emerald-200">
+                            Vui lòng nhập Mã căn hộ và Số điện thoại đã đăng ký để kiểm tra tư cách hợp lệ trước khi biểu quyết.
+                        </p>
+                    </div>
+
+                    <div id="votingAuthActionArea" class="w-full md:w-auto">
+                        <!-- Unverified Form -->
+                        <form id="votingQuickVerifyForm" onsubmit="handleVotingQuickVerify(event)" class="flex flex-wrap sm:flex-nowrap gap-2">
+                            <input type="text" id="voteQuickRoom" placeholder="Mã Căn (VD: A-08.15)" required class="px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-xs font-bold text-white placeholder-emerald-200/60 focus:bg-white focus:text-slate-900 focus:outline-none uppercase w-full sm:w-36">
+                            <input type="tel" id="voteQuickPhone" placeholder="Số điện thoại" required class="px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-xs font-bold text-white placeholder-emerald-200/60 focus:bg-white focus:text-slate-900 focus:outline-none w-full sm:w-36">
+                            <button type="submit" class="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+                                <i class="fa-solid fa-shield-halved"></i> Xác thực
+                            </button>
+                        </form>
+
+                        <!-- Verified Badge (Hidden initially) -->
+                        <div id="votingVerifiedBadge" class="hidden flex items-center gap-3 bg-emerald-500/20 border border-emerald-400/50 p-3 rounded-xl">
+                            <div class="w-9 h-9 rounded-lg bg-emerald-500 text-slate-950 flex items-center justify-center text-lg font-bold shrink-0">
+                                <i class="fa-solid fa-check-double"></i>
+                            </div>
+                            <div>
+                                <p id="votingVerifiedOwnerName" class="text-xs font-extrabold text-emerald-300">Căn: A-08.15 - Nguyễn Văn Hùng</p>
+                                <p id="votingVerifiedAreaRatio" class="text-[11px] text-emerald-100">Tư cách: Hợp lệ | Diện tích: 68.5 m² (0.16%)</p>
+                            </div>
+                            <button type="button" onclick="resetVotingVerification()" class="ml-2 text-[10px] text-amber-300 underline hover:text-white">Đổi căn</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Voting Header Notice -->
             <div class="bg-amber-50 border border-amber-300 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs sm:text-sm text-amber-950 shadow-sm">
                 <div class="flex items-start gap-3">
@@ -325,9 +369,9 @@
                         <i class="fa-solid fa-clipboard-list"></i>
                     </div>
                     <div class="space-y-1">
-                        <h3 class="font-extrabold text-base text-amber-900">NỘI DUNG BIỂU QUYẾT HỘI NGHỊ 2026:</h3>
+                        <h3 class="font-extrabold text-base text-amber-900">11 NỘI DUNG BIỂU QUYẾT HỘI NGHỊ 2026:</h3>
                         <p class="text-amber-800 leading-relaxed">
-                            Quý cư dân vui lòng theo dõi, đọc kỹ các nội dung Tờ trình và Kế hoạch dưới đây. Tại thời điểm tổ chức hoặc sau <strong>Hội Nghị Nhà Chung Cư 2026</strong>, cư dân có thể xem chi tiết tài liệu bằng cách nhấp vào nút <strong class="text-amber-950 underline decoration-amber-500 underline-offset-2">"Mở link liên kết xem tài liệu"</strong> đính kèm ở từng mục.
+                            Quý cư dân vui lòng theo dõi, đọc kỹ các nội dung Tờ trình dưới đây. Tại thời điểm diễn ra Hội nghị, cư dân nhấp vào nút <strong class="text-amber-950 underline decoration-amber-500 underline-offset-2">"Mở link liên kết xem tài liệu"</strong> để xem chi tiết tài liệu và biểu quyết.
                         </p>
                     </div>
                 </div>
@@ -336,6 +380,261 @@
             <!-- List of 11 Voting Items with Attached Links -->
             <div id="votingItemsContainer" class="space-y-4">
                 <!-- Javascript will dynamically render 11 items with attached links here -->
+            </div>
+        </div>
+
+        <!-- TAB NEW: EVALUATION & DETAILED ANALYTICS FOR MANAGEMENT BOARD (BQL) -->
+        <div id="content-evaluation" class="tab-content hidden space-y-6">
+            <!-- Header Info Banner -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
+                <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                        <span class="px-3 py-1 bg-amber-400 text-slate-900 font-extrabold rounded-full text-xs inline-flex items-center gap-1.5 mb-2">
+                            <i class="fa-solid fa-shield-halved"></i> Khảo Sát & Đánh Giá Chất Lượng Vận Hành BQL
+                        </span>
+                        <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">ĐÁNH GIÁ ĐƠN VỊ QUẢN LÝ VẬN HÀNH (BQL)</h2>
+                        <p class="text-xs text-indigo-200 mt-1">Đánh giá chuyên nghiệp theo 6 tiêu chuẩn Hợp đồng dịch vụ quản lý vận hành chung cư hiện hành. Yêu cầu xác thực SĐT chủ sở hữu.</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/10 p-3 rounded-xl border border-white/15">
+                        <i class="fa-solid fa-user-check text-emerald-400 text-2xl"></i>
+                        <div class="text-xs">
+                            <p class="font-bold text-white">Bảo mật & Xác thực:</p>
+                            <p class="text-slate-300">Khớp dữ liệu Chủ hộ / SĐT</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Column: Step 1 Verification & Step 2 Evaluation Form (5 Cols) -->
+                <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
+                    <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                        <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-user text-brand-600"></i> Phiếu Đánh Giá Hợp Đồng Vận Hành
+                        </h3>
+                        <span id="verifyBadgeStatus" class="text-[11px] bg-amber-100 text-amber-800 font-bold px-2.5 py-0.5 rounded-full">Bước 1: Xác thực SĐT</span>
+                    </div>
+
+                    <!-- STEP 1: RESIDENT PHONE VERIFICATION FORM -->
+                    <div id="verifySection" class="space-y-4">
+                        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed">
+                            <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i> Để đảm bảo tính khách quan và đúng quy định, quý cư dân vui lòng nhập chính xác <strong>Mã căn hộ</strong>, <strong>Họ tên chủ hộ</strong> và <strong>Số điện thoại</strong> đã đăng ký trong hồ sơ quản lý chung cư để hệ thống xác thực.
+                        </div>
+
+                        <form onsubmit="handleResidentVerify(event)" class="space-y-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Mã Căn Hộ *</label>
+                                <input type="text" id="verifyRoom" placeholder="VD: A-08.15" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Họ Tên Chủ Sở Hữu *</label>
+                                <input type="text" id="verifyName" placeholder="VD: Nguyễn Văn Hùng" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Số Điện Thoại Đăng Ký (SĐT nhận mã) *</label>
+                                <input type="tel" id="verifyPhone" placeholder="VD: 0981234567" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-extrabold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-shield-check"></i> XÁC THỰC THÔNG TIN & MỞ PHIẾU ĐÁNH GIÁ
+                            </button>
+                        </form>
+                        <p id="verifyErrorMsg" class="text-xs text-rose-600 font-semibold text-center hidden"></p>
+                    </div>
+
+                    <!-- STEP 2: RATING FORM (Hidden until verified) -->
+                    <form id="evaluationForm" onsubmit="handleEvaluationSubmit(event)" class="space-y-4 hidden">
+                        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-between text-xs text-emerald-900">
+                            <div>
+                                <span class="font-bold block text-emerald-800"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Đã xác thực thành công!</span>
+                                <span id="verifiedOwnerInfo" class="text-[11px] text-emerald-700">Căn hộ: A-08.15 - Chủ hộ: Nguyễn Văn Hùng</span>
+                            </div>
+                            <button type="button" onclick="resetVerification()" class="text-[10px] bg-white border border-emerald-300 text-emerald-800 font-bold px-2 py-1 rounded hover:bg-emerald-100 transition">Đổi căn hộ</button>
+                        </div>
+
+                        <!-- Period Selector -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Kỳ Đánh Giá Hợp Đồng *</label>
+                            <select id="evalPeriod" onchange="updateEvalPeriodLabel()" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <option value="Q1-2026">Đánh giá Quý 1 / 2026</option>
+                                <option value="Q2-2026">Đánh giá Quý 2 / 2026</option>
+                                <option value="Q3-2026">Đánh giá Quý 3 / 2026</option>
+                                <option value="Q4-2026">Đánh giá Quý 4 / 2026</option>
+                                <option value="YEAR-2025">Đánh giá Cả Năm 2025</option>
+                                <option value="YEAR-2026" selected>Đánh giá Cả Năm 2026 (Thường niên)</option>
+                            </select>
+                        </div>
+
+                        <!-- 6 Standard Contract Criteria (Star Ratings) -->
+                        <div class="space-y-3 pt-1">
+                            <span class="block text-xs font-bold text-slate-800 border-b border-slate-100 pb-1">
+                                Đánh giá 6 Tiêu chuẩn Vận hành (1 <i class="fa-solid fa-star text-amber-400"></i> Kém → 5 <i class="fa-solid fa-star text-amber-400"></i> Rất tốt)
+                            </span>
+
+                            <!-- Criterion 1 -->
+                            <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800">1. An ninh & Kiểm soát ra vào</h4>
+                                    <p class="text-[10px] text-slate-500">Tuần tra hầm, kiểm soát khách & thẻ thang máy</p>
+                                </div>
+                                <div class="star-rating flex items-center gap-1" data-criterion="c1">
+                                    <button type="button" onclick="setRating('c1', 1)" class="star-btn-c1 text-lg text-slate-300 hover:text-amber-400 transition" data-star="1"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c1', 2)" class="star-btn-c1 text-lg text-slate-300 hover:text-amber-400 transition" data-star="2"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c1', 3)" class="star-btn-c1 text-lg text-slate-300 hover:text-amber-400 transition" data-star="3"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c1', 4)" class="star-btn-c1 text-lg text-amber-400 transition" data-star="4"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c1', 5)" class="star-btn-c1 text-lg text-amber-400 transition" data-star="5"><i class="fa-solid fa-star"></i></button>
+                                    <span id="score-c1-text" class="text-xs font-bold text-amber-600 ml-1.5 w-6">5/5</span>
+                                </div>
+                            </div>
+
+                            <!-- Criterion 2 -->
+                            <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800">2. Vệ sinh môi trường & Cảnh quan</h4>
+                                    <p class="text-[10px] text-slate-500">Sạch sẽ sảnh, hành lang, thu gom rác & cây xanh</p>
+                                </div>
+                                <div class="star-rating flex items-center gap-1" data-criterion="c2">
+                                    <button type="button" onclick="setRating('c2', 1)" class="star-btn-c2 text-lg text-slate-300 hover:text-amber-400 transition" data-star="1"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c2', 2)" class="star-btn-c2 text-lg text-slate-300 hover:text-amber-400 transition" data-star="2"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c2', 3)" class="star-btn-c2 text-lg text-slate-300 hover:text-amber-400 transition" data-star="3"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c2', 4)" class="star-btn-c2 text-lg text-amber-400 transition" data-star="4"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c2', 5)" class="star-btn-c2 text-lg text-amber-400 transition" data-star="5"><i class="fa-solid fa-star"></i></button>
+                                    <span id="score-c2-text" class="text-xs font-bold text-amber-600 ml-1.5 w-6">5/5</span>
+                                </div>
+                            </div>
+
+                            <!-- Criterion 3 -->
+                            <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800">3. Vận hành & Bảo trì kỹ thuật</h4>
+                                    <p class="text-[10px] text-slate-500">Thang máy, PCCC, bơm nước, điện chiếu sáng chung</p>
+                                </div>
+                                <div class="star-rating flex items-center gap-1" data-criterion="c3">
+                                    <button type="button" onclick="setRating('c3', 1)" class="star-btn-c3 text-lg text-slate-300 hover:text-amber-400 transition" data-star="1"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c3', 2)" class="star-btn-c3 text-lg text-slate-300 hover:text-amber-400 transition" data-star="2"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c3', 3)" class="star-btn-c3 text-lg text-slate-300 hover:text-amber-400 transition" data-star="3"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c3', 4)" class="star-btn-c3 text-lg text-amber-400 transition" data-star="4"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c3', 5)" class="star-btn-c3 text-lg text-amber-400 transition" data-star="5"><i class="fa-solid fa-star"></i></button>
+                                    <span id="score-c3-text" class="text-xs font-bold text-amber-600 ml-1.5 w-6">5/5</span>
+                                </div>
+                            </div>
+
+                            <!-- Criterion 4 -->
+                            <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800">4. Tiếp nhận & Giải quyết kiến nghị</h4>
+                                    <p class="text-[10px] text-slate-500">Tốc độ xử lý yêu cầu sửa chữa trong căn hộ & dịch vụ</p>
+                                </div>
+                                <div class="star-rating flex items-center gap-1" data-criterion="c4">
+                                    <button type="button" onclick="setRating('c4', 1)" class="star-btn-c4 text-lg text-slate-300 hover:text-amber-400 transition" data-star="1"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c4', 2)" class="star-btn-c4 text-lg text-slate-300 hover:text-amber-400 transition" data-star="2"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c4', 3)" class="star-btn-c4 text-lg text-slate-300 hover:text-amber-400 transition" data-star="3"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c4', 4)" class="star-btn-c4 text-lg text-amber-400 transition" data-star="4"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c4', 5)" class="star-btn-c4 text-lg text-amber-400 transition" data-star="5"><i class="fa-solid fa-star"></i></button>
+                                    <span id="score-c4-text" class="text-xs font-bold text-amber-600 ml-1.5 w-6">5/5</span>
+                                </div>
+                            </div>
+
+                            <!-- Criterion 5 -->
+                            <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800">5. Minh bạch tài chính & Phí dịch vụ</h4>
+                                    <p class="text-[10px] text-slate-500">Hóa đơn điện nước, phí dịch vụ hàng tháng rõ ràng</p>
+                                </div>
+                                <div class="star-rating flex items-center gap-1" data-criterion="c5">
+                                    <button type="button" onclick="setRating('c5', 1)" class="star-btn-c5 text-lg text-slate-300 hover:text-amber-400 transition" data-star="1"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c5', 2)" class="star-btn-c5 text-lg text-slate-300 hover:text-amber-400 transition" data-star="2"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c5', 3)" class="star-btn-c3 text-lg text-slate-300 hover:text-amber-400 transition" data-star="3"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c5', 4)" class="star-btn-c5 text-lg text-amber-400 transition" data-star="4"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c5', 5)" class="star-btn-c5 text-lg text-amber-400 transition" data-star="5"><i class="fa-solid fa-star"></i></button>
+                                    <span id="score-c5-text" class="text-xs font-bold text-amber-600 ml-1.5 w-6">5/5</span>
+                                </div>
+                            </div>
+
+                            <!-- Criterion 6 -->
+                            <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800">6. Đạo đức & Thái độ nhân viên BQL</h4>
+                                    <p class="text-[10px] text-slate-500">Lễ phép, chuyên nghiệp, hỗ trợ tận tâm với cư dân</p>
+                                </div>
+                                <div class="star-rating flex items-center gap-1" data-criterion="c6">
+                                    <button type="button" onclick="setRating('c6', 1)" class="star-btn-c6 text-lg text-slate-300 hover:text-amber-400 transition" data-star="1"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c6', 2)" class="star-btn-c6 text-lg text-slate-300 hover:text-amber-400 transition" data-star="2"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c6', 3)" class="star-btn-c6 text-lg text-slate-300 hover:text-amber-400 transition" data-star="3"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c6', 4)" class="star-btn-c6 text-lg text-amber-400 transition" data-star="4"><i class="fa-solid fa-star"></i></button>
+                                    <button type="button" onclick="setRating('c6', 5)" class="star-btn-c6 text-lg text-amber-400 transition" data-star="5"><i class="fa-solid fa-star"></i></button>
+                                    <span id="score-c6-text" class="text-xs font-bold text-amber-600 ml-1.5 w-6">5/5</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- General Feedback Textarea -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Đóng Góp Ý Kiến Hoặc Đề Xuất Cải Thiện Dịch Vụ</label>
+                            <textarea id="evalComment" rows="3" placeholder="Nhập ý kiến đóng góp theo hợp đồng vận hành..." class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-extrabold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> GỬI ĐÁNH GIÁ CHÍNH THỨC LÊN FIREBASE CLOUD
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right Column: Detailed Analytics & Breakdown Dashboard (7 Cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    <!-- Top Summary Stats -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-500 block">Tổng Lượt Đánh Giá</span>
+                            <p id="statEvalCount" class="text-2xl font-extrabold text-slate-900 mt-1">128</p>
+                            <span class="text-[10px] text-emerald-600 font-bold">Căn hộ đã xác thực</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-500 block">Điểm Trung Bình 6 Tiêu Chí</span>
+                            <p id="statEvalAvgScore" class="text-2xl font-extrabold text-amber-500 mt-1">4.6 / 5</p>
+                            <div class="text-[10px] text-amber-500 flex justify-center gap-0.5 mt-0.5">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-500 block">Tỷ Lệ Hài Lòng HĐ</span>
+                            <p id="statEvalSatisfiedPercent" class="text-2xl font-extrabold text-brand-600 mt-1">92.4%</p>
+                            <span class="text-[10px] text-brand-700 font-bold">Đạt chuẩn cam kết</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-500 block">Kỳ Đánh Giá</span>
+                            <p id="statEvalPeriodText" class="text-sm font-extrabold text-indigo-900 mt-2">Năm 2026</p>
+                            <span class="text-[10px] text-slate-500">Đang cập nhật live</span>
+                        </div>
+                    </div>
+
+                    <!-- Criteria Breakdown Progress Bars -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-chart-bar text-brand-600"></i> Bảng Phân Tích 6 Tiêu Chí Hợp Vận Hành
+                            </h3>
+                            <span class="text-xs text-slate-500 font-medium">Thang điểm 5.0</span>
+                        </div>
+
+                        <div id="criteriaBreakdownList" class="space-y-3.5">
+                            <!-- Dynamic Criteria Progress Bars rendered via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Resident Feedback Comment Stream -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-comments text-amber-500"></i> Nhận Xét Đã Xác Thực SĐT
+                            </h3>
+                            <span id="evalCommentBadge" class="text-[11px] bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full font-bold">0 nhận xét</span>
+                        </div>
+
+                        <div id="evalCommentsStream" class="space-y-3 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+                            <!-- Dynamic feedback comments list -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -408,48 +707,7 @@
             </div>
         </div>
 
-        <!-- TAB 5: RESULTS & ANALYTICS -->
-        <div id="content-results" class="tab-content hidden space-y-6">
-            <!-- Summary Stat Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center">
-                    <span class="text-xs text-slate-500 font-medium">Tổng Căn Hộ Tham Gia</span>
-                    <p id="statTotalApartments" class="text-2xl font-extrabold text-slate-900 mt-1">482 / 600</p>
-                    <p class="text-xs text-emerald-600 font-semibold mt-0.5">Tỷ lệ: 80.3%</p>
-                </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center">
-                    <span class="text-xs text-slate-500 font-medium">Diện Tích Đã Biểu Quyết</span>
-                    <p id="statTotalArea" class="text-2xl font-extrabold text-brand-600 mt-1">28,450 m²</p>
-                    <p class="text-xs text-slate-500 mt-0.5">Đạt hạn mức tổ chức ( &gt;50% )</p>
-                </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center">
-                    <span class="text-xs text-slate-500 font-medium">Tổng Phiếu Hợp Lệ</span>
-                    <p id="statValidVotes" class="text-2xl font-extrabold text-blue-600 mt-1">482</p>
-                    <p class="text-xs text-blue-600 font-semibold mt-0.5">100% Hợp lệ</p>
-                </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center">
-                    <span class="text-xs text-slate-500 font-medium">Nội Dung Đã Thông Qua</span>
-                    <p id="statPassedItems" class="text-2xl font-extrabold text-amber-600 mt-1">11 / 11</p>
-                    <p class="text-xs text-amber-600 font-semibold mt-0.5">Đạt đồng thuận cao</p>
-                </div>
-            </div>
-
-            <!-- Detail Breakdown Charts/Bars for 11 items -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-bold text-slate-900 text-base">Thống Kê Chi Tiết Kết Quả Mục Biểu Quyết</h3>
-                    <button onclick="window.print()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition flex items-center gap-1">
-                        <i class="fa-solid fa-print"></i> In Báo Cáo
-                    </button>
-                </div>
-
-                <div id="resultsBreakdownContainer" class="space-y-6">
-                    <!-- Dynamic vote stats bars -->
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 6: ADMIN PANEL (PIN Protected: 215151365) -->
+        <!-- TAB 5: ADMIN PANEL (PIN Protected: 215151365) -->
         <div id="content-admin" class="tab-content hidden space-y-6">
             <!-- Lock Screen if not logged in -->
             <div id="adminAuthLock" class="max-w-md mx-auto bg-white rounded-2xl border border-slate-200 p-6 shadow-lg text-center my-12">
@@ -472,6 +730,81 @@
 
             <!-- Admin Content Dashboard (Visible after correct PIN) -->
             <div id="adminDashboard" class="hidden space-y-6">
+                <!-- Admin Resident Excel File Upload Card -->
+                <div class="bg-white rounded-2xl border-2 border-emerald-500/40 p-6 shadow-md space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold">
+                                <i class="fa-solid fa-file-excel"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                                    Quản Lý Danh Sách Chủ Sở Hữu Cư Dân (File Excel)
+                                    <span id="adminResidentCountBadge" class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">5 căn hộ</span>
+                                </h4>
+                                <p class="text-xs text-slate-500">Tải file Excel (VD: <span class="font-mono font-semibold text-slate-700">DANH SÁCH CHỦ SỞ HỮU check in 2026.xlsx</span>) để nạp CSDL xác thực biểu quyết & đánh giá.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                            <button onclick="downloadResidentTemplate()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-arrow-down text-slate-600"></i> Tải file mẫu
+                            </button>
+                            <button onclick="clearAllResidentsData()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-lg border border-rose-200 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-trash-can"></i> Xóa CSDL Cư Dân
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- File Drag/Drop or Browse Box -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                        <div class="lg:col-span-7">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-emerald-300 border-dashed rounded-xl cursor-pointer bg-emerald-50/40 hover:bg-emerald-50 transition">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-emerald-600 mb-2 animate-bounce"></i>
+                                    <p class="text-xs text-slate-700 font-bold"><span class="text-emerald-700 underline">Nhấp để chọn file Excel</span> hoặc kéo thả file vào đây</p>
+                                    <p class="text-[10px] text-slate-500 mt-1">Hỗ trợ: .XLSX, .XLS, .CSV (Tự nhận dạng: Mã căn, Tên chủ hộ, Số điện thoại, Diện tích)</p>
+                                </div>
+                                <input type="file" id="adminExcelResidentInput" onchange="handleResidentExcelUpload(event)" accept=".xlsx, .xls, .csv" class="hidden">
+                            </label>
+                        </div>
+
+                        <!-- Search and Quick Stats -->
+                        <div class="lg:col-span-5 bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-700">Tra cứu nhanh cư dân:</span>
+                                <span id="excelParsedStatusText" class="text-[11px] font-semibold text-emerald-700">Sẵn sàng tra cứu</span>
+                            </div>
+                            <div>
+                                <input type="text" id="adminResidentSearchInput" oninput="filterAdminResidentTable()" placeholder="Gõ tìm Mã căn (A-08...), Tên hoặc SĐT..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                            </div>
+                            <div class="text-[11px] text-slate-500 flex items-center justify-between">
+                                <span>Đồng bộ: <strong class="text-emerald-700">Firebase Firestore Cloud</strong></span>
+                                <span>Trạng thái: <strong class="text-slate-800" id="adminExcelSyncBadge">Đã nạp</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Table preview for uploaded residents -->
+                    <div class="overflow-x-auto max-h-48 border border-slate-200 rounded-xl custom-scrollbar">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-100 text-slate-800 font-bold uppercase text-[10px] sticky top-0">
+                                <tr>
+                                    <th class="px-3 py-2">STT</th>
+                                    <th class="px-3 py-2">Mã Căn</th>
+                                    <th class="px-3 py-2">Chủ Sở Hữu</th>
+                                    <th class="px-3 py-2">Số Điện Thoại</th>
+                                    <th class="px-3 py-2">Diện Tích (m²)</th>
+                                    <th class="px-3 py-2 text-right">Tỷ Lệ (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminResidentTableBody" class="divide-y divide-slate-100 font-medium">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Admin Header Bar -->
                 <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
@@ -565,7 +898,7 @@
 
                                 <div>
                                     <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">Tên Tờ Trình Hiển Thị</label>
-                                    <input type="text" id="adminItemDocName" placeholder="VD: To_Trinh_So_01_Chuong_Trinh_HNNCC.pdf" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                                    <input type="text" id="adminItemDocName" placeholder="VD: To_Trinh_So_01_Chuong_Trinh_HNNCC.pdf" class="w-full px-3.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
                                 </div>
 
                                 <div>
@@ -643,8 +976,35 @@
     <!-- Firebase Script Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, addDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot, addDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Tab navigation handler
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-600', 'text-white', 'active');
+                if (!btn.id.includes('admin') && !btn.id.includes('evaluation')) {
+                    btn.classList.add('text-slate-300');
+                }
+            });
+
+            const targetContent = document.getElementById(`content-${tabId}`);
+            if (targetContent) targetContent.classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-brand-600', 'text-white', 'active');
+                activeBtn.classList.remove('text-slate-300');
+            }
+
+            if (tabId === 'voting') renderVotingItems();
+            if (tabId === 'documents') renderDocuments();
+            if (tabId === 'qa') renderQA();
+            if (tabId === 'evaluation') renderEvaluationAnalytics();
+            if (tabId === 'admin' && state.isAdmin) renderAdminControls();
+        }
+        window.switchTab = switchTab;
 
         // Firebase Configuration provided by user
         const userFirebaseConfig = {
@@ -665,31 +1025,39 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Default 11 Items for initial cloud seeding if empty
-        const DEFAULT_VOTING_ITEMS = [
-            { id: "1", title: "Thông qua Chương trình Hội nghị Nhà chung cư năm 2026", desc: "Chương trình chi tiết hội nghị thường niên bao gồm 6 nội dung kéo dài từ 07:30 đến 11:30.", voteUrl: "https://forms.google.com/", docName: "Chuong_Trinh_HNNCC_2026.pdf", docUrl: "#", order: 1 },
-            { id: "2", title: "Thông qua Quy chế tổ chức và điều hành Hội nghị", desc: "Quy định chi tiết về tư cách tham dự, nguyên tắc thảo luận và hình thức biểu quyết.", voteUrl: "https://forms.google.com/", docName: "Quy_Che_To_Chuc_Dieu_Hanh_2026.pdf", docUrl: "#", order: 2 },
-            { id: "3", title: "Thông qua Báo cáo công tác quản lý vận hành trong kỳ báo cáo", desc: "Báo cáo đánh giá chất lượng dịch vụ an ninh, vệ sinh, cây xanh và kỹ thuật tòa nhà.", voteUrl: "https://forms.google.com/", docName: "Bao_Cao_Quan_Ly_Van_Hanh.pdf", docUrl: "#", order: 3 },
-            { id: "4", title: "Thông qua Báo cáo hoạt động Ban quản trị", desc: "Tổng kết công tác giám sát vận hành và thực hiện các Nghị quyết Hội nghị chung cư.", voteUrl: "https://forms.google.com/", docName: "Bao_Cao_Hoat_Dong_BQT_2025_2026.pdf", docUrl: "#", order: 4 },
-            { id: "5", title: "Thông qua Báo cáo tình hình sử dụng và quản lý kinh phí bảo trì", desc: "Báo cáo chi tiết thu chi, số dư quỹ bảo trì phần sở hữu chung tòa nhà.", voteUrl: "https://forms.google.com/", docName: "Bao_Cao_Thu_Chi_Kinh_Phi_Bao_Tri.pdf", docUrl: "#", order: 5 },
-            { id: "6", title: "Thông qua kế hoạch quản lý vận hành và các nhiệm vụ trọng tâm năm 2026 – 2027", desc: "Phương hướng nâng cao chất lượng dịch vụ vận hành chung cư thời gian tới.", voteUrl: "https://forms.google.com/", docName: "Ke_Hoach_QLVH_2026_2027.pdf", docUrl: "#", order: 6 },
-            { id: "7", title: "Thông qua kế hoạch bảo trì, sửa chữa các hạng mục thuộc phần sở hữu chung", desc: "Kế hoạch bảo trì định kỳ hệ thống PCCC, thang máy, máy bơm và cơ sở hạ tầng.", voteUrl: "https://forms.google.com/", docName: "Ke_Hoach_Bao_Tri_So_Huu_Chung.pdf", docUrl: "#", order: 7 },
-            { id: "8", title: "Thông qua dự toán kinh phí bảo trì năm 2026 – 2027", desc: "Bảng phân bổ dự toán chi phí thực hiện kế hoạch bảo trì các hạng mục dùng chung.", voteUrl: "https://forms.google.com/", docName: "Du_Toan_Kinh_Phi_Bao_Tri_2026_2027.pdf", docUrl: "#", order: 8 },
-            { id: "9", title: "Thông qua kế hoạch sử dụng kinh phí bảo trì theo nội dung trình Hội nghị", desc: "Quy trình rút và giải ngân kinh phí bảo trì theo quy định pháp luật hiện hành.", voteUrl: "https://forms.google.com/", docName: "KH_Su_Dung_Kinh_Phi_Bao_Tri.pdf", docUrl: "#", order: 9 },
-            { id: "10", title: "Thông qua kế hoạch triển khai vách ngăn lũ tại 02 đầu vào và ra ramp dốc hầm", desc: "Trang bị vách chắn chống ngập lụt tại lối ramp hầm nhằm bảo vệ tài sản xe cộ cư dân.", voteUrl: "https://forms.google.com/", docName: "To_Trinh_Vach_Ngan_Lu_Ramp_Ham.pdf", docUrl: "#", order: 10 },
-            { id: "11", title: "Thông qua kế hoạch triển khai lắp đặt trạm kích sóng tại tầng mái (outdoor)", desc: "Lắp đặt trạm kích sóng ngoài trời tầng mái giúp triệt để xử lý tình trạng yếu/mất sóng di động.", voteUrl: "https://forms.google.com/", docName: "To_Trinh_Lap_Dat_Tram_Kich_Song.pdf", docUrl: "#", order: 11 }
+        // Official Resident Database default seeded list
+        const DEFAULT_RESIDENT_DB = [
+            { room: "A-08.15", name: "Nguyễn Văn Hùng", phone: "0981234567", area: 68.5, ratio: "0.16%" },
+            { room: "B-03.02", name: "Phạm Thị Mai", phone: "0905111222", area: 72.0, ratio: "0.17%" },
+            { room: "A-15.01", name: "Lê Quốc Bảo", phone: "0914333444", area: 59.8, ratio: "0.14%" },
+            { room: "A-12.08", name: "Nguyễn Văn A", phone: "0989999888", area: 68.5, ratio: "0.16%" },
+            { room: "B-12.04", name: "Lê Thị Thu", phone: "0935556677", area: 65.2, ratio: "0.15%" }
         ];
 
-        // Default mock QA list
-        const DEFAULT_QA_LIST = [
-            { id: "1", name: "Trần Văn Nam", room: "A-05.12", topic: "Vách ngăn lũ", content: "Cho tôi hỏi thời gian thi công vách ngăn lũ ramp hầm dự kiến kéo dài bao lâu và có ảnh hưởng đến việc đi lại của cư dân không?", time: "10:15 - 30/08/2026", timestamp: 1788062100000, reply: "BQT phản hồi: Thi công trong 3 ngày cuối tuần, lắp đặt thử nghiệm ngoài giờ cao điểm nên sẽ không ảnh hưởng đến việc di chuyển của xe cư dân." },
-            { id: "2", name: "Lê Thị Thu", room: "B-12.04", topic: "Trạm kích sóng", content: "Việc lắp đặt trạm kích sóng di động tại tầng mái có phát sinh chi phí từ quỹ cư dân hay do nhà mạng tài trợ?", time: "09:30 - 30/08/2026", timestamp: 1788059400000, reply: "BQT phản hồi: Do nhà mạng tài trợ 100% kinh phí lắp đặt và vận hành, cư dân không phải đóng thêm khoản phí nào." }
+        const DEFAULT_VOTING_ITEMS = [
+            { id: "1", order: 1, title: "Thông qua Chương trình Hội nghị Nhà chung cư năm 2026", desc: "Thời gian làm việc từ 07:30 đến 11:30 ngày 30/08/2026.", docName: "To_Trinh_So_01_Chuong_Trinh_HNNCC.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "2", order: 2, title: "Thông qua Quy chế tổ chức và điều hành Hội nghị", desc: "Quy định nguyên tắc, điều kiện tham gia và biểu quyết tại hội nghị.", docName: "To_Trinh_So_02_Quy_Che_To_Chuc.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "3", order: 3, title: "Thông qua Báo cáo công tác quản lý vận hành trong kỳ báo cáo", desc: "Đánh giá chi tiết các hoạt động kỹ thuật, an ninh, vệ sinh cảnh quan của BQL.", docName: "To_Trinh_So_03_Bao_Cao_Van_Hanh.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "4", order: 4, title: "Thông qua Báo cáo hoạt động Ban quản trị", desc: "Tổng kết công tác đại diện cư dân và giám sát vận hành của Ban Quản Trị.", docName: "To_Trinh_So_04_Bao_Cao_BQT.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "5", order: 5, title: "Thông qua Báo cáo tình hình sử dụng và quản lý kinh phí bảo trì", desc: "Báo cáo công khai số dư và các khoản chi từ quỹ bảo trì 2%.", docName: "To_Trinh_So_05_Kinh_Phi_Bao_Tri.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "6", order: 6, title: "Thông qua kế hoạch quản lý vận hành và các nhiệm vụ trọng tâm năm 2026 – 2027", desc: "Định hướng nâng cao chất lượng dịch vụ và quản trị cư dân giai đoạn mới.", docName: "To_Trinh_So_06_Ke_Hoach_Van_Hanh.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "7", order: 7, title: "Thông qua kế hoạch bảo trì, sửa chữa các hạng mục thuộc phần sở hữu chung", desc: "Bảo trì thang máy, hệ thống PCCC, máy bơm và hệ thống chiếu sáng chung.", docName: "To_Trinh_So_07_Sua_Chua_Chung.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "8", order: 8, title: "Thông qua dự toán kinh phí bảo trì năm 2026 – 2027", desc: "Kế hoạch ngân sách dự kiến cho các công tác bảo dưỡng định kỳ.", docName: "To_Trinh_So_08_Du_Toan_Bao_Tri.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "9", order: 9, title: "Thông qua kế hoạch sử dụng kinh phí bảo trì theo nội dung trình Hội nghị", desc: "Phê duyệt các danh mục ưu tiên giải ngân quỹ bảo trì tòa nhà.", docName: "To_Trinh_So_09_Su_Dung_Kinh_Phi.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "10", order: 10, title: "Thông qua kế hoạch triển khai vách ngăn lũ tại 02 đầu vào và ra ramp dốc hầm", desc: "Lắp đặt rào cản ngăn ngập úng bảo vệ xe cộ tầng hầm mùa mưa bão.", docName: "To_Trinh_So_10_Vach_Ngan_Lu_Ramp_Ham.pdf", voteUrl: "https://drive.google.com/" },
+            { id: "11", order: 11, title: "Thông qua kế hoạch triển khai lắp đặt trạm kích sóng tại tầng mái (outdoor)", desc: "Xử lý triệt để tình trạng sóng yếu và mất liên lạc trong các căn hộ.", docName: "To_Trinh_So_11_Tram_Kich_Song_Mai.pdf", voteUrl: "https://drive.google.com/" }
         ];
 
         // Application State
         let state = {
-            items: [],
+            items: [...DEFAULT_VOTING_ITEMS],
             qaList: [],
+            evalList: [],
+            residentsList: [...DEFAULT_RESIDENT_DB],
+            isVerified: false,
+            verifiedResident: null,
+            votingVerifiedResident: null,
+            evalRatings: { c1: 5, c2: 5, c3: 5, c4: 5, c5: 5, c6: 5 },
             isAdmin: false,
             pendingDeleteId: null,
             attendanceConfig: {
@@ -699,43 +1067,105 @@
             }
         };
 
-        // Cloud status UI update
-        function updateCloudStatus(connected) {
-            const statusText = document.getElementById('cloudStatusText');
-            const statusIcon = document.getElementById('cloudStatusIcon');
-            if (statusText) statusText.innerText = connected ? "Đã kết nối" : "Ngoại tuyến";
-            if (statusIcon) {
-                statusIcon.className = connected ? "fa-solid fa-cloud text-emerald-600" : "fa-solid fa-cloud-slash text-rose-500";
-            }
+        function updateAttendanceUI() {
+            const cfg = state.attendanceConfig;
+            const navBtn = document.getElementById('navLiveAttendanceBtn');
+            const bannerBtn = document.getElementById('bannerLiveAttendanceBtn');
+            const cardBtn = document.getElementById('cardLiveAttendanceBtn');
+            const percentEl = document.getElementById('livePercentText');
+            const countEl = document.getElementById('liveCountText');
+
+            if (navBtn && cfg.link) navBtn.href = cfg.link;
+            if (bannerBtn && cfg.link) bannerBtn.href = cfg.link;
+            if (cardBtn && cfg.link) cardBtn.href = cfg.link;
+            if (percentEl && cfg.percent) percentEl.innerText = cfg.percent;
+            if (countEl && cfg.count) countEl.innerText = cfg.count;
+
+            const adminLinkInput = document.getElementById('adminAttendanceLinkInput');
+            const adminPercentInput = document.getElementById('adminAttendancePercentInput');
+            const adminCountInput = document.getElementById('adminAttendanceCountInput');
+            if (adminLinkInput && !adminLinkInput.value) adminLinkInput.value = cfg.link || '';
+            if (adminPercentInput && !adminPercentInput.value) adminPercentInput.value = cfg.percent || '';
+            if (adminCountInput && !adminCountInput.value) adminCountInput.value = cfg.count || '';
         }
 
-        // Auth initialization
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+        async function saveAttendanceConfig() {
+            const link = document.getElementById('adminAttendanceLinkInput')?.value.trim();
+            const percent = document.getElementById('adminAttendancePercentInput')?.value.trim();
+            const count = document.getElementById('adminAttendanceCountInput')?.value.trim();
+
+            state.attendanceConfig = {
+                link: link || state.attendanceConfig.link,
+                percent: percent || state.attendanceConfig.percent,
+                count: count || state.attendanceConfig.count
+            };
+
+            if (auth.currentUser) {
+                try {
+                    const configDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'attendance');
+                    await setDoc(configDocRef, state.attendanceConfig, { merge: true });
+                    showToast("Đã lưu cấu hình tỷ lệ tham gia!");
+                } catch(e) {
+                    console.error("Lỗi lưu attendance config:", e);
+                    showToast("Lỗi lưu cấu hình!", "warning");
                 }
-            } catch (err) {
-                console.error("Firebase Auth failed, trying anonymous fallback:", err);
-                try { await signInAnonymously(auth); } catch (e) { console.error("Anonymous auth failed:", e); }
+            }
+            updateAttendanceUI();
+        }
+
+        async function seedDefaultVotingItems() {
+            if (!auth.currentUser) return;
+            for (const item of DEFAULT_VOTING_ITEMS) {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voting_items', String(item.id));
+                await setDoc(docRef, item);
             }
         }
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                updateCloudStatus(true);
-                subscribeFirestoreData();
-            } else {
-                updateCloudStatus(false);
-            }
-        });
+        async function seedDefaultQA() {
+            if (!auth.currentUser) return;
+            const qaColRef = collection(db, 'artifacts', appId, 'public', 'data', 'qa_items');
+            await addDoc(qaColRef, {
+                name: "Nguyễn Văn Hùng",
+                room: "A-08.15",
+                topic: "Vách ngăn lũ",
+                content: "Thời gian dự kiến hoàn thành vách ngăn ramp dốc trước mùa mưa tháng mấy?",
+                time: "08:15 - 28/08/2026",
+                timestamp: Date.now(),
+                reply: "BQT phản hồi: Dự kiến triển khai lắp đặt hoàn tất trước ngày 30/09/2026."
+            });
+        }
 
-        initAuth();
+        async function seedDefaultEval() {
+            if (!auth.currentUser) return;
+            const evalColRef = collection(db, 'artifacts', appId, 'public', 'data', 'eval_items');
+            await addDoc(evalColRef, {
+                room: "A-08.15",
+                name: "Nguyễn Văn Hùng",
+                phone: "0981234567",
+                period: "YEAR-2026",
+                c1: 5, c2: 5, c3: 4, c4: 5, c5: 5, c6: 5,
+                comment: "BQL phản hồi yêu cầu nhanh, nhân viên nhiệt tình, vệ sinh sạch sẽ.",
+                timestamp: Date.now()
+            });
+        }
 
         function subscribeFirestoreData() {
             if (!auth.currentUser) return;
+
+            // Residents Master List Subscription from Excel
+            const residentsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'residents_data', 'master_list');
+            onSnapshot(residentsDocRef, (snap) => {
+                if (snap.exists() && snap.data()?.list?.length) {
+                    state.residentsList = snap.data().list;
+                } else {
+                    state.residentsList = [...DEFAULT_RESIDENT_DB];
+                }
+                updateResidentUI();
+            }, (err) => {
+                console.error("Lỗi sync residents list:", err);
+                state.residentsList = [...DEFAULT_RESIDENT_DB];
+                updateResidentUI();
+            });
 
             // Attendance Config Realtime Subscription
             const configDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'attendance');
@@ -764,7 +1194,6 @@
                 if (state.isAdmin) renderAdminControls();
             }, (error) => {
                 console.error("Lỗi đồng bộ voting items:", error);
-                showToast("Lỗi kết nối CSDL biểu quyết!", "warning");
             });
 
             // QA Realtime Subscription
@@ -783,85 +1212,455 @@
             }, (error) => {
                 console.error("Lỗi đồng bộ QA:", error);
             });
+
+            // Evaluation BQL Realtime Subscription
+            const evalColRef = collection(db, 'artifacts', appId, 'public', 'data', 'eval_items');
+            onSnapshot(evalColRef, async (snapshot) => {
+                if (snapshot.empty) {
+                    await seedDefaultEval();
+                    return;
+                }
+                state.evalList = [];
+                snapshot.forEach((docSnap) => {
+                    state.evalList.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                state.evalList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                renderEvaluationAnalytics();
+            }, (error) => {
+                console.error("Lỗi đồng bộ Evaluation:", error);
+            });
         }
 
-        function updateAttendanceUI() {
-            const link = state.attendanceConfig.link || "https://docs.google.com/spreadsheets/";
-            const percent = state.attendanceConfig.percent || "80.3%";
-            const count = state.attendanceConfig.count || "482 / 600";
+        // Excel File Parser using SheetJS
+        function handleResidentExcelUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-            ['navLiveAttendanceBtn', 'bannerLiveAttendanceBtn', 'cardLiveAttendanceBtn'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.href = link;
+            const statusText = document.getElementById('excelParsedStatusText');
+            if (statusText) statusText.innerText = "Đang xử lý file Excel...";
+
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    // Convert sheet to json array of objects
+                    const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                    
+                    if (!rawRows || rawRows.length === 0) {
+                        showToast("File Excel trống hoặc không đọc được dữ liệu!", "warning");
+                        if (statusText) statusText.innerText = "Lỗi đọc file";
+                        return;
+                    }
+
+                    // Normalize rows: detect room, name, phone, area, ratio
+                    const parsedList = [];
+                    rawRows.forEach((row, idx) => {
+                        let room = "", name = "", phone = "", area = "", ratio = "";
+                        
+                        Object.keys(row).forEach(key => {
+                            const k = key.toLowerCase().trim();
+                            const val = String(row[key] || '').trim();
+
+                            if (k.includes('căn') || k.includes('phòng') || k.includes('mã ch') || k.includes('ch') || k.includes('room')) {
+                                if (!room) room = val;
+                            } else if (k.includes('tên') || k.includes('họ') || k.includes('chủ hộ') || k.includes('sở hữu') || k.includes('owner')) {
+                                if (!name) name = val;
+                            } else if (k.includes('thoại') || k.includes('sđt') || k.includes('phone') || k.includes('tel') || k.includes('mobile')) {
+                                if (!phone) phone = val;
+                            } else if (k.includes('diện tích') || k.includes('area') || k.includes('m2') || k.includes('dt')) {
+                                if (!area) area = val;
+                            } else if (k.includes('tỷ lệ') || k.includes('biểu quyết') || k.includes('ratio') || k.includes('%')) {
+                                if (!ratio) ratio = val;
+                            }
+                        });
+
+                        // Standardize Phone (clean up spaces/dots)
+                        phone = phone.replace(/[^0-9]/g, '');
+                        if (phone.length === 9 && !phone.startsWith('0')) phone = '0' + phone;
+
+                        // Only add if room exists
+                        if (room) {
+                            parsedList.push({
+                                room: room.toUpperCase(),
+                                name: name || "Chủ hộ",
+                                phone: phone || "",
+                                area: parseFloat(area) || 0,
+                                ratio: ratio ? (String(ratio).includes('%') ? ratio : ratio + '%') : (area ? ((parseFloat(area)/42000)*100).toFixed(2)+'%' : '--')
+                            });
+                        }
+                    });
+
+                    if (parsedList.length === 0) {
+                        showToast("Không tìm thấy các cột Mã căn hộ hoặc Tên chủ hộ trong file!", "warning");
+                        if (statusText) statusText.innerText = "Sai định dạng cột";
+                        return;
+                    }
+
+                    // Save to Firebase Firestore
+                    state.residentsList = parsedList;
+                    if (auth.currentUser) {
+                        const residentsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'residents_data', 'master_list');
+                        await setDoc(residentsDocRef, {
+                            list: parsedList,
+                            updatedAt: Date.now(),
+                            fileName: file.name,
+                            total: parsedList.length
+                        });
+                    }
+
+                    updateResidentUI();
+                    showToast(`Đã tải lên và đồng bộ thành công ${parsedList.length} căn hộ từ file ${file.name}!`);
+                    if (statusText) statusText.innerText = `Đã nạp ${parsedList.length} căn hộ`;
+                } catch (err) {
+                    console.error("Lỗi đọc file Excel:", err);
+                    showToast("Lỗi phân tích file Excel. Vui lòng kiểm tra lại định dạng!", "warning");
+                    if (statusText) statusText.innerText = "Lỗi file Excel";
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateResidentUI() {
+            const countBadge = document.getElementById('adminResidentCountBadge');
+            if (countBadge) countBadge.innerText = `${state.residentsList.length} căn hộ`;
+
+            renderAdminResidentTable(state.residentsList);
+        }
+
+        function renderAdminResidentTable(listToRender) {
+            const tbody = document.getElementById('adminResidentTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (!listToRender || listToRender.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-3 py-4 text-center text-slate-400">Không tìm thấy căn hộ nào</td></tr>`;
+                return;
+            }
+
+            // Render up to 100 rows to ensure snappy UI
+            const slice = listToRender.slice(0, 100);
+            slice.forEach((r, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="px-3 py-2 text-slate-400 font-mono">${idx + 1}</td>
+                    <td class="px-3 py-2 font-bold text-slate-900">${r.room}</td>
+                    <td class="px-3 py-2 text-slate-800">${r.name}</td>
+                    <td class="px-3 py-2 text-slate-600 font-mono">${r.phone || '<span class="text-rose-400">Chưa có SĐT</span>'}</td>
+                    <td class="px-3 py-2 text-slate-600">${r.area ? r.area + ' m²' : '--'}</td>
+                    <td class="px-3 py-2 text-right font-bold text-brand-700">${r.ratio || '--'}</td>
+                `;
+                tbody.appendChild(tr);
             });
+        }
 
-            const percentEl = document.getElementById('livePercentText');
-            if (percentEl) percentEl.innerText = percent;
+        function filterAdminResidentTable() {
+            const query = (document.getElementById('adminResidentSearchInput')?.value || '').toLowerCase().trim();
+            if (!query) {
+                renderAdminResidentTable(state.residentsList);
+                return;
+            }
+            const filtered = state.residentsList.filter(r => 
+                r.room.toLowerCase().includes(query) || 
+                r.name.toLowerCase().includes(query) || 
+                (r.phone && r.phone.includes(query))
+            );
+            renderAdminResidentTable(filtered);
+        }
 
-            const countEl = document.getElementById('liveCountText');
-            if (countEl) countEl.innerText = count;
-
-            if (document.getElementById('adminAttendanceLinkInput')) {
-                document.getElementById('adminAttendanceLinkInput').value = link;
-                document.getElementById('adminAttendancePercentInput').value = percent;
-                document.getElementById('adminAttendanceCountInput').value = count;
+        async function clearAllResidentsData() {
+            if (!auth.currentUser) return;
+            try {
+                const residentsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'residents_data', 'master_list');
+                await setDoc(residentsDocRef, { list: [], updatedAt: Date.now(), total: 0 });
+                state.residentsList = [];
+                updateResidentUI();
+                showToast("Đã xóa trắng danh sách cư dân trên Cloud!", "warning");
+            } catch (e) {
+                console.error(e);
+                showToast("Không thể xóa danh sách!", "warning");
             }
         }
 
-        async function saveAttendanceConfig() {
-            if (!auth.currentUser) return;
+        function downloadResidentTemplate() {
+            const sampleData = [
+                { "STT": 1, "Mã Căn": "A-01.01", "Họ và Tên": "Nguyễn Văn An", "Số Điện Thoại": "0981234567", "Diện Tích": 68.5, "Tỷ Lệ Biểu Quyết": "0.16%" },
+                { "STT": 2, "Mã Căn": "A-01.02", "Họ và Tên": "Trần Thị Bình", "Số Điện Thoại": "0905123456", "Diện Tích": 72.0, "Tỷ Lệ Biểu Quyết": "0.17%" },
+                { "STT": 3, "Mã Căn": "B-02.05", "Họ và Tên": "Lê Hoàng Long", "Số Điện Thoại": "0912345678", "Diện Tích": 59.8, "Tỷ Lệ Biểu Quyết": "0.14%" }
+            ];
+            const ws = XLSX.utils.json_to_sheet(sampleData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "DanhSachCuDan");
+            XLSX.writeFile(wb, "Mau_Danh_Sach_Chu_So_Huu_Ecohome.xlsx");
+            showToast("Đã tải xuống file mẫu Excel!");
+        }
 
-            const link = document.getElementById('adminAttendanceLinkInput')?.value.trim() || "https://docs.google.com/spreadsheets/";
-            const percent = document.getElementById('adminAttendancePercentInput')?.value.trim() || "80.3%";
-            const count = document.getElementById('adminAttendanceCountInput')?.value.trim() || "482 / 600";
+        // Pre-voting verification function
+        function handleVotingQuickVerify(e) {
+            e.preventDefault();
+            const room = document.getElementById('voteQuickRoom').value.trim().toUpperCase();
+            const rawPhone = document.getElementById('voteQuickPhone').value.trim();
+            const phone = rawPhone.replace(/[^0-9]/g, '');
+
+            // Cross-check against the live loaded Excel database
+            const matched = state.residentsList.find(res => {
+                const resPhone = String(res.phone || '').replace(/[^0-9]/g, '');
+                return res.room === room && (resPhone === phone || (phone.length >= 7 && resPhone.endsWith(phone)));
+            });
+
+            if (matched) {
+                state.votingVerifiedResident = matched;
+                
+                // Also automatically verify for Evaluation tab!
+                state.isVerified = true;
+                state.verifiedResident = matched;
+
+                document.getElementById('votingQuickVerifyForm').classList.add('hidden');
+                document.getElementById('votingVerifiedBadge').classList.remove('hidden');
+                document.getElementById('votingVerifiedOwnerName').innerText = `Căn: ${matched.room} - ${matched.name}`;
+                document.getElementById('votingVerifiedAreaRatio').innerText = `Tư cách: Hợp lệ | Diện tích: ${matched.area || '--'} m² (${matched.ratio || 'Đầy đủ quyền'})`;
+                
+                const summaryEl = document.getElementById('votingAuthSummaryText');
+                if (summaryEl) summaryEl.innerHTML = `<span class="text-amber-300 font-bold"><i class="fa-solid fa-circle-check"></i> Đã xác thực thành công thông tin chủ sở hữu theo danh sách HNNCC 2026.</span>`;
+
+                showToast(`Xác thực thành công Căn hộ ${matched.room} (${matched.name})!`);
+            } else {
+                showToast("Mã căn hộ hoặc Số điện thoại không khớp với Danh sách chủ sở hữu chính thức!", "warning");
+            }
+        }
+
+        function resetVotingVerification() {
+            state.votingVerifiedResident = null;
+            document.getElementById('votingQuickVerifyForm').classList.remove('hidden');
+            document.getElementById('votingVerifiedBadge').classList.add('hidden');
+            document.getElementById('voteQuickRoom').value = '';
+            document.getElementById('voteQuickPhone').value = '';
+            const summaryEl = document.getElementById('votingAuthSummaryText');
+            if (summaryEl) summaryEl.innerText = "Vui lòng nhập Mã căn hộ và Số điện thoại đã đăng ký để kiểm tra tư cách hợp lệ trước khi biểu quyết.";
+        }
+
+        // Resident Verification before Evaluation (now also cross-checks live uploaded database)
+        function handleResidentVerify(e) {
+            e.preventDefault();
+            const room = document.getElementById('verifyRoom').value.trim().toUpperCase();
+            const name = document.getElementById('verifyName').value.trim();
+            const phone = document.getElementById('verifyPhone').value.trim().replace(/[^0-9]/g, '');
+            const errorMsg = document.getElementById('verifyErrorMsg');
+
+            // Check against live uploaded database
+            const matched = state.residentsList.find(res => {
+                const resPhone = String(res.phone || '').replace(/[^0-9]/g, '');
+                const roomMatch = res.room === room;
+                const phoneMatch = !phone || resPhone === phone || resPhone.endsWith(phone);
+                return roomMatch && phoneMatch;
+            });
+
+            if (matched) {
+                state.isVerified = true;
+                state.verifiedResident = { room: matched.room, name: matched.name || name, phone: matched.phone || phone };
+                errorMsg.classList.add('hidden');
+
+                // Toggle forms
+                document.getElementById('verifySection').classList.add('hidden');
+                document.getElementById('evaluationForm').classList.remove('hidden');
+                document.getElementById('verifyBadgeStatus').innerText = "Đã xác thực thành công";
+                document.getElementById('verifyBadgeStatus').className = "text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full";
+                document.getElementById('verifiedOwnerInfo').innerText = `Căn hộ: ${matched.room} - Chủ hộ: ${matched.name}`;
+
+                showToast("Xác thực thông tin và số điện thoại thành công theo dữ liệu Excel!");
+            } else {
+                errorMsg.innerText = "Thông tin Căn hộ hoặc Số điện thoại không khớp với Danh sách chủ sở hữu chính thức. Vui lòng kiểm tra lại!";
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function resetVerification() {
+            state.isVerified = false;
+            state.verifiedResident = null;
+            document.getElementById('evaluationForm').classList.add('hidden');
+            document.getElementById('verifySection').classList.remove('hidden');
+            document.getElementById('verifyBadgeStatus').innerText = "Bước 1: Xác thực SĐT";
+            document.getElementById('verifyBadgeStatus').className = "text-[11px] bg-amber-100 text-amber-800 font-bold px-2.5 py-0.5 rounded-full";
+            document.getElementById('verifyRoom').value = '';
+            document.getElementById('verifyName').value = '';
+            document.getElementById('verifyPhone').value = '';
+        }
+
+        // Evaluation Star Rating Controller
+        function setRating(criterion, score) {
+            state.evalRatings[criterion] = score;
+            const textEl = document.getElementById(`score-${criterion}-text`);
+            if (textEl) textEl.innerText = `${score}/5`;
+
+            const buttons = document.querySelectorAll(`.star-btn-${criterion}`);
+            buttons.forEach(btn => {
+                const starVal = parseInt(btn.getAttribute('data-star'));
+                if (starVal <= score) {
+                    btn.classList.add('text-amber-400');
+                    btn.classList.remove('text-slate-300');
+                } else {
+                    btn.classList.add('text-slate-300');
+                    btn.classList.remove('text-amber-400');
+                }
+            });
+        }
+
+        function updateEvalPeriodLabel() {
+            renderEvaluationAnalytics();
+        }
+
+        async function handleEvaluationSubmit(e) {
+            e.preventDefault();
+            if (!state.isVerified || !state.verifiedResident) {
+                showToast("Vui lòng xác thực số điện thoại chủ sở hữu trước khi gửi!", "warning");
+                return;
+            }
+            if (!auth.currentUser) {
+                showToast("Đang kết nối CSDL Cloud, vui lòng thử lại!", "warning");
+                return;
+            }
+
+            const period = document.getElementById('evalPeriod').value;
+            const comment = document.getElementById('evalComment').value.trim();
+
+            const newEval = {
+                room: state.verifiedResident.room,
+                name: state.verifiedResident.name,
+                phone: state.verifiedResident.phone,
+                period,
+                c1: state.evalRatings.c1,
+                c2: state.evalRatings.c2,
+                c3: state.evalRatings.c3,
+                c4: state.evalRatings.c4,
+                c5: state.evalRatings.c5,
+                c6: state.evalRatings.c6,
+                comment,
+                timestamp: Date.now()
+            };
 
             try {
-                const configDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'attendance');
-                await setDoc(configDocRef, { link, percent, count }, { merge: true });
-                showToast("Đã lưu Link & Tỷ lệ tham gia trực tiến!");
+                const evalColRef = collection(db, 'artifacts', appId, 'public', 'data', 'eval_items');
+                await addDoc(evalColRef, newEval);
+
+                document.getElementById('evalComment').value = '';
+                showToast("Cảm ơn Quý chủ hộ! Đánh giá theo hợp đồng vận hành đã được ghi nhận thành công.");
+                resetVerification();
             } catch (err) {
-                console.error("Lỗi lưu attendance config:", err);
-                showToast("Không thể lưu cấu hình lên Cloud!", "warning");
+                console.error("Lỗi gửi đánh giá:", err);
+                showToast("Lỗi khi gửi đánh giá lên Cloud!", "warning");
             }
         }
 
-        async function seedDefaultVotingItems() {
-            if (!auth.currentUser) return;
-            for (let i = 0; i < DEFAULT_VOTING_ITEMS.length; i++) {
-                const item = DEFAULT_VOTING_ITEMS[i];
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voting_items', String(item.id));
-                await setDoc(docRef, item);
-            }
-        }
+        function renderEvaluationAnalytics() {
+            const selectedPeriod = document.getElementById('evalPeriod')?.value || 'YEAR-2026';
+            const filteredList = state.evalList.filter(item => !item.period || item.period === selectedPeriod || selectedPeriod === 'ALL');
+            
+            const totalCount = filteredList.length;
 
-        async function seedDefaultQA() {
-            if (!auth.currentUser) return;
-            for (const qa of DEFAULT_QA_LIST) {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'qa_items', String(qa.id));
-                await setDoc(docRef, qa);
-            }
-        }
+            const periodTextMap = {
+                'Q1-2026': 'Quý 1 / 2026',
+                'Q2-2026': 'Quý 2 / 2026',
+                'Q3-2026': 'Quý 3 / 2026',
+                'Q4-2026': 'Quý 4 / 2026',
+                'YEAR-2025': 'Cả Năm 2025',
+                'YEAR-2026': 'Năm 2026'
+            };
+            const periodLabelEl = document.getElementById('statEvalPeriodText');
+            if (periodLabelEl) periodLabelEl.innerText = periodTextMap[selectedPeriod] || selectedPeriod;
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('bg-brand-600', 'text-white');
-                el.classList.add('text-slate-300');
+            let sumC1 = 0, sumC2 = 0, sumC3 = 0, sumC4 = 0, sumC5 = 0, sumC6 = 0;
+
+            filteredList.forEach(item => {
+                sumC1 += Number(item.c1 || 5);
+                sumC2 += Number(item.c2 || 5);
+                sumC3 += Number(item.c3 || 5);
+                sumC4 += Number(item.c4 || 5);
+                sumC5 += Number(item.c5 || 5);
+                sumC6 += Number(item.c6 || item.c5 || 5);
             });
 
-            const activeContent = document.getElementById(`content-${tabId}`);
-            if (activeContent) activeContent.classList.remove('hidden');
+            const avgC1 = totalCount > 0 ? (sumC1 / totalCount).toFixed(1) : "5.0";
+            const avgC2 = totalCount > 0 ? (sumC2 / totalCount).toFixed(1) : "5.0";
+            const avgC3 = totalCount > 0 ? (sumC3 / totalCount).toFixed(1) : "5.0";
+            const avgC4 = totalCount > 0 ? (sumC4 / totalCount).toFixed(1) : "5.0";
+            const avgC5 = totalCount > 0 ? (sumC5 / totalCount).toFixed(1) : "5.0";
+            const avgC6 = totalCount > 0 ? (sumC6 / totalCount).toFixed(1) : "5.0";
 
-            const activeBtn = document.getElementById(`tab-${tabId}`);
-            if (activeBtn) {
-                activeBtn.classList.add('bg-brand-600', 'text-white');
-                activeBtn.classList.remove('text-slate-300');
+            const overallAvg = totalCount > 0 ? ((parseFloat(avgC1) + parseFloat(avgC2) + parseFloat(avgC3) + parseFloat(avgC4) + parseFloat(avgC5) + parseFloat(avgC6)) / 6).toFixed(1) : "4.8";
+            const satisfiedPercent = totalCount > 0 ? ((overallAvg / 5) * 100).toFixed(1) + "%" : "96.0%";
+
+            const countEl = document.getElementById('statEvalCount');
+            if (countEl) countEl.innerText = totalCount;
+
+            const scoreEl = document.getElementById('statEvalAvgScore');
+            if (scoreEl) scoreEl.innerText = `${overallAvg} / 5`;
+
+            const satEl = document.getElementById('statEvalSatisfiedPercent');
+            if (satEl) satEl.innerText = satisfiedPercent;
+
+            // Render 6 Contract Criteria Breakdown Bars
+            const criteriaListContainer = document.getElementById('criteriaBreakdownList');
+            if (criteriaListContainer) {
+                const criteriaData = [
+                    { name: "1. An ninh & Kiểm soát ra vào", score: avgC1, desc: "Tuần tra hầm, thẻ thang máy & kiểm soát khách" },
+                    { name: "2. Vệ sinh môi trường & Cảnh quan", score: avgC2, desc: "Sạch sẽ sảnh, hành lang, thu gom rác & cây xanh" },
+                    { name: "3. Vận hành & Bảo trì kỹ thuật", score: avgC3, desc: "Thang máy, PCCC, bơm nước & điện chiếu sáng" },
+                    { name: "4. Tiếp nhận & Giải quyết kiến nghị", score: avgC4, desc: "Tốc độ xử lý yêu cầu sửa chữa căn hộ & dịch vụ" },
+                    { name: "5. Minh bạch tài chính & Phí dịch vụ", score: avgC5, desc: "Hóa đơn điện nước, phí quản lý hàng tháng" },
+                    { name: "6. Đạo đức & Thái độ nhân viên BQL", score: avgC6, desc: "Lễ phép, chuyên nghiệp, hỗ trợ tận tâm với cư dân" }
+                ];
+
+                criteriaListContainer.innerHTML = criteriaData.map(c => {
+                    const percent = (parseFloat(c.score) / 5) * 100;
+                    let colorClass = "bg-emerald-500";
+                    if (percent < 60) colorClass = "bg-rose-500";
+                    else if (percent < 80) colorClass = "bg-amber-500";
+
+                    return `
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-800">${c.name}</span>
+                                <span class="font-extrabold text-brand-700">${c.score} <span class="text-slate-400 font-normal">/ 5.0</span></span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                                <div class="${colorClass} h-2.5 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                            </div>
+                            <p class="text-[10px] text-slate-400">${c.desc}</p>
+                        </div>
+                    `;
+                }).join('');
             }
 
-            if (tabId === 'voting') renderVotingItems();
-            if (tabId === 'documents') renderDocuments();
-            if (tabId === 'qa') renderQA();
-            if (tabId === 'admin' && state.isAdmin) renderAdminControls();
+            // Render Comments Stream
+            const streamContainer = document.getElementById('evalCommentsStream');
+            const commentBadge = document.getElementById('evalCommentBadge');
+            
+            const commentsWithText = filteredList.filter(i => i.comment && i.comment.trim() !== '');
+            if (commentBadge) commentBadge.innerText = `${commentsWithText.length} nhận xét`;
+
+            if (streamContainer) {
+                if (commentsWithText.length === 0) {
+                    streamContainer.innerHTML = `<div class="text-xs text-slate-400 text-center py-6 bg-slate-50 rounded-xl">Chưa có nhận xét nào trong kỳ này.</div>`;
+                } else {
+                    streamContainer.innerHTML = commentsWithText.map(item => `
+                        <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-slate-900">${item.name || 'Chủ hộ'}</span>
+                                    <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.2 rounded">${item.room || 'Căn hộ'}</span>
+                                    <span class="text-[10px] text-emerald-700 bg-emerald-50 px-1 rounded"><i class="fa-solid fa-shield-check"></i> Đã xác thực SĐT</span>
+                                </div>
+                                <span class="text-[10px] text-slate-400">${item.period || ''}</span>
+                            </div>
+                            <p class="text-xs text-slate-700 italic">"${item.comment}"</p>
+                        </div>
+                    `).join('');
+                }
+            }
         }
 
         function renderVotingItems() {
@@ -1312,6 +2111,32 @@
             }, 3000);
         }
 
+        // Initialize Firebase Authentication & Realtime Listeners
+        signInAnonymously(auth).catch(err => {
+            console.warn("Firebase Auth fallback:", err);
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            const statusText = document.getElementById('cloudStatusText');
+            const statusIcon = document.getElementById('cloudStatusIcon');
+            if (user) {
+                if (statusText) statusText.innerText = "Đã kết nối";
+                if (statusIcon) statusIcon.className = "fa-solid fa-cloud text-emerald-600";
+                subscribeFirestoreData();
+            } else {
+                if (statusText) statusText.innerText = "Chế độ Offline";
+                if (statusIcon) statusIcon.className = "fa-solid fa-cloud-slash text-slate-400";
+            }
+        });
+
+        // Initialize view rendering
+        renderVotingItems();
+        renderDocuments();
+        renderQA();
+        renderEvaluationAnalytics();
+        updateAttendanceUI();
+        updateResidentUI();
+
         // Attach functions to global window object for HTML event handlers
         window.switchTab = switchTab;
         window.filterDocuments = filterDocuments;
@@ -1333,6 +2158,18 @@
         window.adminLogout = adminLogout;
         window.showToast = showToast;
         window.saveAttendanceConfig = saveAttendanceConfig;
+        window.setRating = setRating;
+        window.handleEvaluationSubmit = handleEvaluationSubmit;
+        window.renderEvaluationAnalytics = renderEvaluationAnalytics;
+        window.updateEvalPeriodLabel = updateEvalPeriodLabel;
+        window.handleResidentVerify = handleResidentVerify;
+        window.resetVerification = resetVerification;
+        window.handleResidentExcelUpload = handleResidentExcelUpload;
+        window.filterAdminResidentTable = filterAdminResidentTable;
+        window.clearAllResidentsData = clearAllResidentsData;
+        window.downloadResidentTemplate = downloadResidentTemplate;
+        window.handleVotingQuickVerify = handleVotingQuickVerify;
+        window.resetVotingVerification = resetVotingVerification;
     </script>
 </body>
 </html>
