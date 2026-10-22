@@ -1017,7 +1017,7 @@
         const DB_VERSION = 1;
 
         function getIDB() {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 if (!window.indexedDB) { resolve(null); return; }
                 const req = indexedDB.open(DB_NAME, DB_VERSION);
                 req.onupgradeneeded = (e) => {
@@ -1071,6 +1071,29 @@
                 .replace(/^CANHO|^CAN/i, '');
         }
 
+        // Smart room matching supporting variations like A-08.15 vs A8.15 vs A0815
+        function isRoomMatch(inputStr, targetStr) {
+            const r1 = normalizeRoom(inputStr);
+            const r2 = normalizeRoom(targetStr);
+            if (!r1 || !r2) return false;
+            if (r1 === r2) return true;
+
+            // Extract block characters and numeric segments
+            const extractParts = (s) => {
+                const letters = s.match(/^[A-Z]+/i)?.[0] || '';
+                const nums = s.replace(/^[A-Z]+/i, '').replace(/\D+/g, '');
+                const numVal = parseInt(nums, 10);
+                return { letters, nums, numVal };
+            };
+
+            const p1 = extractParts(r1);
+            const p2 = extractParts(r2);
+            if (p1.letters && p2.letters && p1.letters === p2.letters) {
+                if (!isNaN(p1.numVal) && !isNaN(p2.numVal) && p1.numVal === p2.numVal) return true;
+            }
+            return false;
+        }
+
         function normalizePhone(phone) {
             if (!phone) return '';
             let s = String(phone).replace(/\s+/g, '').replace(/[-.,()]/g, '');
@@ -1082,7 +1105,7 @@
             // Auto convert +84 or 84 to 0
             if (s.startsWith('+84')) s = '0' + s.slice(3);
             else if (s.startsWith('84') && s.length >= 11) s = '0' + s.slice(2);
-            // Append leading 0 for 9-digit phones
+            // Prepend leading 0 for 9-digit phones
             if (s.length === 9 && !s.startsWith('0')) s = '0' + s;
             return s;
         }
@@ -1243,26 +1266,36 @@
             const file = e.target.files?.[0];
             if (!file) return;
 
-            showToast('Đang phân tích dữ liệu file Excel...', 'info');
+            showToast('Đang đọc và phân tích file Excel...', 'info');
             const reader = new FileReader();
             reader.onload = async function(evt) {
                 try {
                     const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, { type: 'array', raw: false });
-                    const sheetName = workbook.SheetNames[0];
-                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, defval: '' });
+                    const workbook = XLSX.read(data, { type: 'array', raw: false, cellDates: true });
+
+                    // Find the best sheet with resident data
+                    let targetSheetName = workbook.SheetNames[0];
+                    for (const name of workbook.SheetNames) {
+                        const low = removeAccents(name);
+                        if (low.includes('can ho') || low.includes('chu so huu') || low.includes('check in') || low.includes('danh sach')) {
+                            targetSheetName = name;
+                            break;
+                        }
+                    }
+
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[targetSheetName], { header: 1, defval: '' });
 
                     if (!rows || rows.length < 2) {
-                        showToast('File Excel không có dữ liệu!', 'error');
+                        showToast('File Excel không có dữ liệu hợp lệ!', 'error');
                         return;
                     }
 
-                    // Locate header row matching the 7 columns
+                    // Locate header row matching resident database columns
                     let headerIdx = -1;
-                    for (let i = 0; i < Math.min(rows.length, 25); i++) {
+                    for (let i = 0; i < Math.min(rows.length, 30); i++) {
                         const line = rows[i].map(c => removeAccents(String(c)));
-                        if (line.some(c => c.includes('can ho') || c.includes('ma can') || c.includes('phong')) &&
-                            line.some(c => c.includes('chu so huu') || c.includes('ho ten') || c.includes('ten'))) {
+                        if ((line.some(c => c.includes('can ho') || c.includes('ma can') || c.includes('phong') || c === 'can')) &&
+                            (line.some(c => c.includes('chu so huu') || c.includes('ho ten') || c.includes('chu ho') || c === 'ten'))) {
                             headerIdx = i;
                             break;
                         }
@@ -1271,12 +1304,12 @@
 
                     const headers = rows[headerIdx].map(c => removeAccents(String(c)));
                     const colMap = {
-                        room: headers.findIndex(c => c.includes('ma can') || c.includes('can ho') || c.includes('so phong')),
-                        name: headers.findIndex(c => c.includes('chu so huu') || c.includes('ho ten') || c.includes('chu ho')),
-                        area: headers.findIndex(c => c.includes('dien tich') || c.includes('m2') || c.includes('dt')),
+                        room: headers.findIndex(c => c.includes('ma can') || c.includes('can ho') || c.includes('phong') || c === 'can'),
+                        name: headers.findIndex(c => c.includes('chu so huu') || c.includes('ho ten') || c.includes('chu ho') || c === 'ten'),
+                        area: headers.findIndex(c => c.includes('dien tich') || c.includes('m2') || c.includes('dt') || c.includes('thong thuy')),
                         nationality: headers.findIndex(c => c.includes('quoc tich')),
                         gender: headers.findIndex(c => c.includes('gioi tinh') || c.includes('nam/nu')),
-                        phone: headers.findIndex(c => c.includes('dien thoai') || c.includes('sdt') || c.includes('phone') || c.includes('lien he')),
+                        phone: headers.findIndex(c => c.includes('dien thoai') || c.includes('sdt') || c.includes('phone') || c.includes('mobile') || c.includes('lien he')),
                         relation: headers.findIndex(c => c.includes('qh') || c.includes('quan he'))
                     };
 
@@ -1284,10 +1317,12 @@
                     for (let i = headerIdx + 1; i < rows.length; i++) {
                         const r = rows[i];
                         const roomVal = String(r[colMap.room] || '').trim();
-                        if (!roomVal) continue;
+                        if (!roomVal || roomVal === '0') continue;
 
                         const rawPhone = String(colMap.phone !== -1 ? r[colMap.phone] : '').trim();
                         const areaNum = parseFloat(String(colMap.area !== -1 ? r[colMap.area] : '0').replace(',', '.')) || 0;
+                        const extractedPhones = extractPhoneList(rawPhone);
+                        const primaryPhone = extractedPhones[0] || normalizePhone(rawPhone);
 
                         parsedList.push({
                             room: roomVal,
@@ -1295,14 +1330,15 @@
                             area: areaNum,
                             nationality: String(colMap.nationality !== -1 ? r[colMap.nationality] : 'Việt Nam').trim() || 'Việt Nam',
                             gender: String(colMap.gender !== -1 ? r[colMap.gender] : '').trim(),
-                            phone: normalizePhone(rawPhone),
+                            phone: primaryPhone,
                             phoneRaw: rawPhone,
+                            allPhones: extractedPhones,
                             relation: String(colMap.relation !== -1 ? r[colMap.relation] : 'Chủ hộ').trim() || 'Chủ hộ'
                         });
                     }
 
                     if (parsedList.length === 0) {
-                        showToast('Không tìm thấy danh sách căn hộ hợp lệ!', 'error');
+                        showToast('Không tìm thấy danh sách căn hộ hợp lệ trong file Excel!', 'error');
                         return;
                     }
 
@@ -1310,7 +1346,7 @@
                     localStorage.setItem('ecohome_residents_count', parsedList.length);
                     await saveToIndexedDB('residentStore', 'residents_list', parsedList);
 
-                    // Sync to Cloud Firestore in chunks if connected
+                    // Sync to Cloud Firestore in chunks if available
                     if (db) {
                         try {
                             const chunkSize = 200;
@@ -1321,8 +1357,17 @@
                         } catch (e) {}
                     }
 
+                    // Automatically update attendance total units to match uploaded database
+                    if (document.getElementById('adminTotalUnitsInput')) {
+                        document.getElementById('adminTotalUnitsInput').value = parsedList.length;
+                        calculateAttendanceRate();
+                    }
+
                     renderAdminResidentTable();
-                    showToast(`Nạp thành công ${parsedList.length} căn hộ vào CSDL!`);
+                    renderHomeEvalAnalytics();
+
+                    const withPhoneCount = parsedList.filter(r => r.phone && r.phone.length >= 8).length;
+                    showToast(`Nạp thành công ${parsedList.length} căn hộ (${withPhoneCount} căn có SĐT)!`, 'success');
                 } catch (err) {
                     showToast('Lỗi đọc file Excel: ' + err.message, 'error');
                 } finally {
@@ -1400,7 +1445,7 @@
 
                 // Prefill existing evaluation if present
                 const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR_2026';
-                const existing = state.evaluations.find(ev => normalizeRoom(ev.room) === normalizeRoom(resident.room) && ev.period === period);
+                const existing = state.evaluations.find(ev => isRoomMatch(ev.room, resident.room) && ev.period === period);
                 if (existing && existing.scores) {
                     for (let i = 1; i <= 6; i++) {
                         setRating(`crit${i}`, existing.scores[`crit${i}`] || 5);
@@ -1408,7 +1453,7 @@
                     if (document.getElementById('evalFeedbackText')) {
                         document.getElementById('evalFeedbackText').value = existing.feedback || '';
                     }
-                    showToast(`Đã nạp phiếu đánh giá kỳ này của căn ${resident.room}!`);
+                    showToast(`Căn ${resident.room} đã có phiếu kỳ này. Bạn có thể cập nhật lại điểm số.`, 'info');
                 }
             }
         }
@@ -1426,8 +1471,7 @@
                 return;
             }
 
-            const cleanRoom = normalizeRoom(roomIn);
-            const found = state.residentsList.find(r => normalizeRoom(r.room) === cleanRoom);
+            const found = state.residentsList.find(r => isRoomMatch(roomIn, r.room));
 
             if (!found) {
                 showToast(`Không tìm thấy căn ${roomIn} trong CSDL cư dân!`, 'error');
@@ -1435,12 +1479,12 @@
             }
 
             if (!isPhoneMatch(phoneIn, found.phoneRaw || found.phone)) {
-                showToast('Số điện thoại không khớp với thông tin đã đăng ký!', 'error');
+                showToast('Số điện thoại không khớp với thông tin đăng ký của căn hộ!', 'error');
                 return;
             }
 
             syncVerificationAcrossTabs(found);
-            showToast(`Xác thực thành công Căn ${found.room} - ${found.name}!`);
+            showToast(`Xác thực thành công Căn ${found.room} - ${found.name}!`, 'success');
         };
 
         window.resetVotingVerification = function() {
@@ -1469,8 +1513,7 @@
                 return;
             }
 
-            const cleanRoom = normalizeRoom(roomIn);
-            const found = state.residentsList.find(r => normalizeRoom(r.room) === cleanRoom);
+            const found = state.residentsList.find(r => isRoomMatch(roomIn, r.room));
 
             if (!found) {
                 showToast(`Không tìm thấy căn ${roomIn} trong CSDL cư dân!`, 'error');
@@ -1478,18 +1521,26 @@
             }
 
             if (!isPhoneMatch(phoneIn, found.phoneRaw || found.phone)) {
-                showToast('Số điện thoại không khớp với đăng ký của căn hộ!', 'error');
+                showToast('Số điện thoại không khớp với thông tin đã đăng ký!', 'error');
                 return;
             }
 
             syncVerificationAcrossTabs(found);
-            showToast(`Xác thực thành công! Đã mở phiếu đánh giá.`);
+            showToast(`Xác thực thành công! Đã mở phiếu đánh giá Căn ${found.room}.`, 'success');
+
+            // Smooth scroll to the criteria section for best user experience
+            setTimeout(() => {
+                const formEl = document.getElementById('evaluationFormWrapper');
+                if (formEl) formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
         };
 
         window.resetEvaluationVerification = function() {
             state.verifiedResident = null;
-            document.getElementById('evalRoomInput').value = '';
-            document.getElementById('evalPhoneInput').value = '';
+            const roomInput = document.getElementById('evalRoomInput');
+            const phoneInput = document.getElementById('evalPhoneInput');
+            if (roomInput) roomInput.value = '';
+            if (phoneInput) phoneInput.value = '';
             document.getElementById('evalVerifiedDetailCard')?.classList.add('hidden');
             document.getElementById('evaluationFormWrapper')?.classList.add('opacity-60', 'pointer-events-none');
             document.getElementById('btnSwitchEvaluator')?.classList.add('hidden');
@@ -1500,16 +1551,17 @@
                 eBadge.textContent = 'Chưa Xác Thực';
                 eBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900';
             }
-            document.getElementById('evalRoomInput')?.focus();
-            showToast('Đã chuyển đổi người đánh giá. Vui lòng xác thực căn hộ tiếp theo.');
+            if (roomInput) roomInput.focus();
+            showToast('Đã đổi người đánh giá. Vui lòng nhập thông tin căn hộ tiếp theo.');
         };
 
         window.onEvalPeriodChange = function(period) {
             if (state.verifiedResident) {
-                const existing = state.evaluations.find(ev => normalizeRoom(ev.room) === normalizeRoom(state.verifiedResident.room) && ev.period === period);
+                const existing = state.evaluations.find(ev => isRoomMatch(ev.room, state.verifiedResident.room) && ev.period === period);
                 if (existing && existing.scores) {
                     for (let i = 1; i <= 6; i++) setRating(`crit${i}`, existing.scores[`crit${i}`] || 5);
                     if (document.getElementById('evalFeedbackText')) document.getElementById('evalFeedbackText').value = existing.feedback || '';
+                    showToast(`Đã nạp phiếu đánh giá ${period} của căn ${state.verifiedResident.room}!`, 'info');
                 } else {
                     for (let i = 1; i <= 6; i++) setRating(`crit${i}`, 5);
                     if (document.getElementById('evalFeedbackText')) document.getElementById('evalFeedbackText').value = '';
@@ -1524,7 +1576,7 @@
                 let html = '';
                 for (let s = 1; s <= 5; s++) {
                     html += `
-                        <button type="button" onclick="setRating('crit${c}', ${s})" class="star-btn text-xl sm:text-2xl transition hover:scale-110 focus:outline-none star-active" data-crit="crit${c}" data-star="${s}">
+                        <button type="button" onclick="setRating('crit${c}', ${s})" class="star-btn text-xl sm:text-2xl transition hover:scale-110 focus:outline-none star-active active:scale-95" data-crit="crit${c}" data-star="${s}">
                             <i class="fa-solid fa-star"></i>
                         </button>
                     `;
@@ -1541,9 +1593,9 @@
                 const stars = container.querySelectorAll('.star-btn');
                 stars.forEach((btn, idx) => {
                     if (idx < star) {
-                        btn.className = 'star-btn text-xl sm:text-2xl transition hover:scale-110 focus:outline-none star-active';
+                        btn.className = 'star-btn text-xl sm:text-2xl transition hover:scale-110 focus:outline-none star-active active:scale-95';
                     } else {
-                        btn.className = 'star-btn text-xl sm:text-2xl transition hover:scale-110 focus:outline-none star-inactive';
+                        btn.className = 'star-btn text-xl sm:text-2xl transition hover:scale-110 focus:outline-none star-inactive active:scale-95';
                     }
                 });
             }
@@ -1585,8 +1637,11 @@
             };
 
             const existingIdx = state.evaluations.findIndex(ev => ev.id === record.id);
-            if (existingIdx !== -1) state.evaluations[existingIdx] = record;
-            else state.evaluations.unshift(record);
+            if (existingIdx !== -1) {
+                state.evaluations[existingIdx] = record;
+            } else {
+                state.evaluations.unshift(record);
+            }
 
             localStorage.setItem('ecohome_evaluations', JSON.stringify(state.evaluations));
             await saveToIndexedDB('evalStore', 'eval_list', state.evaluations);
@@ -1599,7 +1654,8 @@
 
             renderHomeEvalAnalytics();
             renderAdminEvalTable();
-            showToast(`Căn ${record.room} đã gửi đánh giá thành công!`);
+
+            showToast(`Căn ${record.room} đã gửi phiếu đánh giá thành công! Điểm TB: ${avgScore}★`, 'success');
         };
 
         window.renderHomeEvalAnalytics = function(period = 'ALL') {
