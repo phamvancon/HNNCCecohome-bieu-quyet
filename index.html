@@ -1025,22 +1025,35 @@
                         </div>
                     </div>
 
-                    <!-- Search & Filter Filter -->
-                    <div class="flex items-center justify-between gap-3 pt-2">
-                        <div class="w-full sm:w-80">
-                            <input type="text" id="adminResidentSearchInput" onkeyup="filterAdminResidentTable()" placeholder="Tìm theo Mã căn, Tên, SĐT, QH..." class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <!-- Search & Filter Controls with Pagination -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+                        <div class="flex-1 max-w-md relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="adminResidentSearchInput" oninput="filterAdminResidentTable()" placeholder="Tìm theo Mã căn, Họ tên, SĐT, Quan hệ..." class="w-full pl-8 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
                         </div>
-                        <button onclick="clearAllResidentsData()" class="text-xs text-rose-600 hover:text-rose-800 font-bold px-3 py-1.5 rounded-lg border border-rose-200 hover:bg-rose-50 transition">
-                            <i class="fa-solid fa-trash-can"></i> Xóa Hết Dữ Liệu
-                        </button>
+                        <div class="flex items-center justify-between sm:justify-end gap-2 flex-wrap">
+                            <div class="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
+                                <span class="font-bold text-[11px]">Hiển thị:</span>
+                                <select id="adminResidentPageSizeSelect" onchange="changeResidentPageSize(this.value)" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none cursor-pointer">
+                                    <option value="ALL" selected>Tất cả (Đầy đủ)</option>
+                                    <option value="100">100 căn</option>
+                                    <option value="200">200 căn</option>
+                                    <option value="500">500 căn</option>
+                                </select>
+                            </div>
+                            <span id="adminResidentDisplayCountBadge" class="text-xs font-bold text-slate-500 px-2 py-1 bg-slate-100 rounded-lg border border-slate-200">0/0</span>
+                            <button onclick="clearAllResidentsData()" class="text-xs text-rose-600 hover:text-rose-800 font-bold px-3 py-1.5 rounded-xl border border-rose-200 hover:bg-rose-50 transition flex items-center gap-1">
+                                <i class="fa-solid fa-trash-can"></i> Xóa CSDL
+                            </button>
+                        </div>
                     </div>
 
                     <!-- 7-Column Table Preview -->
-                    <div class="overflow-x-auto max-h-64 border border-slate-200 rounded-xl custom-scrollbar shadow-inner">
+                    <div class="overflow-x-auto max-h-96 border border-slate-200 rounded-xl custom-scrollbar shadow-inner">
                         <table class="w-full text-left text-xs text-slate-600">
                             <thead class="bg-slate-200 text-slate-800 font-bold uppercase text-[10px] sticky top-0 border-b border-slate-300">
                                 <tr>
-                                    <th class="px-3 py-2 text-center w-10">STT</th>
+                                    <th class="px-3 py-2 text-center w-12">STT</th>
                                     <th class="px-3 py-2">Mã Căn Hộ</th>
                                     <th class="px-3 py-2">Họ Tên Chủ Sở Hữu</th>
                                     <th class="px-3 py-2 text-right">Diện tích (m2)</th>
@@ -1285,6 +1298,20 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ecohome-nhonbinh-2026';
+
+        /* Gracefully handle any unhandled Firebase permission rejections */
+        window.addEventListener('unhandledrejection', (event) => {
+            const reason = event.reason;
+            if (
+                reason?.code === 'permission-denied' ||
+                (typeof reason?.message === 'string' && reason.message.includes('Missing or insufficient permissions'))
+            ) {
+                event.preventDefault();
+                console.warn('Firebase permission denied handled gracefully. Operating with LocalStorage cache.');
+                const badge = document.getElementById('cloudStatusText');
+                if (badge) badge.textContent = "Offline Cache";
+            }
+        });
 
         const DEFAULT_VOTING_ITEMS = [
             {
@@ -1605,9 +1632,7 @@
         };
 
         window.saveNavConfig = async function() {
-            const sel = document.getElementById('adminDefaultHomeSelect');
-            const defaultHome = sel ? sel.value : 'home';
-
+            const defaultHome = document.getElementById('adminDefaultHomeSelect')?.value || 'home';
             const visibleTabs = {
                 home: document.getElementById('navToggle-home')?.checked ?? true,
                 voting: document.getElementById('navToggle-voting')?.checked ?? true,
@@ -1615,81 +1640,128 @@
                 documents: document.getElementById('navToggle-documents')?.checked ?? true,
                 qa: document.getElementById('navToggle-qa')?.checked ?? true
             };
-
             visibleTabs[defaultHome] = true;
-
             state.navConfig = { defaultHomeTab: defaultHome, visibleTabs };
             saveToLocalStorage(LOCAL_STORAGE_KEYS.NAV_CONFIG, state.navConfig);
             applyNavConfigUI();
 
             if (auth.currentUser) {
                 try {
-                    const navRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'navigation');
-                    await setDoc(navRef, state.navConfig, { merge: true });
-                } catch(e) {
-                    console.warn("Fallback nav local save:", e);
+                    const navDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'navigation');
+                    await setDoc(navDocRef, state.navConfig, { merge: true });
+                } catch (e) {
+                    console.warn("Save nav config fallback:", e);
                 }
             }
-            showToast(`Đã lưu cấu hình menu! Trang chủ mặc định: ${defaultHome.toUpperCase()}`);
+            showToast("Đã lưu cấu hình menu và trang chủ mặc định!");
         };
 
         function normalizeRoom(str) {
             if (!str) return '';
-            return str.toString().trim().toUpperCase().replace(/[\s\-_.]/g, '');
+            // Loại bỏ khoảng trắng, dấu gạch nối, dấu chấm và đưa về chữ hoa
+            let clean = str.toString().trim().toUpperCase().replace(/[\s\-_.]/g, '');
+            // Chuẩn hóa định dạng tầng/số căn (ví dụ A815 -> A0815)
+            const m = clean.match(/^([A-Z]+)0*(\d{1,2})(\d{2})$/);
+            if (m) {
+                const block = m[1];
+                const floor = m[2].padStart(2, '0');
+                const roomNum = m[3];
+                return `${block}${floor}${roomNum}`;
+            }
+            return clean;
         }
 
         function normalizePhone(str) {
             if (!str) return '';
-            let p = str.toString().trim().replace(/[\s\-_.\(\)]/g, '');
-            if (p.startsWith('+84')) p = '0' + p.slice(3);
-            if (p.startsWith('84') && p.length > 9) p = '0' + p.slice(2);
+            let p = str.toString().trim().replace(/[\s\-_.\(\)\+]/g, '');
+            // Xử lý mã quốc gia Việt Nam 84
+            if (p.startsWith('84')) p = p.slice(2);
+            // Xóa số 0 đầu tiên để đối chiếu chuẩn với dạng số trong Excel
+            if (p.startsWith('0')) p = p.slice(1);
             return p;
         }
 
         function maskPhone(p) {
-            if (!p || p.length < 7) return p || '***';
-            return p.substring(0, 3) + '****' + p.substring(p.length - 3);
+            if (!p) return '***';
+            const s = p.toString();
+            if (s.length < 6) return s;
+            return s.substring(0, 3) + '****' + s.substring(s.length - 3);
         }
 
-        window.renderVotingItems = function() {
-            const container = document.getElementById('votingItemsContainer');
-            if (!container) return;
+        window.syncVerificationAcrossTabs = function() {
+            const res = state.verifiedResident || state.votingVerifiedResident;
 
-            const sorted = [...state.items].sort((a, b) => a.num - b.num);
+            // 1. Đồng bộ mục Xác thực trên Tab Biểu Quyết
+            const votingBadge = document.getElementById('votingVerificationBadge');
+            const votingUnverifiedForm = document.getElementById('votingUnverifiedForm');
+            const votingVerifiedCard = document.getElementById('votingVerifiedCard');
 
-            container.innerHTML = sorted.map(item => `
-                <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:shadow-md transition space-y-4">
-                    <div class="flex items-start justify-between gap-4">
-                        <div class="flex items-start gap-3.5">
-                            <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-brand-50 text-brand-700 border border-brand-200 flex items-center justify-center font-black text-sm sm:text-base flex-shrink-0 mt-0.5">
-                                ${item.num}
-                            </span>
-                            <div class="space-y-1">
-                                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                                    Nội dung ${item.num} / 11
-                                </span>
-                                <h3 class="text-sm sm:text-base font-black text-slate-900 leading-snug">
-                                    ${item.title}
-                                </h3>
-                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    ${item.desc || 'Nội dung tờ trình chính thức được trình bày tại Hội nghị Nhà chung cư.'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+            if (res) {
+                if (votingBadge) {
+                    votingBadge.textContent = "Đã xác thực";
+                    votingBadge.className = "text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+                }
+                if (votingUnverifiedForm) votingUnverifiedForm.classList.add('hidden');
+                if (votingVerifiedCard) {
+                    votingVerifiedCard.classList.remove('hidden');
+                    document.getElementById('votingVerifiedRoomDisplay').textContent = res.room;
+                    document.getElementById('votingVerifiedNameDisplay').textContent = res.name;
+                    document.getElementById('votingVerifiedRelationDisplay').textContent = res.relation || 'Chủ hộ';
+                    document.getElementById('votingVerifiedAreaDisplay').textContent = res.area || '68.5';
+                    
+                    const totalArea = state.residentsList.reduce((acc, c) => acc + (parseFloat(c.area) || 0), 0) || 1000;
+                    const voteRate = res.area ? ((parseFloat(res.area) / totalArea) * 100).toFixed(3) : '0.182';
+                    document.getElementById('votingVerifiedVoteRateDisplay').textContent = voteRate;
+                }
+            } else {
+                if (votingBadge) {
+                    votingBadge.textContent = "Chưa xác thực";
+                    votingBadge.className = "text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200";
+                }
+                if (votingUnverifiedForm) votingUnverifiedForm.classList.remove('hidden');
+                if (votingVerifiedCard) votingVerifiedCard.classList.add('hidden');
+            }
 
-                    <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                        <div class="flex items-center gap-2 text-xs text-slate-500">
-                            <i class="fa-regular fa-file-pdf text-rose-500 text-sm"></i>
-                            <span class="font-medium">${item.docName || 'To-trinh-dinh-kem.pdf'}</span>
-                        </div>
+            // 2. Đồng bộ mục Xác thực trên Tab Đánh Giá BQL
+            const evalBadge = document.getElementById('evalVerifyStatusBadge');
+            const evalUnverifiedForm = document.getElementById('evalUnverifiedForm');
+            const evalVerifiedCard = document.getElementById('evalVerifiedCard');
+            const evalFormSection = document.getElementById('evalFormSection');
 
-                        <a href="${item.docLink || '#'}" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-700 hover:from-brand-500 hover:to-emerald-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở link liên kết xem tài liệu Mục ${item.num}
-                        </a>
-                    </div>
-                </div>
-            `).join('');
+            if (res) {
+                if (evalBadge) {
+                    evalBadge.textContent = "Đã xác thực hợp lệ";
+                    evalBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+                }
+                if (evalUnverifiedForm) evalUnverifiedForm.classList.add('hidden');
+                if (evalVerifiedCard) {
+                    evalVerifiedCard.classList.remove('hidden');
+                    document.getElementById('evalVerifiedRoomDisplay').textContent = res.room;
+                    document.getElementById('evalVerifiedNameDisplay').textContent = res.name;
+                    document.getElementById('evalVerifiedRelationDisplay').textContent = res.relation || 'Chủ hộ';
+                    document.getElementById('evalVerifiedPhoneDisplay').textContent = maskPhone(res.phone);
+                    document.getElementById('evalVerifiedAreaDisplay').textContent = res.area || '68.5';
+                    
+                    const totalArea = state.residentsList.reduce((acc, c) => acc + (parseFloat(c.area) || 0), 0) || 1000;
+                    const rate = res.area ? ((parseFloat(res.area) / totalArea) * 100).toFixed(3) : '0.182';
+                    document.getElementById('evalVerifiedRateDisplay').textContent = rate;
+                }
+                // Mở khóa form đánh giá
+                if (evalFormSection) {
+                    evalFormSection.classList.remove('opacity-60', 'pointer-events-none');
+                }
+            } else {
+                if (evalBadge) {
+                    evalBadge.textContent = "Chưa xác thực";
+                    evalBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300";
+                }
+                if (evalUnverifiedForm) evalUnverifiedForm.classList.remove('hidden');
+                if (evalVerifiedCard) evalVerifiedCard.classList.add('hidden');
+                // Khóa lại form đánh giá
+                if (evalFormSection) {
+                    evalFormSection.classList.add('opacity-60', 'pointer-events-none');
+                }
+            }
         };
 
         window.handleVotingQuickVerify = function() {
@@ -1712,6 +1784,7 @@
                 state.votingVerifiedResident = match;
                 state.verifiedResident = match;
                 syncVerificationAcrossTabs();
+                loadExistingEvaluationIfAny(match);
                 showToast(`Xác thực thành công Căn ${match.room} - ${match.name}!`);
             } else {
                 showToast("Không tìm thấy thông tin trùng khớp với Căn hộ và SĐT đã nạp!", "Xác thực thất bại", true);
@@ -1720,6 +1793,7 @@
 
         window.resetVotingVerification = function() {
             state.votingVerifiedResident = null;
+            state.verifiedResident = null;
             syncVerificationAcrossTabs();
             showToast("Đã hủy trạng thái xác thực căn hộ.");
         };
@@ -1747,7 +1821,7 @@
                 loadExistingEvaluationIfAny(match);
                 showToast(`Xác thực thành công Căn ${match.room} - ${match.name}!`);
             } else {
-                showToast("Không khớp số điện thoại với danh sách chủ sở hữu chính thức!", "Xác thực thất bại", true);
+                showToast("Số điện thoại hoặc mã căn không trùng khớp trong danh sách!", "Xác thực thất bại", true);
             }
         };
 
@@ -1755,7 +1829,6 @@
             state.verifiedResident = null;
             state.votingVerifiedResident = null;
             
-            // Clean up verification inputs and return focus smoothly
             const roomInp = document.getElementById('evalVerifyRoom');
             const phoneInp = document.getElementById('evalVerifyPhone');
             const nameInp = document.getElementById('evalVerifyName');
@@ -1768,17 +1841,225 @@
             if (commentInp) { commentInp.value = ''; }
             if (noticeEl) { noticeEl.classList.add('hidden'); }
 
-            // Reset ratings to 5 stars default
             ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(k => {
                 setRating(k, 5);
             });
 
             syncVerificationAcrossTabs();
-            showToast("Đã hủy xác thực. Bạn có thể nhập mã căn và SĐT khác.");
+            showToast("Đã hủy xác thực. Quý cư dân có thể nhập mã căn khác.");
 
             setTimeout(() => {
                 if (roomInp) roomInp.focus();
             }, 100);
+        };
+
+        window.initAllRatingStars = function() {
+            ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(key => {
+                const group = document.getElementById(`star-group-${key}`);
+                if (!group) return;
+
+                group.innerHTML = [1, 2, 3, 4, 5].map(star => `
+                    <button type="button" onclick="setRating('${key}', ${star})" class="star-btn-${key} text-lg sm:text-xl text-amber-400 hover:scale-125 transition-transform duration-150 focus:outline-none" data-val="${star}" title="${star} sao">
+                        <i class="fa-solid fa-star"></i>
+                    </button>
+                `).join('');
+
+                setRating(key, state.evalRatings[key] || 5);
+            });
+        };
+
+        window.setRating = function(key, val) {
+            state.evalRatings[key] = val;
+            const scoreBadge = document.getElementById(`score-${key}`);
+            if (scoreBadge) {
+                scoreBadge.textContent = `${val}/5`;
+                if (val >= 4) {
+                    scoreBadge.className = "text-xs font-extrabold px-2 py-1 rounded bg-emerald-100 text-emerald-800 border border-emerald-200";
+                } else if (val === 3) {
+                    scoreBadge.className = "text-xs font-extrabold px-2 py-1 rounded bg-amber-100 text-amber-800 border border-amber-200";
+                } else {
+                    scoreBadge.className = "text-xs font-extrabold px-2 py-1 rounded bg-rose-100 text-rose-800 border border-rose-200";
+                }
+            }
+
+            const btns = document.querySelectorAll(`.star-btn-${key}`);
+            btns.forEach(btn => {
+                const bVal = parseInt(btn.getAttribute('data-val'));
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    if (bVal <= val) {
+                        icon.className = "fa-solid fa-star text-amber-400";
+                    } else {
+                        icon.className = "fa-regular fa-star text-slate-300";
+                    }
+                }
+            });
+        };
+
+        window.handleEvaluationSubmit = async function() {
+            const res = state.verifiedResident;
+            if (!res) {
+                showToast("Vui lòng xác thực số điện thoại và căn hộ trước khi gửi đánh giá!", "Chưa xác thực", true);
+                return;
+            }
+
+            const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR-2026';
+            const comment = document.getElementById('evalCommentInput')?.value?.trim() || '';
+
+            const evalData = {
+                id: `eval-${normalizeRoom(res.room)}-${period}`,
+                room: res.room,
+                name: res.name,
+                phone: res.phone,
+                period: period,
+                c1: state.evalRatings.c1,
+                c2: state.evalRatings.c2,
+                c3: state.evalRatings.c3,
+                c4: state.evalRatings.c4,
+                c5: state.evalRatings.c5,
+                c6: state.evalRatings.c6,
+                comment: comment,
+                timestamp: Date.now()
+            };
+
+            const existingIdx = state.evalList.findIndex(e => 
+                normalizeRoom(e.room) === normalizeRoom(res.room) && e.period === period
+            );
+
+            if (existingIdx !== -1) {
+                state.evalList[existingIdx] = evalData;
+            } else {
+                state.evalList.unshift(evalData);
+            }
+
+            saveToLocalStorage(LOCAL_STORAGE_KEYS.EVAL, state.evalList);
+
+            if (auth.currentUser) {
+                try {
+                    const evalRef = doc(db, 'artifacts', appId, 'public', 'data', 'eval_items', evalData.id);
+                    await setDoc(evalRef, evalData, { merge: true });
+                } catch (e) {
+                    console.warn("Firebase evaluation sync fallback:", e);
+                }
+            }
+
+            renderEvaluationAnalytics();
+            if (state.isAdmin) renderAdminEvalTable();
+            showToast(`Căn ${res.room} đã gửi phiếu đánh giá kỳ ${period} thành công!`);
+        };
+
+        window.getEvaluationDirectUrl = function() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', 'evaluation');
+            return url.toString();
+        };
+
+        window.copyEvaluationLink = function() {
+            const directUrl = window.getEvaluationDirectUrl();
+            const tempInput = document.createElement('input');
+            tempInput.value = directUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast("Đã sao chép đường link đánh giá vào bộ nhớ tạm!");
+        };
+
+        window.exportEvaluationExcel = function() {
+            if (!state.evalList || state.evalList.length === 0) {
+                showToast("Chưa có phiếu đánh giá nào để xuất file!", "Chưa có dữ liệu", true);
+                return;
+            }
+
+            const rows = [
+                ["STT", "Mã Căn Hộ", "Họ Tên Cư Dân", "Số Điện Thoại", "Kỳ Đánh Giá", "T1 - An Ninh", "T2 - Vệ Sinh", "T3 - Kỹ Thuật", "T4 - Xử Lý KN", "T5 - Tài Chính", "T6 - Thái Độ", "Điểm TB", "Ý Kiến Đóng Góp", "Thời Gian Gửi"]
+            ];
+
+            state.evalList.forEach((e, idx) => {
+                const avg = (((e.c1||5) + (e.c2||5) + (e.c3||5) + (e.c4||5) + (e.c5||5) + (e.c6||5)) / 6).toFixed(2);
+                const timeStr = e.timestamp ? new Date(e.timestamp).toLocaleString('vi-VN') : '';
+                rows.push([
+                    idx + 1,
+                    e.room,
+                    e.name,
+                    e.phone,
+                    e.period,
+                    e.c1, e.c2, e.c3, e.c4, e.c5, e.c6,
+                    parseFloat(avg),
+                    e.comment || '',
+                    timeStr
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "DanhSachDanhGiaBQL");
+            XLSX.writeFile(wb, `KET_QUA_DANH_GIA_BQL_ECOHOME_${Date.now()}.xlsx`);
+            showToast("Đã xuất file Excel kết quả đánh giá thành công!");
+        };
+
+        window.renderAdminEvalTable = function() {
+            const tbody = document.getElementById('adminEvalTableBody');
+            const countBadge = document.getElementById('adminEvalCountDisplay');
+            if (!tbody) return;
+
+            const periodFilter = document.getElementById('adminEvalFilterPeriod')?.value || 'ALL';
+            let list = state.evalList || [];
+
+            if (periodFilter !== 'ALL') {
+                list = list.filter(e => e.period === periodFilter);
+            }
+
+            if (countBadge) countBadge.textContent = `${list.length} phiếu`;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="13" class="text-center py-6 text-slate-400 italic">Chưa có phiếu đánh giá nào trong kỳ này.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((e, idx) => {
+                const avg = (((e.c1||5) + (e.c2||5) + (e.c3||5) + (e.c4||5) + (e.c5||5) + (e.c6||5)) / 6).toFixed(1);
+                return `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="px-3 py-2 text-center text-slate-400">${idx + 1}</td>
+                        <td class="px-3 py-2 font-bold text-slate-900">${e.room}</td>
+                        <td class="px-3 py-2 font-medium text-slate-800">${e.name}</td>
+                        <td class="px-3 py-2 font-mono text-slate-500">${e.phone || '-'}</td>
+                        <td class="px-3 py-2 text-center font-bold text-slate-600">${e.period}</td>
+                        <td class="px-2 py-2 text-center font-bold text-slate-700">${e.c1}</td>
+                        <td class="px-2 py-2 text-center font-bold text-slate-700">${e.c2}</td>
+                        <td class="px-2 py-2 text-center font-bold text-slate-700">${e.c3}</td>
+                        <td class="px-2 py-2 text-center font-bold text-slate-700">${e.c4}</td>
+                        <td class="px-2 py-2 text-center font-bold text-slate-700">${e.c5}</td>
+                        <td class="px-2 py-2 text-center font-bold text-slate-700">${e.c6}</td>
+                        <td class="px-3 py-2 text-center font-black text-amber-600">${avg}</td>
+                        <td class="px-3 py-2 text-slate-600 max-w-xs truncate" title="${e.comment || ''}">${e.comment || '-'}</td>
+                        <td class="px-3 py-2 text-center">
+                            <button onclick="deleteAdminEval('${e.id}')" class="text-rose-600 hover:text-rose-800 font-bold text-xs" title="Xóa phiếu này">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        };
+
+        window.deleteAdminEval = async function(id) {
+            state.evalList = state.evalList.filter(e => e.id !== id);
+            saveToLocalStorage(LOCAL_STORAGE_KEYS.EVAL, state.evalList);
+
+            if (auth.currentUser) {
+                try {
+                    const evalRef = doc(db, 'artifacts', appId, 'public', 'data', 'eval_items', id);
+                    await deleteDoc(evalRef);
+                } catch (e) {
+                    console.warn("Delete eval fallback:", e);
+                }
+            }
+
+            renderAdminEvalTable();
+            renderEvaluationAnalytics();
+            showToast("Đã xóa phiếu đánh giá.");
         };
 
         function loadExistingEvaluationIfAny(resident) {
@@ -1792,7 +2073,6 @@
             const commentInp = document.getElementById('evalCommentInput');
 
             if (existing) {
-                // Populate previous rating & comment so the resident can smoothly adjust
                 ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(k => {
                     if (existing[k]) setRating(k, existing[k]);
                 });
@@ -2058,6 +2338,41 @@
             }
         };
 
+        window.renderVotingItems = function() {
+            const container = document.getElementById('votingItemsContainer');
+            if (!container) return;
+
+            const sorted = [...state.items].sort((a, b) => a.num - b.num);
+
+            container.innerHTML = sorted.map(item => `
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3 hover:shadow-md transition">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                        <div class="space-y-1.5 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs border border-emerald-300">
+                                    Nội dung ${item.num}
+                                </span>
+                                <h3 class="font-extrabold text-slate-900 text-sm sm:text-base leading-snug">
+                                    ${item.title}
+                                </h3>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                ${item.desc || 'Nội dung tờ trình và phương án trình Hội nghị Nhà chung cư thường niên năm 2026.'}
+                            </p>
+                        </div>
+                        <div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 flex-shrink-0">
+                            <span class="text-[11px] font-bold text-slate-400">
+                                <i class="fa-regular fa-file-pdf text-rose-500 mr-1"></i> ${item.docName || 'To-trinh.pdf'}
+                            </span>
+                            <a href="${item.docLink || 'https://drive.google.com/'}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm hover:shadow transition flex items-center gap-2 whitespace-nowrap">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở link liên kết xem tài liệu Mục ${item.num}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        };
+
         window.renderDocuments = function() {
             const container = document.getElementById('documentsGridContainer');
             if (!container) return;
@@ -2194,23 +2509,58 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                    if (json.length < 2) {
-                        showToast("File Excel trống hoặc không đúng định dạng!", "Lỗi file", true);
+                    if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+                        showToast("File Excel không có sheet dữ liệu nào!", "Lỗi file", true);
                         return;
                     }
 
-                    // Locate header row matching 7 columns
+                    function removeAccents(str) {
+                        if (!str) return '';
+                        return str.toString()
+                            .normalize('NFD')
+                            .replace(/[\u0300-\u036f]/g, '')
+                            .toLowerCase()
+                            .trim();
+                    }
+
+                    // Tự động tìm sheet chứa dữ liệu danh sách căn hộ
+                    let targetSheet = null;
+                    let targetJson = [];
+
+                    for (const sName of workbook.SheetNames) {
+                        const ws = workbook.Sheets[sName];
+                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+                        if (rows && rows.length >= 2) {
+                            const sampleText = rows.slice(0, 15).map(r => r.join(' ')).join(' ');
+                            const sampleNorm = removeAccents(sampleText);
+                            if (sampleNorm.includes('can') || sampleNorm.includes('dien thoai') || sampleNorm.includes('so huu')) {
+                                targetSheet = ws;
+                                targetJson = rows;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!targetSheet) {
+                        targetSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        targetJson = XLSX.utils.sheet_to_json(targetSheet, { header: 1, defval: '' });
+                    }
+
+                    if (!targetJson || targetJson.length < 2) {
+                        showToast("File Excel trống hoặc không đủ dữ liệu!", "Lỗi file", true);
+                        return;
+                    }
+
+                    // Tìm hàng tiêu đề (header) chính xác (quét tới 25 dòng đầu)
                     let headerIdx = -1;
-                    for (let i = 0; i < Math.min(10, json.length); i++) {
-                        const rowStr = json[i].map(c => c ? c.toString().toLowerCase() : '').join(' ');
-                        if (rowStr.includes('căn') || rowStr.includes('mã căn') || rowStr.includes('sở hữu')) {
+                    for (let i = 0; i < Math.min(25, targetJson.length); i++) {
+                        const rowNorm = targetJson[i].map(c => removeAccents(c)).join(' ');
+                        if (rowNorm.includes('can ho') || rowNorm.includes('ma can') || rowNorm.includes('chu so huu') || (rowNorm.includes('can') && rowNorm.includes('dien thoai'))) {
                             headerIdx = i;
                             break;
                         }
@@ -2218,45 +2568,73 @@
 
                     if (headerIdx === -1) headerIdx = 0;
 
-                    const headers = json[headerIdx].map(h => h ? h.toString().trim() : '');
-                    
-                    const colRoom = headers.findIndex(h => /căn|mã căn/i.test(h));
-                    const colName = headers.findIndex(h => /tên|chủ/i.test(h));
-                    const colArea = headers.findIndex(h => /diện tích|m2/i.test(h));
-                    const colNation = headers.findIndex(h => /quốc tịch/i.test(h));
-                    const colGender = headers.findIndex(h => /giới tính/i.test(h));
-                    const colPhone = headers.findIndex(h => /thoại|điện thoại|sđt/i.test(h));
-                    const colRelation = headers.findIndex(h => /qh|quan hệ/i.test(h));
+                    const rawHeaders = targetJson[headerIdx].map(h => removeAccents(h));
+
+                    const colRoom = rawHeaders.findIndex(h => h.includes('ma can') || h.includes('can ho') || h.includes('so can') || h === 'can');
+                    const colName = rawHeaders.findIndex(h => h.includes('chu so huu') || h.includes('ho ten') || h.includes('chu ho') || h.includes('ten chu'));
+                    const colArea = rawHeaders.findIndex(h => h.includes('dien tich') || h.includes('m2') || h.includes('dt'));
+                    const colNation = rawHeaders.findIndex(h => h.includes('quoc tich') || h.includes('nationality'));
+                    const colGender = rawHeaders.findIndex(h => h.includes('gioi tinh') || h.includes('gender'));
+                    const colPhone = rawHeaders.findIndex(h => h.includes('dien thoai') || h.includes('sdt') || h.includes('so dien thoai') || h.includes('phone') || h.includes('mobile'));
+                    const colRelation = rawHeaders.findIndex(h => h.includes('qh voi ch') || h.includes('quan he') || h.includes('qh') || h.includes('quan he voi'));
 
                     const parsedResidents = [];
 
-                    for (let r = headerIdx + 1; r < json.length; r++) {
-                        const row = json[r];
+                    for (let r = headerIdx + 1; r < targetJson.length; r++) {
+                        const row = targetJson[r];
                         if (!row || row.length === 0) continue;
 
-                        const room = colRoom !== -1 ? row[colRoom] : row[1];
-                        const name = colName !== -1 ? row[colName] : row[2];
-                        const area = colArea !== -1 ? row[colArea] : row[3];
-                        const nation = colNation !== -1 ? row[colNation] : row[4];
-                        const gender = colGender !== -1 ? row[colGender] : row[5];
-                        const phone = colPhone !== -1 ? row[colPhone] : row[6];
-                        const relation = colRelation !== -1 ? row[colRelation] : row[7];
+                        let room = colRoom !== -1 ? row[colRoom] : (row[0] || row[1]);
+                        if (!room || room.toString().trim() === '') continue;
 
-                        if (room && room.toString().trim().length > 0) {
-                            parsedResidents.push({
-                                room: room.toString().trim().toUpperCase(),
-                                name: name ? name.toString().trim() : 'Chủ sở hữu',
-                                area: area ? parseFloat(area) || 0 : 65.0,
-                                nation: nation ? nation.toString().trim() : 'Việt Nam',
-                                gender: gender ? gender.toString().trim() : '',
-                                phone: phone ? normalizePhone(phone) : '',
-                                relation: relation ? relation.toString().trim() : 'Chủ hộ'
-                            });
+                        let roomStr = room.toString().trim().toUpperCase();
+                        // Bỏ qua các dòng tổng cộng / ghi chú
+                        if (roomStr.includes('TỔNG') || roomStr.includes('TONG') || roomStr.includes('CỘNG') || roomStr.includes('STT')) {
+                            continue;
                         }
+
+                        let name = colName !== -1 ? row[colName] : '';
+                        name = name ? name.toString().trim() : 'Chủ sở hữu';
+
+                        let rawArea = colArea !== -1 ? row[colArea] : '';
+                        let areaNum = 65.0;
+                        if (rawArea) {
+                            let cleanArea = rawArea.toString().replace(',', '.').replace(/[^\d.]/g, '');
+                            areaNum = parseFloat(cleanArea) || 65.0;
+                        }
+
+                        let nation = colNation !== -1 ? row[colNation] : 'Việt Nam';
+                        nation = nation ? nation.toString().trim() : 'Việt Nam';
+
+                        let gender = colGender !== -1 ? row[colGender] : '';
+                        gender = gender ? gender.toString().trim() : '';
+
+                        let rawPhone = colPhone !== -1 ? row[colPhone] : '';
+                        let phoneStr = '';
+                        if (rawPhone !== undefined && rawPhone !== null) {
+                            let p = rawPhone.toString().trim().replace(/[\s\-_.\(\)\+]/g, '');
+                            if (p.includes('.')) p = p.split('.')[0];
+                            if (p.startsWith('84')) p = '0' + p.slice(2);
+                            if (p.length === 9 && !p.startsWith('0')) p = '0' + p;
+                            phoneStr = p;
+                        }
+
+                        let relation = colRelation !== -1 ? row[colRelation] : 'Chủ hộ';
+                        relation = relation ? relation.toString().trim() : 'Chủ hộ';
+
+                        parsedResidents.push({
+                            room: roomStr,
+                            name: name,
+                            area: areaNum,
+                            nation: nation,
+                            gender: gender,
+                            phone: phoneStr,
+                            relation: relation
+                        });
                     }
 
                     if (parsedResidents.length === 0) {
-                        showToast("Không tìm thấy dữ liệu căn hộ hợp lệ trong file!", "Lỗi nạp", true);
+                        showToast("Không tìm thấy dữ liệu căn hộ hợp lệ trong file Excel!", "Lỗi nạp", true);
                         return;
                     }
 
@@ -2266,20 +2644,101 @@
                     if (auth.currentUser) {
                         try {
                             const resDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'residents_db');
-                            setDoc(resDocRef, { list: parsedResidents, updatedAt: Date.now() });
+                            await setDoc(resDocRef, { list: parsedResidents, updatedAt: Date.now() });
                         } catch(e) {
                             console.warn("Firebase resident sync fallback:", e);
                         }
                     }
 
+                    window.residentCurrentPageSize = 'ALL';
+                    const pageSizeSel = document.getElementById('adminResidentPageSizeSelect');
+                    if (pageSizeSel) pageSizeSel.value = 'ALL';
+
                     updateResidentUI();
-                    showToast(`Đã nạp thành công ${parsedResidents.length} căn hộ vào CSDL!`);
+                    renderEvaluationAnalytics();
+                    showToast(`Đã nạp chính xác & đầy đủ toàn bộ ${parsedResidents.length} căn hộ vào hệ thống!`, "Nạp thành công");
                 } catch(err) {
                     console.error("Lỗi đọc Excel:", err);
-                    showToast("Lỗi phân tích file Excel!", "Lỗi", true);
+                    showToast("Lỗi phân tích file Excel! Vui lòng kiểm tra định dạng file.", "Lỗi", true);
                 }
             };
             reader.readAsArrayBuffer(file);
+        };
+
+        window.residentCurrentPageSize = 'ALL';
+
+        window.changeResidentPageSize = function(val) {
+            window.residentCurrentPageSize = val;
+            updateResidentUI();
+        };
+
+        window.updateResidentUI = function() {
+            const list = state.residentsList || [];
+            const countEl = document.getElementById('adminTotalResidentCount');
+            const areaEl = document.getElementById('adminTotalAreaCount');
+            const validPhoneEl = document.getElementById('adminValidPhoneCount');
+            const tbody = document.getElementById('adminResidentTableBody');
+            const badgeCount = document.getElementById('adminResidentDisplayCountBadge');
+
+            const totalArea = list.reduce((acc, c) => acc + (parseFloat(c.area) || 0), 0);
+            const validPhoneCount = list.filter(c => c.phone && c.phone.length >= 9).length;
+            const validPhonePercent = list.length > 0 ? ((validPhoneCount / list.length) * 100).toFixed(0) : '0';
+
+            if (countEl) countEl.textContent = `${list.length} Căn Hộ`;
+            if (areaEl) areaEl.textContent = `${totalArea.toFixed(1)} m²`;
+            if (validPhoneEl) validPhoneEl.textContent = `${validPhonePercent}%`;
+
+            if (tbody) {
+                if (list.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">Chưa có dữ liệu. Vui lòng bấm "Nạp File Excel Cư Dân" để nạp danh sách.</td></tr>`;
+                    if (badgeCount) badgeCount.textContent = "0/0";
+                    return;
+                }
+
+                const query = document.getElementById('adminResidentSearchInput')?.value?.toLowerCase().trim() || '';
+                let filtered = list;
+                if (query) {
+                    filtered = list.filter(r => 
+                        (r.room && r.room.toLowerCase().includes(query)) ||
+                        (r.name && r.name.toLowerCase().includes(query)) ||
+                        (r.phone && r.phone.toLowerCase().includes(query)) ||
+                        (r.relation && r.relation.toLowerCase().includes(query))
+                    );
+                }
+
+                const pageSize = window.residentCurrentPageSize || 'ALL';
+                const displayList = pageSize === 'ALL' ? filtered : filtered.slice(0, parseInt(pageSize));
+
+                if (badgeCount) {
+                    badgeCount.textContent = `Hiển thị ${displayList.length} / ${filtered.length} (Tổng ${list.length})`;
+                }
+
+                if (displayList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">Không tìm thấy căn hộ nào khớp với từ khóa tìm kiếm.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = displayList.map((r, i) => `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="px-3 py-2 text-center text-slate-400">${i + 1}</td>
+                        <td class="px-3 py-2 font-bold text-slate-900">${r.room}</td>
+                        <td class="px-3 py-2 font-semibold text-slate-800">${r.name}</td>
+                        <td class="px-3 py-2 text-right font-medium text-brand-700">${parseFloat(r.area).toFixed(1)}</td>
+                        <td class="px-3 py-2 text-center">${r.nation || 'VN'}</td>
+                        <td class="px-3 py-2 text-center">${r.gender || '-'}</td>
+                        <td class="px-3 py-2 font-mono text-slate-600">${r.phone || '-'}</td>
+                        <td class="px-3 py-2 text-center">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.relation === 'Chủ hộ' ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'}">
+                                ${r.relation || 'Chủ hộ'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        };
+
+        window.filterAdminResidentTable = function() {
+            updateResidentUI();
         };
 
         window.downloadResidentTemplate = function() {
@@ -2305,55 +2764,6 @@
                 updateResidentUI();
                 showToast("Đã làm trống danh sách cư dân.");
             }
-        };
-
-        window.updateResidentUI = function() {
-            const list = state.residentsList || [];
-            const countEl = document.getElementById('adminTotalResidentCount');
-            const areaEl = document.getElementById('adminTotalAreaCount');
-            const validPhoneEl = document.getElementById('adminValidPhoneCount');
-            const tbody = document.getElementById('adminResidentTableBody');
-
-            const totalArea = list.reduce((acc, c) => acc + (parseFloat(c.area) || 0), 0);
-            const validPhoneCount = list.filter(c => c.phone && c.phone.length >= 9).length;
-            const validPhonePercent = list.length > 0 ? ((validPhoneCount / list.length) * 100).toFixed(0) : '0';
-
-            if (countEl) countEl.textContent = `${list.length} Căn Hộ`;
-            if (areaEl) areaEl.textContent = `${totalArea.toFixed(1)} m²`;
-            if (validPhoneEl) validPhoneEl.textContent = `${validPhonePercent}%`;
-
-            if (tbody) {
-                if (list.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">Chưa có dữ liệu. Vui lòng bấm "Nạp File Excel Cư Dân" hoặc "Tải File Mẫu Chuẩn".</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = list.slice(0, 100).map((r, i) => `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="px-3 py-2 text-center text-slate-400">${i + 1}</td>
-                        <td class="px-3 py-2 font-bold text-slate-900">${r.room}</td>
-                        <td class="px-3 py-2 font-semibold text-slate-800">${r.name}</td>
-                        <td class="px-3 py-2 text-right font-medium text-brand-700">${parseFloat(r.area).toFixed(1)}</td>
-                        <td class="px-3 py-2 text-center">${r.nation || 'VN'}</td>
-                        <td class="px-3 py-2 text-center">${r.gender || '-'}</td>
-                        <td class="px-3 py-2 font-mono text-slate-600">${r.phone || '-'}</td>
-                        <td class="px-3 py-2 text-center">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.relation === 'Chủ hộ' ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'}">
-                                ${r.relation || 'Chủ hộ'}
-                            </span>
-                        </td>
-                    </tr>
-                `).join('');
-            }
-        };
-
-        window.filterAdminResidentTable = function() {
-            const q = document.getElementById('adminResidentSearchInput')?.value?.toLowerCase() || '';
-            const rows = document.querySelectorAll('#adminResidentTableBody tr');
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(q) ? '' : 'none';
-            });
         };
 
         window.handleAdminLogin = function() {
@@ -2610,7 +3020,7 @@
             // Listen for Voting Items
             try {
                 const votingCol = collection(db, 'artifacts', appId, 'public', 'data', 'voting_items');
-                onSnapshot(votingCol, (snap) => {
+                const unsubVoting = onSnapshot(votingCol, (snap) => {
                     if (!snap.empty) {
                         const fetched = [];
                         snap.forEach(d => fetched.push(d.data()));
@@ -2620,37 +3030,46 @@
                         renderDocuments();
                         if (state.isAdmin) renderAdminControls();
                     }
-                }, (err) => console.warn("Firestore voting listener:", err));
+                }, (err) => {
+                    console.warn("Firestore voting listener:", err);
+                    if (err?.code === 'permission-denied') unsubVoting();
+                });
             } catch(e) {}
 
             // Listen for Attendance Config
             try {
                 const attDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'attendance');
-                onSnapshot(attDocRef, (snap) => {
+                const unsubAtt = onSnapshot(attDocRef, (snap) => {
                     if (snap.exists()) {
                         state.attendanceConfig = { ...state.attendanceConfig, ...snap.data() };
                         saveToLocalStorage(LOCAL_STORAGE_KEYS.ATTENDANCE, state.attendanceConfig);
                         updateAttendanceUI();
                     }
-                }, (err) => console.warn("Firestore att listener:", err));
+                }, (err) => {
+                    console.warn("Firestore att listener:", err);
+                    if (err?.code === 'permission-denied') unsubAtt();
+                });
             } catch(e) {}
 
             // Listen for Nav Config
             try {
                 const navDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'navigation');
-                onSnapshot(navDocRef, (snap) => {
+                const unsubNav = onSnapshot(navDocRef, (snap) => {
                     if (snap.exists()) {
                         state.navConfig = { ...state.navConfig, ...snap.data() };
                         saveToLocalStorage(LOCAL_STORAGE_KEYS.NAV_CONFIG, state.navConfig);
                         applyNavConfigUI();
                     }
-                }, (err) => console.warn("Firestore nav listener:", err));
+                }, (err) => {
+                    console.warn("Firestore nav listener:", err);
+                    if (err?.code === 'permission-denied') unsubNav();
+                });
             } catch(e) {}
 
             // Listen for Evaluations
             try {
                 const evalCol = collection(db, 'artifacts', appId, 'public', 'data', 'eval_items');
-                onSnapshot(evalCol, (snap) => {
+                const unsubEval = onSnapshot(evalCol, (snap) => {
                     if (!snap.empty) {
                         const fetched = [];
                         snap.forEach(d => fetched.push(d.data()));
@@ -2658,13 +3077,32 @@
                         saveToLocalStorage(LOCAL_STORAGE_KEYS.EVAL, state.evalList);
                         renderEvaluationAnalytics();
                     }
-                }, (err) => console.warn("Firestore eval listener:", err));
+                }, (err) => {
+                    console.warn("Firestore eval listener:", err);
+                    if (err?.code === 'permission-denied') unsubEval();
+                });
+            } catch(e) {}
+
+            // Listen for Residents Database
+            try {
+                const resDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'residents_db');
+                const unsubRes = onSnapshot(resDocRef, (snap) => {
+                    if (snap.exists() && snap.data()?.list && Array.isArray(snap.data().list)) {
+                        state.residentsList = snap.data().list;
+                        saveToLocalStorage(LOCAL_STORAGE_KEYS.RESIDENTS, state.residentsList);
+                        updateResidentUI();
+                        renderEvaluationAnalytics();
+                    }
+                }, (err) => {
+                    console.warn("Firestore resident listener:", err);
+                    if (err?.code === 'permission-denied') unsubRes();
+                });
             } catch(e) {}
 
             // Listen for Q&A
             try {
                 const qaCol = collection(db, 'artifacts', appId, 'public', 'data', 'qa_items');
-                onSnapshot(qaCol, (snap) => {
+                const unsubQA = onSnapshot(qaCol, (snap) => {
                     if (!snap.empty) {
                         const fetched = [];
                         snap.forEach(d => fetched.push(d.data()));
@@ -2672,7 +3110,10 @@
                         saveToLocalStorage(LOCAL_STORAGE_KEYS.QA, state.qaList);
                         renderQA();
                     }
-                }, (err) => console.warn("Firestore QA listener:", err));
+                }, (err) => {
+                    console.warn("Firestore QA listener:", err);
+                    if (err?.code === 'permission-denied') unsubQA();
+                });
             } catch(e) {}
         }
 
