@@ -3012,10 +3012,34 @@
                     state.residentsList = parsedResidents;
                     saveToLocalStorage(LOCAL_STORAGE_KEYS.RESIDENTS, state.residentsList);
 
+                    /* 1. LƯU VĨNH VIỄN VÀO INDEXEDDB (Không giới hạn dung lượng) */
+                    await saveToIndexedDB('residentStore', 'residents_list', parsedResidents);
+
+                    /* 2. LƯU LÂU DÀI LÊN FIREBASE CLOUD THEO CHUNKS (Tránh giới hạn 1MB Firestore) */
                     if (auth.currentUser) {
                         try {
+                            const CHUNK_SIZE = 200; // Mỗi chunk 200 căn hộ an toàn tuyệt đối
+                            const totalChunks = Math.ceil(parsedResidents.length / CHUNK_SIZE);
+
+                            // Lưu metadata
+                            const metaRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'residents_meta');
+                            await setDoc(metaRef, {
+                                totalCount: parsedResidents.length,
+                                totalChunks: totalChunks,
+                                chunkSize: CHUNK_SIZE,
+                                updatedAt: Date.now()
+                            });
+
+                            // Lưu từng chunk
+                            for (let c = 0; c < totalChunks; c++) {
+                                const chunkData = parsedResidents.slice(c * CHUNK_SIZE, (c + 1) * CHUNK_SIZE);
+                                const chunkRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', `residents_chunk_${c}`);
+                                await setDoc(chunkRef, { chunkIndex: c, list: chunkData });
+                            }
+
+                            // Giữ thêm 1 bản tóm tắt tương thích ngược
                             const resDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'residents_db');
-                            await setDoc(resDocRef, { list: parsedResidents, updatedAt: Date.now() });
+                            await setDoc(resDocRef, { list: parsedResidents.slice(0, 300), totalCount: parsedResidents.length, updatedAt: Date.now() });
                         } catch(e) {
                             console.warn("Firebase resident sync fallback:", e);
                         }
@@ -3025,15 +3049,69 @@
                     const pageSizeSel = document.getElementById('adminResidentPageSizeSelect');
                     if (pageSizeSel) pageSizeSel.value = 'ALL';
 
+                    const syncEl = document.getElementById('adminLastSyncTime');
+                    if (syncEl) syncEl.textContent = `Lưu lúc ${new Date().toLocaleTimeString('vi-VN')}`;
+
                     updateResidentUI();
                     renderEvaluationAnalytics();
-                    showToast(`Đã nạp chính xác & đầy đủ toàn bộ ${parsedResidents.length} căn hộ vào hệ thống!`, "Nạp thành công");
+                    showToast(`Đã nạp chính xác & lưu trữ lâu dài toàn bộ ${parsedResidents.length} căn hộ vào hệ thống!`, "Nạp thành công");
                 } catch(err) {
                     console.error("Lỗi đọc Excel:", err);
                     showToast("Lỗi phân tích file Excel! Vui lòng kiểm tra định dạng file.", "Lỗi", true);
                 }
             };
             reader.readAsArrayBuffer(file);
+        };
+
+        /* SAO LƯU TOÀN BỘ CSDL CƯ DÂN THÀNH FILE JSON ĐỘC LẬP */
+        window.backupResidentDatabase = function() {
+            if (!state.residentsList || state.residentsList.length === 0) {
+                showToast("CSDL cư dân hiện đang trống!", "Chưa có dữ liệu", true);
+                return;
+            }
+            const backupPayload = {
+                app: "Ecohome Nhơn Bình 2026",
+                backupType: "RESIDENTS_DB",
+                exportedAt: new Date().toISOString(),
+                totalCount: state.residentsList.length,
+                data: state.residentsList
+            };
+            const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `CSDL_CU_DAN_ECOHOME_BACKUP_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Đã xuất file sao lưu ${state.residentsList.length} căn hộ an toàn!`);
+        };
+
+        /* KHÔI PHỤC CSDL TỪ FILE SAO LƯU JSON */
+        window.restoreResidentDatabase = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    const list = Array.isArray(parsed) ? parsed : (parsed.data && Array.isArray(parsed.data) ? parsed.data : null);
+                    if (!list || list.length === 0) {
+                        showToast("File sao lưu không chứa danh sách cư dân hợp lệ!", "Lỗi file", true);
+                        return;
+                    }
+                    state.residentsList = list;
+                    saveToLocalStorage(LOCAL_STORAGE_KEYS.RESIDENTS, state.residentsList);
+                    await saveToIndexedDB('residentStore', 'residents_list', state.residentsList);
+                    updateResidentUI();
+                    renderEvaluationAnalytics();
+                    showToast(`Khôi phục thành công ${list.length} căn hộ từ file sao lưu!`);
+                } catch (err) {
+                    showToast("Lỗi đọc file sao lưu JSON!", "Lỗi", true);
+                }
+            };
+            reader.readAsText(file);
         };
 
         window.residentCurrentPageSize = 'ALL';
@@ -3270,14 +3348,27 @@
             if (f) f.value = '';
         };
 
+        /* ĐỌC & LƯU FILE TỜ TRÌNH LÂU DÀI VĨNH VIỄN (DataURL & IndexedDB, không dùng Blob tạm) */
         window.handleAdminFileUpload = function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             document.getElementById('adminInputDocName').value = file.name;
-            const fakeUrl = URL.createObjectURL(file);
-            document.getElementById('adminInputDocLink').value = fakeUrl;
-            showToast(`Đã đính kèm file: ${file.name}`);
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const permanentDataUrl = e.target.result;
+                document.getElementById('adminInputDocLink').value = permanentDataUrl;
+                try {
+                    await saveToIndexedDB('fileStore', `file_${file.name}`, {
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        dataUrl: permanentDataUrl
+                    });
+                } catch(err) {}
+                showToast(`Đã mã hóa & đính kèm file lâu dài: ${file.name}`);
+            };
+            reader.readAsDataURL(file);
         };
 
         window.handleAdminSaveItem = async function() {
@@ -3456,13 +3547,44 @@
 
             // Listen for Residents Database
             try {
+                // Ưu tiên nạp theo chunks nếu có
+                const metaRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'residents_meta');
+                const unsubMeta = onSnapshot(metaRef, async (metaSnap) => {
+                    if (metaSnap.exists() && metaSnap.data()?.totalChunks) {
+                        const meta = metaSnap.data();
+                        const chunksData = [];
+                        for (let c = 0; c < meta.totalChunks; c++) {
+                            try {
+                                const cRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', `residents_chunk_${c}`);
+                                const cSnap = await getDoc(cRef);
+                                if (cSnap.exists() && Array.isArray(cSnap.data()?.list)) {
+                                    chunksData.push(...cSnap.data().list);
+                                }
+                            } catch(e) {}
+                        }
+                        if (chunksData.length > 0) {
+                            state.residentsList = chunksData;
+                            saveToLocalStorage(LOCAL_STORAGE_KEYS.RESIDENTS, state.residentsList);
+                            await saveToIndexedDB('residentStore', 'residents_list', state.residentsList);
+                            updateResidentUI();
+                            renderEvaluationAnalytics();
+                            return;
+                        }
+                    }
+                }, (err) => {
+                    if (err?.code === 'permission-denied') unsubMeta();
+                });
+
                 const resDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'residents_db');
-                const unsubRes = onSnapshot(resDocRef, (snap) => {
+                const unsubRes = onSnapshot(resDocRef, async (snap) => {
                     if (snap.exists() && snap.data()?.list && Array.isArray(snap.data().list)) {
-                        state.residentsList = snap.data().list;
-                        saveToLocalStorage(LOCAL_STORAGE_KEYS.RESIDENTS, state.residentsList);
-                        updateResidentUI();
-                        renderEvaluationAnalytics();
+                        if (!state.residentsList || state.residentsList.length < snap.data().list.length) {
+                            state.residentsList = snap.data().list;
+                            saveToLocalStorage(LOCAL_STORAGE_KEYS.RESIDENTS, state.residentsList);
+                            await saveToIndexedDB('residentStore', 'residents_list', state.residentsList);
+                            updateResidentUI();
+                            renderEvaluationAnalytics();
+                        }
                     }
                 }, (err) => {
                     console.warn("Firestore resident listener:", err);
