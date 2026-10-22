@@ -411,9 +411,17 @@
                             Phiếu đánh giá theo các tiêu chuẩn Hợp đồng Quản lý Vận hành nhà chung cư hiện hành. Cư dân cần xác thực đúng Số điện thoại và Căn hộ chính chủ để gửi đánh giá.
                         </p>
                     </div>
-                    <div class="px-4 py-2 bg-white/20 rounded-xl text-center">
-                        <span class="text-[10px] uppercase font-bold text-amber-200 block">Đơn vị đang vận hành</span>
-                        <strong class="text-sm font-black text-white">N&H Management</strong>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="copyEvaluationLink()" class="px-3.5 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition flex items-center gap-1.5 backdrop-blur-sm border border-white/20" title="Sao chép link gửi cho cư dân">
+                            <i class="fa-solid fa-share-nodes"></i> Sao chép link đánh giá
+                        </button>
+                        <button onclick="exportEvaluationExcel()" class="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-900 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 border border-amber-400/40 shadow-sm">
+                            <i class="fa-solid fa-file-excel text-emerald-400"></i> Xuất File Excel Đánh Giá
+                        </button>
+                        <div class="px-3 py-2 bg-white/10 rounded-xl text-center hidden lg:block border border-white/10">
+                            <span class="text-[9px] uppercase font-bold text-amber-200 block">Đơn vị vận hành</span>
+                            <strong class="text-xs font-black text-white">N&H Management</strong>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -439,42 +447,45 @@
                 <div id="evalUnverifiedForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Mã Căn Hộ *</label>
-                        <input type="text" id="evalVerifyRoom" placeholder="Ví dụ: A-08.15" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none uppercase font-bold">
+                        <input type="text" id="evalVerifyRoom" placeholder="Ví dụ: A-08.15" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none uppercase font-bold transition">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Họ Tên Chủ Sở Hữu (Tùy chọn)</label>
-                        <input type="text" id="evalVerifyName" placeholder="Ví dụ: Nguyễn Văn Hùng" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <input type="text" id="evalVerifyName" placeholder="Ví dụ: Nguyễn Văn Hùng" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none transition">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Số Điện Thoại Đăng Ký *</label>
-                        <input type="tel" id="evalVerifyPhone" placeholder="Ví dụ: 0981234567" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <input type="tel" id="evalVerifyPhone" placeholder="Ví dụ: 0981234567" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none transition">
                     </div>
                     <div class="flex items-end">
-                        <button onclick="handleResidentVerify()" class="w-full py-2 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5 h-[38px]">
+                        <button onclick="handleResidentVerify()" class="w-full py-2 px-4 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5 h-[38px]">
                             <i class="fa-solid fa-shield-check"></i> Xác Thực Thông Tin
                         </button>
                     </div>
                 </div>
 
                 <!-- Verified State Information -->
-                <div id="evalVerifiedCard" class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="font-extrabold text-sm text-emerald-800" id="evalVerifiedRoomDisplay">A-08.15</span>
+                <div id="evalVerifiedCard" class="hidden p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 text-xs text-emerald-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm transition-all duration-300">
+                    <div class="space-y-1.5 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-extrabold text-sm text-emerald-900 bg-white px-2.5 py-0.5 rounded-lg border border-emerald-200 shadow-xs" id="evalVerifiedRoomDisplay">A-08.15</span>
                             <span class="px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900 font-bold text-[10px]" id="evalVerifiedRelationDisplay">Chủ hộ</span>
-                            <span class="text-slate-500">•</span>
-                            <span class="font-bold text-slate-800" id="evalVerifiedNameDisplay">Nguyễn Văn Hùng</span>
+                            <span class="text-slate-400">•</span>
+                            <span class="font-bold text-slate-900 text-xs" id="evalVerifiedNameDisplay">Nguyễn Văn Hùng</span>
+                            <span id="evalExistingVoteNotice" class="hidden text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-md border border-amber-300 flex items-center gap-1">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Đã có phiếu - Chế độ cập nhật
+                            </span>
                         </div>
-                        <div class="text-[11px] text-emerald-700 flex items-center gap-3">
-                            <span>SĐT: <strong id="evalVerifiedPhoneDisplay">098****567</strong></span>
+                        <div class="text-[11px] text-emerald-800 flex items-center gap-3 flex-wrap">
+                            <span>SĐT: <strong id="evalVerifiedPhoneDisplay" class="font-mono">098****567</strong></span>
                             <span>•</span>
                             <span>Diện tích: <strong id="evalVerifiedAreaDisplay">68.5</strong> m²</span>
                             <span>•</span>
                             <span>Tỷ lệ biểu quyết: <strong id="evalVerifiedRateDisplay">0.182</strong>%</span>
                         </div>
                     </div>
-                    <button onclick="resetVerification()" class="px-3 py-1.5 rounded-lg bg-white border border-emerald-300 text-emerald-800 font-bold hover:bg-emerald-100 text-[11px] transition">
-                        Đổi Người Đánh Giá
+                    <button onclick="resetVerification()" class="px-3.5 py-2 rounded-xl bg-white border border-emerald-300 text-rose-700 hover:text-white hover:bg-rose-600 hover:border-rose-600 font-bold text-xs shadow-xs transition flex items-center gap-1.5 whitespace-nowrap active:scale-95" title="Chuyển sang kiểm tra hoặc đánh giá cho căn hộ khác">
+                        <i class="fa-solid fa-arrow-right-arrow-left"></i> Đổi Người Đánh Giá
                     </button>
                 </div>
             </div>
@@ -493,7 +504,7 @@
                     <!-- Period Selector: Quarter vs Year -->
                     <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                         <label class="text-xs font-bold text-slate-700 pl-2">Kỳ Đánh Giá:</label>
-                        <select id="evalPeriodSelect" onchange="updateEvalPeriodLabel()" class="bg-white px-3 py-1.5 text-xs font-bold text-slate-800 rounded-lg border border-slate-200 focus:outline-none">
+                        <select id="evalPeriodSelect" onchange="updateEvalPeriodLabel()" class="bg-white px-3 py-1.5 text-xs font-bold text-slate-800 rounded-lg border border-slate-200 focus:outline-none cursor-pointer">
                             <option value="YEAR-2026">Cả Năm 2026</option>
                             <option value="Q1-2026">Quý 1 / 2026</option>
                             <option value="Q2-2026">Quý 2 / 2026</option>
@@ -594,55 +605,151 @@
 
                 <!-- Submit Button -->
                 <div class="flex items-center justify-between pt-2">
-                    <span class="text-[11px] text-slate-500 italic">* Mỗi căn hộ chỉ gửi 01 phiếu đánh giá cho mỗi kỳ khảo sát.</span>
-                    <button onclick="handleEvaluationSubmit()" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg transition flex items-center gap-2">
+                    <span class="text-[11px] text-slate-500 italic">* Mỗi căn hộ có thể cập nhật lại điểm đánh giá bất cứ lúc nào trong kỳ khảo sát.</span>
+                    <button onclick="handleEvaluationSubmit()" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg transition flex items-center gap-2 active:scale-95">
                         <i class="fa-solid fa-paper-plane"></i> Gửi Phiếu Đánh Giá
                     </button>
                 </div>
             </div>
 
             <!-- Detailed Evaluation Analytics Dashboard -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-                    <div>
-                        <h4 class="font-black text-slate-900 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-chart-pie text-amber-500"></i>
-                            Bảng Phân Tích Chi Tiết Đánh Giá Chất Lượng BQL
-                        </h4>
-                        <p class="text-xs text-slate-500">Tổng hợp điểm đánh giá trung thực từ các chủ sở hữu đã xác thực.</p>
-                    </div>
-
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs font-bold text-slate-600">Tổng số phiếu:</span>
-                        <strong class="text-sm font-black text-brand-600 bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200" id="evalTotalCountDisplay">128 Phiếu</strong>
-                    </div>
-                </div>
-
-                <!-- Overall Score & Breakdown -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Overall Score Big Card -->
-                    <div class="p-6 rounded-2xl bg-amber-50/60 border border-amber-200 text-center flex flex-col items-center justify-center space-y-2">
-                        <span class="text-xs uppercase font-extrabold text-amber-800">Điểm Đánh Giá Bình Quân</span>
-                        <div class="text-4xl sm:text-5xl font-black text-amber-600 tracking-tight" id="evalAverageScoreDisplay">4.8 / 5.0</div>
-                        <div class="flex items-center text-amber-500 text-base" id="evalAverageStarsDisplay">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+                <!-- Analytics Header & Filter Toolbar -->
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base sm:text-lg">
+                                Bảng Phân Tích Đánh Giá Vận Hành Chuyên Sâu (SLA)
+                            </h4>
                         </div>
-                        <span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">Chất lượng: Rất Tốt</span>
+                        <p class="text-xs text-slate-500">
+                            Hệ thống kiểm toán chất lượng dịch vụ vận hành N&H Real Estate Management theo tiêu chuẩn Hợp đồng Quản lý Tòa nhà.
+                        </p>
                     </div>
 
-                    <!-- Progress Bars by Criteria -->
-                    <div class="md:col-span-2 space-y-3" id="evalCriteriaBreakdownContainer">
-                        <!-- Populated by JS -->
+                    <!-- Realtime Period Filter for Analytics -->
+                    <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 w-full sm:w-auto justify-between sm:justify-start">
+                        <span class="text-xs font-bold text-slate-600 pl-2 whitespace-nowrap"><i class="fa-solid fa-filter text-amber-500 mr-1"></i> Lọc dữ liệu:</span>
+                        <select id="analyticsPeriodFilter" onchange="renderEvaluationAnalytics()" class="bg-white px-3 py-1.5 text-xs font-bold text-slate-800 rounded-xl border border-slate-200 shadow-xs focus:outline-none cursor-pointer">
+                            <option value="ALL">Toàn Bộ Dữ Liệu (Tất Cả Kỳ)</option>
+                            <option value="YEAR-2026">Cả Năm 2026</option>
+                            <option value="Q1-2026">Quý 1 / 2026</option>
+                            <option value="Q2-2026">Quý 2 / 2026</option>
+                            <option value="Q3-2026">Quý 3 / 2026</option>
+                            <option value="Q4-2026">Quý 4 / 2026</option>
+                        </select>
                     </div>
                 </div>
 
-                <!-- Recent Comments List -->
-                <div class="border-t border-slate-100 pt-5 space-y-3">
-                    <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-comments text-slate-400"></i> Ý Kiến & Đề Xuất Gần Đây Từ Cư Dân
-                    </h5>
-                    <div class="space-y-2.5 max-h-60 overflow-y-auto custom-scrollbar" id="evalRecentCommentsContainer">
-                        <!-- Populated by JS -->
+                <!-- 4 High-level Executive KPI Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <!-- KPI 1: Overall Average -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1 relative overflow-hidden">
+                        <span class="text-[10px] sm:text-xs font-extrabold uppercase text-amber-800 tracking-wider block">Điểm Bình Quân Chung</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl sm:text-4xl font-black text-amber-600" id="evalAverageScoreDisplay">4.8</span>
+                            <span class="text-xs text-amber-700 font-bold">/ 5.0</span>
+                        </div>
+                        <div class="text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1" id="evalGradeBadge">
+                            Xuất sắc (Vượt chuẩn)
+                        </div>
+                    </div>
+
+                    <!-- KPI 2: Total Participation / Coverage -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-1">
+                        <span class="text-[10px] sm:text-xs font-extrabold uppercase text-emerald-800 tracking-wider block">Tỷ Lệ Tham Gia Đánh Giá</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl sm:text-4xl font-black text-emerald-700" id="evalTurnoutRateDisplay">80.3%</span>
+                        </div>
+                        <span class="text-[10px] sm:text-xs text-emerald-900 font-medium block" id="evalTotalCountDisplay">128 Căn / CSDL</span>
+                    </div>
+
+                    <!-- KPI 3: Satisfaction Index -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-indigo-50/70 border border-indigo-200/80 space-y-1">
+                        <span class="text-[10px] sm:text-xs font-extrabold uppercase text-indigo-800 tracking-wider block">Chỉ Số Hài Lòng (4 - 5★)</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl sm:text-4xl font-black text-indigo-700" id="evalSatisfactionRateDisplay">96.2%</span>
+                        </div>
+                        <span class="text-[10px] sm:text-xs text-indigo-800 font-medium block">Tỷ lệ đồng thuận tích cực</span>
+                    </div>
+
+                    <!-- KPI 4: Actionable Complaints -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-rose-50/70 border border-rose-200/80 space-y-1">
+                        <span class="text-[10px] sm:text-xs font-extrabold uppercase text-rose-800 tracking-wider block">Ý Kiến & Cần Cải Thiện</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl sm:text-4xl font-black text-rose-700" id="evalIssueCountDisplay">3</span>
+                            <span class="text-xs text-rose-600 font-bold">ý kiến</span>
+                        </div>
+                        <span class="text-[10px] sm:text-xs text-rose-800 font-medium block">Điểm $\le$ 3 sao hoặc góp ý</span>
+                    </div>
+                </div>
+
+                <!-- Deep Breakdown: 6 SLA Contract Criteria & Rating Distribution -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+                    <!-- Left: 6 Detailed Contract Criteria with SLA Targets -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h5 class="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-brand-600"></i> Đánh Giá 6 Hạng Mục Vận Hành Theo Cam Kết SLA
+                            </h5>
+                            <span class="text-[11px] font-bold text-slate-500">Mục tiêu chuẩn: $\ge$ 80% (4.0/5.0)</span>
+                        </div>
+
+                        <div class="space-y-3.5" id="evalCriteriaBreakdownContainer">
+                            <!-- Populated dynamically by JS with deep metrics -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Star Rating Distribution (Histogram) -->
+                    <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 h-fit">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                            <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-chart-simple text-amber-500"></i> Phân Bố Số Sao
+                            </h5>
+                            <div class="flex items-center text-amber-400 text-xs" id="evalAverageStarsDisplay">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2.5" id="evalStarDistributionContainer">
+                            <!-- Populated dynamically (5 stars down to 1 star) -->
+                        </div>
+
+                        <!-- SLA Quality Summary Note -->
+                        <div class="p-3 rounded-xl bg-white border border-slate-200 text-[11px] space-y-1">
+                            <span class="font-bold text-slate-800 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check text-emerald-500"></i> Quy chuẩn Hợp đồng Vận hành:
+                            </span>
+                            <p class="text-slate-500 leading-snug">
+                                Ban Quản Trị sử dụng kết quả khảo sát này để làm căn cứ nghiệm thu khối lượng và chất lượng dịch vụ vận hành tòa nhà của N&H Real Estate Management theo từng quý.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resident Feedback & Comments Explorer -->
+                <div class="border-t border-slate-100 pt-6 space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <h5 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-comments text-brand-600"></i> Ý Kiến Phản Ánh & Đóng Góp Từ Cư Dân
+                            </h5>
+                            <span class="text-xs bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded-full" id="evalCommentsCountBadge">0 ý kiến</span>
+                        </div>
+
+                        <!-- Feedback Sentiment Filter Tabs -->
+                        <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-bold">
+                            <button onclick="filterEvalComments('ALL')" id="btnCommentFilter-ALL" class="comment-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-900 shadow-xs">Tất cả</button>
+                            <button onclick="filterEvalComments('PRAISE')" id="btnCommentFilter-PRAISE" class="comment-filter-btn px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900">Hài lòng (4-5★)</button>
+                            <button onclick="filterEvalComments('CONCERN')" id="btnCommentFilter-CONCERN" class="comment-filter-btn px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900">Góp ý (1-3★)</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-72 overflow-y-auto custom-scrollbar p-1" id="evalRecentCommentsContainer">
+                        <!-- Populated dynamically by JS -->
                     </div>
                 </div>
             </div>
@@ -750,7 +857,7 @@
                 <div class="space-y-3 text-left">
                     <label class="block text-xs font-bold text-slate-700">Mã PIN Quản Trị *</label>
                     <input type="password" id="adminPinInput" placeholder="Nhập mã PIN quản trị..." class="w-full px-4 py-3 text-sm text-center tracking-widest border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold">
-                    <p class="text-[11px] text-slate-400 italic text-center">()</p>
+                    <p class="text-[11px] text-slate-400 italic text-center"></p>
                 </div>
 
                 <button onclick="handleAdminLogin()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
@@ -1019,6 +1126,84 @@
                     <!-- Items List Table in Admin -->
                     <div class="space-y-2" id="adminVotingItemsList">
                         <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- 5. BQL EVALUATION REPORT & EXCEL EXPORT MANAGEMENT -->
+                <div class="bg-white rounded-2xl border-2 border-amber-500/30 p-6 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-slate-900 text-sm">Quản Lý & Xuất Báo Cáo Đánh Giá Vận Hành BQL (Excel)</h4>
+                                <p class="text-xs text-slate-500">Tra cứu toàn bộ phiếu đánh giá của cư dân và xuất file Excel chi tiết phục vụ tổng hợp Hội nghị.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button onclick="copyEvaluationLink()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-200">
+                                <i class="fa-solid fa-link text-brand-600"></i> Lấy Link Đánh Giá
+                            </button>
+                            <button onclick="exportEvaluationExcel()" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-xs font-black rounded-xl transition shadow-md flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-excel"></i> Xuất File Đánh Giá (.xlsx)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Direct Link Box for Admin -->
+                    <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center gap-2 text-slate-700">
+                            <i class="fa-solid fa-bullhorn text-amber-600 text-sm"></i>
+                            <span><strong>Link gửi cư dân đánh giá:</strong> <span id="adminEvalShareUrlDisplay" class="font-mono text-slate-900 bg-white px-2 py-0.5 rounded border border-amber-300 break-all select-all"></span></span>
+                        </div>
+                        <button onclick="copyEvaluationLink()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs whitespace-nowrap transition">
+                            <i class="fa-regular fa-copy"></i> Sao Chép Link
+                        </button>
+                    </div>
+
+                    <!-- Filter & Evaluations List Preview in Admin -->
+                    <div class="flex items-center justify-between gap-3 pt-2">
+                        <div class="flex items-center gap-2 text-xs">
+                            <label class="font-bold text-slate-700">Lọc kỳ:</label>
+                            <select id="adminEvalFilterPeriod" onchange="renderAdminEvalTable()" class="px-3 py-1.5 text-xs font-bold border border-slate-300 rounded-lg bg-white focus:outline-none">
+                                <option value="ALL">-- Tất cả các kỳ --</option>
+                                <option value="YEAR-2026">Cả Năm 2026</option>
+                                <option value="Q1-2026">Quý 1 / 2026</option>
+                                <option value="Q2-2026">Quý 2 / 2026</option>
+                                <option value="Q3-2026">Quý 3 / 2026</option>
+                                <option value="Q4-2026">Quý 4 / 2026</option>
+                            </select>
+                        </div>
+                        <span class="text-xs text-slate-500 font-medium" id="adminEvalCountDisplay">0 phiếu</span>
+                    </div>
+
+                    <!-- Table Preview in Admin -->
+                    <div class="overflow-x-auto max-h-60 border border-slate-200 rounded-xl custom-scrollbar shadow-inner">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-200 text-slate-800 font-bold uppercase text-[10px] sticky top-0 border-b border-slate-300">
+                                <tr>
+                                    <th class="px-3 py-2 text-center w-10">STT</th>
+                                    <th class="px-3 py-2">Mã Căn</th>
+                                    <th class="px-3 py-2">Họ Tên</th>
+                                    <th class="px-3 py-2">Số ĐT</th>
+                                    <th class="px-3 py-2 text-center">Kỳ</th>
+                                    <th class="px-2 py-2 text-center">T1</th>
+                                    <th class="px-2 py-2 text-center">T2</th>
+                                    <th class="px-2 py-2 text-center">T3</th>
+                                    <th class="px-2 py-2 text-center">T4</th>
+                                    <th class="px-2 py-2 text-center">T5</th>
+                                    <th class="px-2 py-2 text-center">T6</th>
+                                    <th class="px-3 py-2 text-center font-black text-amber-700">Đ.TB</th>
+                                    <th class="px-3 py-2">Nhận xét cư dân</th>
+                                    <th class="px-3 py-2 text-center w-16">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminEvalTableBody" class="divide-y divide-slate-100 font-medium bg-white">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1548,14 +1733,18 @@
                 return;
             }
 
+            const targetRoom = normalizeRoom(room);
+            const targetPhone = normalizePhone(phone);
+
             const match = state.residentsList.find(r => 
-                normalizeRoom(r.room) === normalizeRoom(room) && normalizePhone(r.phone) === normalizePhone(phone)
+                normalizeRoom(r.room) === targetRoom && normalizePhone(r.phone) === targetPhone
             );
 
             if (match) {
                 state.verifiedResident = match;
                 state.votingVerifiedResident = match;
                 syncVerificationAcrossTabs();
+                loadExistingEvaluationIfAny(match);
                 showToast(`Xác thực thành công Căn ${match.room} - ${match.name}!`);
             } else {
                 showToast("Không khớp số điện thoại với danh sách chủ sở hữu chính thức!", "Xác thực thất bại", true);
@@ -1564,245 +1753,307 @@
 
         window.resetVerification = function() {
             state.verifiedResident = null;
+            state.votingVerifiedResident = null;
+            
+            // Clean up verification inputs and return focus smoothly
+            const roomInp = document.getElementById('evalVerifyRoom');
+            const phoneInp = document.getElementById('evalVerifyPhone');
+            const nameInp = document.getElementById('evalVerifyName');
+            const commentInp = document.getElementById('evalCommentInput');
+            const noticeEl = document.getElementById('evalExistingVoteNotice');
+
+            if (roomInp) { roomInp.value = ''; }
+            if (phoneInp) { phoneInp.value = ''; }
+            if (nameInp) { nameInp.value = ''; }
+            if (commentInp) { commentInp.value = ''; }
+            if (noticeEl) { noticeEl.classList.add('hidden'); }
+
+            // Reset ratings to 5 stars default
+            ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(k => {
+                setRating(k, 5);
+            });
+
             syncVerificationAcrossTabs();
-            showToast("Đã hủy xác thực người đánh giá.");
+            showToast("Đã hủy xác thực. Bạn có thể nhập mã căn và SĐT khác.");
+
+            setTimeout(() => {
+                if (roomInp) roomInp.focus();
+            }, 100);
         };
 
-        function syncVerificationAcrossTabs() {
-            const vRes = state.votingVerifiedResident || state.verifiedResident;
+        function loadExistingEvaluationIfAny(resident) {
+            if (!resident) return;
+            const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR-2026';
+            const existing = state.evalList.find(e => 
+                normalizeRoom(e.room) === normalizeRoom(resident.room) && e.period === period
+            );
 
-            /* Tab 2 Voting UI */
-            const vUnverifiedForm = document.getElementById('votingUnverifiedForm');
-            const vVerifiedCard = document.getElementById('votingVerifiedCard');
-            const vBadge = document.getElementById('votingVerificationBadge');
+            const noticeEl = document.getElementById('evalExistingVoteNotice');
+            const commentInp = document.getElementById('evalCommentInput');
 
-            if (vRes) {
-                if (vUnverifiedForm) vUnverifiedForm.classList.add('hidden');
-                if (vVerifiedCard) vVerifiedCard.classList.remove('hidden');
-                if (vBadge) {
-                    vBadge.textContent = "Hợp lệ";
-                    vBadge.className = "text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
-                }
-                const rEl = document.getElementById('votingVerifiedRoomDisplay');
-                const nEl = document.getElementById('votingVerifiedNameDisplay');
-                const relEl = document.getElementById('votingVerifiedRelationDisplay');
-                const aEl = document.getElementById('votingVerifiedAreaDisplay');
-                const rateEl = document.getElementById('votingVerifiedVoteRateDisplay');
-
-                if (rEl) rEl.textContent = vRes.room;
-                if (nEl) nEl.textContent = vRes.name;
-                if (relEl) relEl.textContent = vRes.relation || 'Chủ sở hữu';
-                if (aEl) aEl.textContent = vRes.area || '68.5';
-                if (rateEl) {
-                    const totalArea = state.residentsList.reduce((acc, curr) => acc + (parseFloat(curr.area) || 0), 0) || 271.6;
-                    const rRate = ((parseFloat(vRes.area) || 68.5) / totalArea * 100).toFixed(3);
-                    rateEl.textContent = rRate;
-                }
+            if (existing) {
+                // Populate previous rating & comment so the resident can smoothly adjust
+                ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(k => {
+                    if (existing[k]) setRating(k, existing[k]);
+                });
+                if (commentInp) commentInp.value = existing.comment || '';
+                if (noticeEl) noticeEl.classList.remove('hidden');
+                showToast(`Đã tải lại phiếu đánh giá kỳ ${period} của căn ${resident.room} để quý cư dân xem lại hoặc cập nhật.`);
             } else {
-                if (vUnverifiedForm) vUnverifiedForm.classList.remove('hidden');
-                if (vVerifiedCard) vVerifiedCard.classList.add('hidden');
-                if (vBadge) {
-                    vBadge.textContent = "Chưa xác thực";
-                    vBadge.className = "text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200";
-                }
+                if (noticeEl) noticeEl.classList.add('hidden');
+                if (commentInp) commentInp.value = '';
+                ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(k => setRating(k, 5));
             }
-
-            /* Tab 3 Evaluation UI */
-            const eUnverifiedForm = document.getElementById('evalUnverifiedForm');
-            const eVerifiedCard = document.getElementById('evalVerifiedCard');
-            const eStatusBadge = document.getElementById('evalVerifyStatusBadge');
-            const eFormSec = document.getElementById('evalFormSection');
-
-            if (vRes) {
-                if (eUnverifiedForm) eUnverifiedForm.classList.add('hidden');
-                if (eVerifiedCard) eVerifiedCard.classList.remove('hidden');
-                if (eFormSec) {
-                    eFormSec.classList.remove('opacity-60', 'pointer-events-none');
-                }
-                if (eStatusBadge) {
-                    eStatusBadge.textContent = "Đã xác thực";
-                    eStatusBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
-                }
-
-                const erEl = document.getElementById('evalVerifiedRoomDisplay');
-                const enEl = document.getElementById('evalVerifiedNameDisplay');
-                const epEl = document.getElementById('evalVerifiedPhoneDisplay');
-                const eaEl = document.getElementById('evalVerifiedAreaDisplay');
-                const erateEl = document.getElementById('evalVerifiedRateDisplay');
-                const erelEl = document.getElementById('evalVerifiedRelationDisplay');
-
-                if (erEl) erEl.textContent = vRes.room;
-                if (enEl) enEl.textContent = vRes.name;
-                if (epEl) epEl.textContent = maskPhone(vRes.phone);
-                if (eaEl) eaEl.textContent = vRes.area;
-                if (erelEl) erelEl.textContent = vRes.relation || 'Chủ hộ';
-                if (erateEl) {
-                    const totalArea = state.residentsList.reduce((acc, curr) => acc + (parseFloat(curr.area) || 0), 0) || 271.6;
-                    const rRate = ((parseFloat(vRes.area) || 68.5) / totalArea * 100).toFixed(3);
-                    erateEl.textContent = rRate;
-                }
-            } else {
-                if (eUnverifiedForm) eUnverifiedForm.classList.remove('hidden');
-                if (eVerifiedCard) eVerifiedCard.classList.add('hidden');
-                if (eFormSec) {
-                    eFormSec.classList.add('opacity-60', 'pointer-events-none');
-                }
-                if (eStatusBadge) {
-                    eStatusBadge.textContent = "Chưa xác thực";
-                    eStatusBadge.className = "text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300";
-                }
-            }
-        }
-
-        window.setRating = function(criteriaKey, stars) {
-            state.evalRatings[criteriaKey] = stars;
-            const scoreEl = document.getElementById(`score-${criteriaKey}`);
-            if (scoreEl) scoreEl.textContent = `${stars}/5`;
-            renderCriteriaStars(criteriaKey);
-        };
-
-        function renderCriteriaStars(criteriaKey) {
-            const container = document.getElementById(`star-group-${criteriaKey}`);
-            if (!container) return;
-            const current = state.evalRatings[criteriaKey] || 5;
-
-            container.innerHTML = [1, 2, 3, 4, 5].map(star => `
-                <button type="button" onclick="setRating('${criteriaKey}', ${star})" class="p-1 focus:outline-none transition transform hover:scale-110">
-                    <i class="fa-solid fa-star text-lg ${star <= current ? 'text-amber-400' : 'text-slate-200'}"></i>
-                </button>
-            `).join('');
-        }
-
-        function initAllRatingStars() {
-            ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].forEach(key => renderCriteriaStars(key));
         }
 
         window.updateEvalPeriodLabel = function() {
-            // Callback placeholder for period switch
+            if (state.verifiedResident) {
+                loadExistingEvaluationIfAny(state.verifiedResident);
+            }
         };
 
-        window.handleEvaluationSubmit = async function() {
-            const resident = state.verifiedResident || state.votingVerifiedResident;
-            if (!resident) {
-                showToast("Vui lòng hoàn thành xác thực Căn hộ & SĐT ở Bước 1!", "Chưa xác thực", true);
-                return;
+        let currentCommentFilter = 'ALL';
+        window.filterEvalComments = function(type) {
+            currentCommentFilter = type;
+            document.querySelectorAll('.comment-filter-btn').forEach(btn => {
+                btn.className = "comment-filter-btn px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900";
+            });
+            const activeBtn = document.getElementById(`btnCommentFilter-${type}`);
+            if (activeBtn) {
+                activeBtn.className = "comment-filter-btn px-2.5 py-1 rounded-lg bg-white text-slate-900 shadow-xs font-bold";
             }
-
-            const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR-2026';
-            const comment = document.getElementById('evalCommentInput')?.value?.trim() || '';
-
-            const evalData = {
-                id: 'eval-' + Date.now(),
-                room: resident.room,
-                name: resident.name,
-                phone: resident.phone,
-                period: period,
-                c1: state.evalRatings.c1,
-                c2: state.evalRatings.c2,
-                c3: state.evalRatings.c3,
-                c4: state.evalRatings.c4,
-                c5: state.evalRatings.c5,
-                c6: state.evalRatings.c6,
-                comment: comment,
-                timestamp: Date.now()
-            };
-
-            // Remove existing evaluation for this room and period to prevent duplicate votes
-            state.evalList = state.evalList.filter(e => !(normalizeRoom(e.room) === normalizeRoom(resident.room) && e.period === period));
-            state.evalList.unshift(evalData);
-            saveToLocalStorage(LOCAL_STORAGE_KEYS.EVAL, state.evalList);
-
-            if (auth.currentUser) {
-                try {
-                    const evalCol = collection(db, 'artifacts', appId, 'public', 'data', 'eval_items');
-                    await addDoc(evalCol, evalData);
-                } catch(e) {
-                    console.warn("Firebase eval save fallback:", e);
-                }
-            }
-
             renderEvaluationAnalytics();
-            showToast("Đã ghi nhận phiếu đánh giá chất lượng BQL của quý cư dân!");
-            if (document.getElementById('evalCommentInput')) {
-                document.getElementById('evalCommentInput').value = '';
-            }
         };
 
         window.renderEvaluationAnalytics = function() {
             const countEl = document.getElementById('evalTotalCountDisplay');
             const avgEl = document.getElementById('evalAverageScoreDisplay');
+            const gradeBadge = document.getElementById('evalGradeBadge');
+            const turnoutEl = document.getElementById('evalTurnoutRateDisplay');
+            const satEl = document.getElementById('evalSatisfactionRateDisplay');
+            const issueEl = document.getElementById('evalIssueCountDisplay');
             const breakdownEl = document.getElementById('evalCriteriaBreakdownContainer');
+            const starDistEl = document.getElementById('evalStarDistributionContainer');
             const commentsEl = document.getElementById('evalRecentCommentsContainer');
+            const commentsBadge = document.getElementById('evalCommentsCountBadge');
+            const starDisplay = document.getElementById('evalAverageStarsDisplay');
 
-            const list = state.evalList || [];
+            const selectedPeriod = document.getElementById('analyticsPeriodFilter')?.value || 'ALL';
+
+            let list = state.evalList || [];
+            if (selectedPeriod !== 'ALL') {
+                list = list.filter(e => e.period === selectedPeriod);
+            }
+
             const count = list.length;
+            const totalResidents = state.residentsList.length || 600;
+            const turnoutRate = totalResidents > 0 ? ((count / totalResidents) * 100).toFixed(1) : '0';
 
-            if (countEl) countEl.textContent = `${count} Phiếu`;
+            if (countEl) countEl.textContent = `${count} Căn / ${totalResidents} Căn Hộ CSDL`;
+            if (turnoutEl) turnoutEl.textContent = `${turnoutRate}%`;
 
             if (count === 0) {
-                if (avgEl) avgEl.textContent = "5.0 / 5.0";
+                if (avgEl) avgEl.textContent = "5.0";
+                if (gradeBadge) {
+                    gradeBadge.textContent = "Chưa có dữ liệu kỳ này";
+                    gradeBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1 bg-slate-100 text-slate-600";
+                }
+                if (satEl) satEl.textContent = "100%";
+                if (issueEl) issueEl.textContent = "0";
+                if (breakdownEl) breakdownEl.innerHTML = `<p class="text-xs text-slate-400 italic py-4">Chưa có phiếu đánh giá nào trong kỳ này.</p>`;
+                if (starDistEl) starDistEl.innerHTML = `<p class="text-xs text-slate-400 italic py-4">Chưa có phân bổ số sao.</p>`;
+                if (commentsEl) commentsEl.innerHTML = `<p class="text-xs text-slate-400 italic py-4 col-span-2 text-center">Chưa có nhận xét nào.</p>`;
+                if (commentsBadge) commentsBadge.textContent = `0 ý kiến`;
                 return;
             }
 
+            // Calculate criteria averages
             const avgC = { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0 };
+            const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+            let totalScoresAllCriteria = 0;
+            let satisfiedCount = 0;
+            let issueCount = 0;
+
             list.forEach(e => {
-                avgC.c1 += (e.c1 || 5);
-                avgC.c2 += (e.c2 || 5);
-                avgC.c3 += (e.c3 || 5);
-                avgC.c4 += (e.c4 || 5);
-                avgC.c5 += (e.c5 || 5);
-                avgC.c6 += (e.c6 || 5);
+                const c1 = Number(e.c1) || 5;
+                const c2 = Number(e.c2) || 5;
+                const c3 = Number(e.c3) || 5;
+                const c4 = Number(e.c4) || 5;
+                const c5 = Number(e.c5) || 5;
+                const c6 = Number(e.c6) || 5;
+
+                avgC.c1 += c1;
+                avgC.c2 += c2;
+                avgC.c3 += c3;
+                avgC.c4 += c4;
+                avgC.c5 += c5;
+                avgC.c6 += c6;
+
+                const rowAvg = (c1 + c2 + c3 + c4 + c5 + c6) / 6;
+                const roundStar = Math.min(5, Math.max(1, Math.round(rowAvg)));
+                starCounts[roundStar] = (starCounts[roundStar] || 0) + 1;
+
+                if (rowAvg >= 3.8) satisfiedCount++;
+                if (rowAvg < 3.5 || (e.comment && e.comment.trim().length > 0 && rowAvg < 4)) {
+                    issueCount++;
+                }
             });
 
             for (let k in avgC) {
-                avgC[k] = (avgC[k] / count).toFixed(1);
+                avgC[k] = (avgC[k] / count).toFixed(2);
+                totalScoresAllCriteria += parseFloat(avgC[k]);
             }
 
-            const overall = ((parseFloat(avgC.c1) + parseFloat(avgC.c2) + parseFloat(avgC.c3) + parseFloat(avgC.c4) + parseFloat(avgC.c5) + parseFloat(avgC.c6)) / 6).toFixed(1);
+            const overall = (totalScoresAllCriteria / 6).toFixed(2);
+            if (avgEl) avgEl.textContent = overall;
 
-            if (avgEl) avgEl.textContent = `${overall} / 5.0`;
+            // Grade based on operation contract SLA
+            if (gradeBadge) {
+                if (overall >= 4.5) {
+                    gradeBadge.textContent = "Xuất sắc (Vượt chuẩn HĐ)";
+                    gradeBadge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full inline-block mt-1 bg-emerald-100 text-emerald-800 border border-emerald-300";
+                } else if (overall >= 4.0) {
+                    gradeBadge.textContent = "Đạt chuẩn Tốt (Cam kết SLA)";
+                    gradeBadge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full inline-block mt-1 bg-brand-100 text-brand-800 border border-brand-300";
+                } else if (overall >= 3.0) {
+                    gradeBadge.textContent = "Cần chấn chỉnh & cải thiện";
+                    gradeBadge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full inline-block mt-1 bg-amber-100 text-amber-900 border border-amber-300";
+                } else {
+                    gradeBadge.textContent = "Không đạt SLA Hợp đồng";
+                    gradeBadge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full inline-block mt-1 bg-rose-100 text-rose-800 border border-rose-300";
+                }
+            }
 
-            const criteriaTitles = {
-                c1: "1. An ninh & Kiểm soát ra vào",
-                c2: "2. Vệ sinh môi trường & Thu rác",
-                c3: "3. Vận hành kỹ thuật & Thang máy",
-                c4: "4. Tiếp nhận & Xử lý kiến nghị",
-                c5: "5. Minh bạch tài chính & Thu phí",
-                c6: "6. Tác phong nhân viên BQL"
+            const satRate = ((satisfiedCount / count) * 100).toFixed(1);
+            if (satEl) satEl.textContent = `${satRate}%`;
+            if (issueEl) issueEl.textContent = issueCount;
+
+            // Stars visual
+            if (starDisplay) {
+                const fullStars = Math.floor(overall);
+                const halfStar = overall - fullStars >= 0.3 && overall - fullStars <= 0.7;
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= fullStars) {
+                        starsHtml += '<i class="fa-solid fa-star"></i>';
+                    } else if (i === fullStars + 1 && halfStar) {
+                        starsHtml += '<i class="fa-solid fa-star-half-stroke"></i>';
+                    } else if (i <= Math.round(overall)) {
+                        starsHtml += '<i class="fa-solid fa-star"></i>';
+                    } else {
+                        starsHtml += '<i class="fa-regular fa-star text-slate-300"></i>';
+                    }
+                }
+                starDisplay.innerHTML = starsHtml;
+            }
+
+            // Criteria Details
+            const criteriaMeta = {
+                c1: { title: "1. An Ninh, Trật Tự & Kiểm Soát Ra Vào", desc: "Kiểm soát an ninh tầng hầm, camera & sảnh" },
+                c2: { title: "2. Vệ Sinh Môi Trường & Thu Gom Rác", desc: "Lau dọn hành lang, sảnh & khử mùi phòng rác" },
+                c3: { title: "3. Vận Hành & Bảo Trì Kỹ Thuật Tòa Nhà", desc: "Thang máy, hệ thống PCCC, điện & cấp thoát nước" },
+                c4: { title: "4. Tiếp Nhận & Xử Lý Ý Kiến Cư Dân", desc: "Tốc độ xử lý sự cố & phản hồi cư dân" },
+                c5: { title: "5. Minh Bạch Quản Lý Tài Chính & Thu Phí", desc: "Công khai tài chính, thông báo thu phí rõ ràng" },
+                c6: { title: "6. Tác Phong & Thái Độ Nhân Viên BQL", desc: "Lịch sự, chuyên nghiệp, hỗ trợ tận tình" }
             };
 
             if (breakdownEl) {
                 breakdownEl.innerHTML = Object.keys(avgC).map(k => {
-                    const score = avgC[k];
-                    const percent = (score / 5 * 100).toFixed(0);
+                    const score = parseFloat(avgC[k]);
+                    const percent = Math.min(100, ((score / 5) * 100)).toFixed(0);
+                    const meetsSLA = score >= 4.0;
+
                     return `
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between text-xs">
-                                <span class="font-bold text-slate-800">${criteriaTitles[k]}</span>
-                                <span class="font-black text-amber-600">${score} / 5.0 (${percent}%)</span>
+                        <div class="p-3.5 rounded-xl border border-slate-200 bg-white shadow-xs space-y-2 hover:border-slate-300 transition">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <h6 class="font-bold text-xs sm:text-sm text-slate-900">${criteriaMeta[k].title}</h6>
+                                    <p class="text-[11px] text-slate-500">${criteriaMeta[k].desc}</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="flex items-center gap-1.5 justify-end">
+                                        <span class="font-black text-sm text-slate-900">${score}</span>
+                                        <span class="text-[11px] text-slate-400">/ 5.0</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${meetsSLA ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                            ${meetsSLA ? 'Đạt SLA' : 'Cần khắc phục'}
+                                        </span>
+                                    </div>
+                                    <span class="text-[10px] text-slate-500 font-bold">${percent}% Hài lòng</span>
+                                </div>
                             </div>
                             <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
-                                <div class="bg-gradient-to-r from-amber-500 to-emerald-500 h-2 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                                <div class="h-2 rounded-full transition-all duration-700 ${meetsSLA ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : 'bg-gradient-to-r from-amber-500 to-rose-500'}" style="width: ${percent}%"></div>
                             </div>
                         </div>
                     `;
                 }).join('');
             }
 
-            if (commentsEl) {
-                const withComments = list.filter(e => e.comment && e.comment.trim().length > 0);
-                if (withComments.length === 0) {
-                    commentsEl.innerHTML = `<p class="text-xs text-slate-400 italic">Chưa có ý kiến nhận xét cụ thể nào.</p>`;
-                } else {
-                    commentsEl.innerHTML = withComments.slice(0, 8).map(e => `
-                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-                            <div class="flex items-center justify-between text-slate-500 text-[10px]">
-                                <span class="font-bold text-slate-800">Căn ${e.room} (${e.name ? e.name : 'Chủ hộ'})</span>
-                                <span>${new Date(e.timestamp || Date.now()).toLocaleDateString('vi-VN')}</span>
+            // Star Distribution Histogram
+            if (starDistEl) {
+                starDistEl.innerHTML = [5, 4, 3, 2, 1].map(star => {
+                    const c = starCounts[star] || 0;
+                    const pct = count > 0 ? ((c / count) * 100).toFixed(0) : 0;
+                    return `
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="font-bold text-slate-700 w-10 flex items-center gap-1 text-[11px]">
+                                ${star} <i class="fa-solid fa-star text-amber-400 text-[10px]"></i>
+                            </span>
+                            <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
+                                <div class="bg-amber-400 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
                             </div>
-                            <p class="text-slate-700 font-medium">"${e.comment}"</p>
+                            <span class="font-mono text-[10px] text-slate-500 w-12 text-right">${c} (${pct}%)</span>
                         </div>
-                    `).join('');
+                    `;
+                }).join('');
+            }
+
+            // Comments explorer
+            let filteredList = list.filter(e => e.comment && e.comment.trim().length > 0);
+            if (currentCommentFilter === 'PRAISE') {
+                filteredList = filteredList.filter(e => {
+                    const rAvg = ((e.c1 || 5) + (e.c2 || 5) + (e.c3 || 5) + (e.c4 || 5) + (e.c5 || 5) + (e.c6 || 5)) / 6;
+                    return rAvg >= 4.0;
+                });
+            } else if (currentCommentFilter === 'CONCERN') {
+                filteredList = filteredList.filter(e => {
+                    const rAvg = ((e.c1 || 5) + (e.c2 || 5) + (e.c3 || 5) + (e.c4 || 5) + (e.c5 || 5) + (e.c6 || 5)) / 6;
+                    return rAvg < 4.0;
+                });
+            }
+
+            if (commentsBadge) commentsBadge.textContent = `${filteredList.length} ý kiến`;
+
+            if (commentsEl) {
+                if (filteredList.length === 0) {
+                    commentsEl.innerHTML = `<div class="col-span-2 text-center py-6 text-xs text-slate-400 italic">Không có nhận xét nào trong bộ lọc này.</div>`;
+                } else {
+                    commentsEl.innerHTML = filteredList.slice(0, 10).map(e => {
+                        const rAvg = (((e.c1 || 5) + (e.c2 || 5) + (e.c3 || 5) + (e.c4 || 5) + (e.c5 || 5) + (e.c6 || 5)) / 6).toFixed(1);
+                        const isPraise = rAvg >= 4.0;
+
+                        return `
+                            <div class="p-3.5 rounded-xl border border-slate-200 bg-white shadow-xs space-y-2 hover:shadow-sm transition">
+                                <div class="flex items-center justify-between text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded text-[11px] border border-slate-200">
+                                            Căn ${e.room}
+                                        </span>
+                                        <span class="font-medium text-slate-600 text-[11px]">${e.name || 'Chủ hộ'}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${isPraise ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                            ★ ${rAvg}/5.0
+                                        </span>
+                                        <span class="text-[10px] text-slate-400">${e.period || '2026'}</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-700 leading-relaxed font-medium bg-slate-50/70 p-2.5 rounded-lg border border-slate-100">
+                                    "${e.comment}"
+                                </p>
+                            </div>
+                        `;
+                    }).join('');
                 }
             }
         };
@@ -2115,6 +2366,11 @@
                 updateAttendanceUI();
                 updateResidentUI();
                 applyNavConfigUI();
+                renderAdminEvalTable();
+
+                const shareDisp = document.getElementById('adminEvalShareUrlDisplay');
+                if (shareDisp) shareDisp.textContent = window.getEvaluationDirectUrl();
+
                 showToast("Đăng nhập Admin thành công!");
             } else {
                 showToast("Mã PIN không chính xác! (Gợi ý: 215151365)", "Sai mã PIN", true);
@@ -2429,10 +2685,16 @@
             updateAttendanceUI();
             updateResidentUI();
             applyNavConfigUI();
+            renderAdminEvalTable();
             initFirebaseSync();
 
-            // Auto-switch to configured default landing tab
-            if (state.navConfig && state.navConfig.defaultHomeTab) {
+            // Detect URL query parameter or hash to directly jump to evaluation tab
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab') || window.location.hash.replace('#', '');
+            if (tabParam && ['home', 'voting', 'evaluation', 'documents', 'qa', 'admin'].includes(tabParam)) {
+                switchTab(tabParam);
+            } else if (state.navConfig && state.navConfig.defaultHomeTab) {
+                // Auto-switch to configured default landing tab
                 switchTab(state.navConfig.defaultHomeTab);
             }
         });
