@@ -1602,6 +1602,67 @@
             NAV_CONFIG: 'ecohome_nav_config_v2026'
         };
 
+        const DB_NAME = 'EcohomeNhonBinh_Storage_2026';
+        const DB_VERSION = 1;
+
+        function getIDB() {
+            return new Promise((resolve) => {
+                if (!window.indexedDB) {
+                    resolve(null);
+                    return;
+                }
+                const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const idb = e.target.result;
+                    if (!idb.objectStoreNames.contains('residentStore')) {
+                        idb.createObjectStore('residentStore');
+                    }
+                    if (!idb.objectStoreNames.contains('fileStore')) {
+                        idb.createObjectStore('fileStore');
+                    }
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => {
+                    console.warn("IndexedDB open error:", e);
+                    resolve(null);
+                };
+            });
+        }
+
+        async function saveToIndexedDB(storeName, key, value) {
+            try {
+                const idb = await getIDB();
+                if (!idb) return false;
+                return new Promise((resolve) => {
+                    const tx = idb.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    const req = store.put(value, key);
+                    req.onsuccess = () => resolve(true);
+                    req.onerror = () => resolve(false);
+                });
+            } catch (err) {
+                console.warn("saveToIndexedDB error:", err);
+                return false;
+            }
+        }
+
+        async function getFromIndexedDB(storeName, key) {
+            try {
+                const idb = await getIDB();
+                if (!idb) return null;
+                return new Promise((resolve) => {
+                    const tx = idb.transaction(storeName, 'readonly');
+                    const store = tx.objectStore(storeName);
+                    const req = store.get(key);
+                    req.onsuccess = (e) => resolve(e.target.result || null);
+                    req.onerror = () => resolve(null);
+                });
+            } catch (err) {
+                console.warn("getFromIndexedDB error:", err);
+                return null;
+            }
+        }
+
         function loadFromLocalStorage() {
             try {
                 const sItems = localStorage.getItem(LOCAL_STORAGE_KEYS.ITEMS);
@@ -1665,6 +1726,20 @@
         }
 
         loadFromLocalStorage();
+
+        async function loadFromIndexedDB() {
+            try {
+                const idbResidents = await getFromIndexedDB('residentStore', 'residents_list');
+                if (idbResidents && Array.isArray(idbResidents) && idbResidents.length > (state.residentsList?.length || 0)) {
+                    state.residentsList = idbResidents;
+                    updateResidentUI();
+                    renderEvaluationAnalytics();
+                }
+            } catch (e) {
+                console.warn("Error restoring from IndexedDB:", e);
+            }
+        }
+        loadFromIndexedDB();
 
         window.showToast = function(message, title = "Thông báo", isError = false) {
             const toast = document.getElementById('toastNotification');
@@ -2887,7 +2962,7 @@
             reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
 
                     if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
                         showToast("File Excel không có sheet dữ liệu nào!", "Lỗi file", true);
@@ -2895,7 +2970,7 @@
                     }
 
                     function removeAccents(str) {
-                        if (!str) return '';
+                        if (str === undefined || str === null) return '';
                         return str.toString()
                             .normalize('NFD')
                             .replace(/[\u0300-\u036f]/g, '')
@@ -2909,11 +2984,11 @@
 
                     for (const sName of workbook.SheetNames) {
                         const ws = workbook.Sheets[sName];
-                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
                         if (rows && rows.length >= 2) {
                             const sampleText = rows.slice(0, 15).map(r => r.join(' ')).join(' ');
                             const sampleNorm = removeAccents(sampleText);
-                            if (sampleNorm.includes('can') || sampleNorm.includes('dien thoai') || sampleNorm.includes('so huu')) {
+                            if (sampleNorm.includes('can') || sampleNorm.includes('dien thoai') || sampleNorm.includes('so huu') || sampleNorm.includes('sdt')) {
                                 targetSheet = ws;
                                 targetJson = rows;
                                 break;
@@ -2923,7 +2998,7 @@
 
                     if (!targetSheet) {
                         targetSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        targetJson = XLSX.utils.sheet_to_json(targetSheet, { header: 1, defval: '' });
+                        targetJson = XLSX.utils.sheet_to_json(targetSheet, { header: 1, defval: '', raw: false });
                     }
 
                     if (!targetJson || targetJson.length < 2) {
@@ -2935,7 +3010,12 @@
                     let headerIdx = -1;
                     for (let i = 0; i < Math.min(25, targetJson.length); i++) {
                         const rowNorm = targetJson[i].map(c => removeAccents(c)).join(' ');
-                        if (rowNorm.includes('can ho') || rowNorm.includes('ma can') || rowNorm.includes('chu so huu') || (rowNorm.includes('can') && rowNorm.includes('dien thoai'))) {
+                        if (
+                            rowNorm.includes('can ho') || 
+                            rowNorm.includes('ma can') || 
+                            rowNorm.includes('chu so huu') || 
+                            (rowNorm.includes('can') && (rowNorm.includes('dien thoai') || rowNorm.includes('sdt') || rowNorm.includes('dt')))
+                        ) {
                             headerIdx = i;
                             break;
                         }
@@ -2945,13 +3025,21 @@
 
                     const rawHeaders = targetJson[headerIdx].map(h => removeAccents(h));
 
-                    const colRoom = rawHeaders.findIndex(h => h.includes('ma can') || h.includes('can ho') || h.includes('so can') || h === 'can');
-                    const colName = rawHeaders.findIndex(h => h.includes('chu so huu') || h.includes('ho ten') || h.includes('chu ho') || h.includes('ten chu'));
-                    const colArea = rawHeaders.findIndex(h => h.includes('dien tich') || h.includes('m2') || h.includes('dt'));
-                    const colNation = rawHeaders.findIndex(h => h.includes('quoc tich') || h.includes('nationality'));
-                    const colGender = rawHeaders.findIndex(h => h.includes('gioi tinh') || h.includes('gender'));
-                    const colPhone = rawHeaders.findIndex(h => h.includes('dien thoai') || h.includes('sdt') || h.includes('so dien thoai') || h.includes('phone') || h.includes('mobile'));
-                    const colRelation = rawHeaders.findIndex(h => h.includes('qh voi ch') || h.includes('quan he') || h.includes('qh') || h.includes('quan he voi'));
+                    let colRoom = rawHeaders.findIndex(h => h.includes('ma can') || h.includes('can ho') || h.includes('so can') || h === 'can');
+                    let colName = rawHeaders.findIndex(h => h.includes('chu so huu') || h.includes('ho ten') || h.includes('chu ho') || h.includes('ten chu') || h.includes('ho va ten'));
+                    let colArea = rawHeaders.findIndex(h => h.includes('dien tich') || h.includes('m2') || h.includes('dt'));
+                    let colNation = rawHeaders.findIndex(h => h.includes('quoc tich') || h.includes('nationality'));
+                    let colGender = rawHeaders.findIndex(h => h.includes('gioi tinh') || h.includes('gender'));
+                    let colPhone = rawHeaders.findIndex(h => h.includes('dien thoai') || h.includes('sdt') || h.includes('so dien thoai') || h.includes('phone') || h.includes('mobile'));
+                    let colRelation = rawHeaders.findIndex(h => h.includes('qh voi ch') || h.includes('quan he') || h.includes('qh') || h.includes('quan he voi'));
+
+                    // Fallback theo vị trí nếu không nhận diện được tiêu đề
+                    if (colRoom === -1) colRoom = 0;
+                    if (colName === -1 && targetJson[headerIdx].length > 1) colName = 1;
+                    if (colArea === -1 && targetJson[headerIdx].length > 2) colArea = 2;
+                    if (colPhone === -1) {
+                        colPhone = rawHeaders.findIndex((_, idx) => idx !== colRoom && idx !== colName && idx !== colArea);
+                    }
 
                     const parsedResidents = [];
 
@@ -3012,16 +3100,15 @@
                     state.residentsList = parsedResidents;
                     saveToLocalStorage(LOCAL_STORAGE_KEYS.RESIDENTS, state.residentsList);
 
-                    /* 1. LƯU VĨNH VIỄN VÀO INDEXEDDB (Không giới hạn dung lượng) */
+                    /* 1. LƯU VĨNH VIỄN VÀO INDEXEDDB */
                     await saveToIndexedDB('residentStore', 'residents_list', parsedResidents);
 
-                    /* 2. LƯU LÂU DÀI LÊN FIREBASE CLOUD THEO CHUNKS (Tránh giới hạn 1MB Firestore) */
+                    /* 2. LƯU LÊN FIREBASE CLOUD THEO CHUNKS */
                     if (auth.currentUser) {
                         try {
-                            const CHUNK_SIZE = 200; // Mỗi chunk 200 căn hộ an toàn tuyệt đối
+                            const CHUNK_SIZE = 200;
                             const totalChunks = Math.ceil(parsedResidents.length / CHUNK_SIZE);
 
-                            // Lưu metadata
                             const metaRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'residents_meta');
                             await setDoc(metaRef, {
                                 totalCount: parsedResidents.length,
@@ -3030,14 +3117,12 @@
                                 updatedAt: Date.now()
                             });
 
-                            // Lưu từng chunk
                             for (let c = 0; c < totalChunks; c++) {
                                 const chunkData = parsedResidents.slice(c * CHUNK_SIZE, (c + 1) * CHUNK_SIZE);
                                 const chunkRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', `residents_chunk_${c}`);
                                 await setDoc(chunkRef, { chunkIndex: c, list: chunkData });
                             }
 
-                            // Giữ thêm 1 bản tóm tắt tương thích ngược
                             const resDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'residents_db');
                             await setDoc(resDocRef, { list: parsedResidents.slice(0, 300), totalCount: parsedResidents.length, updatedAt: Date.now() });
                         } catch(e) {
@@ -3049,15 +3134,15 @@
                     const pageSizeSel = document.getElementById('adminResidentPageSizeSelect');
                     if (pageSizeSel) pageSizeSel.value = 'ALL';
 
-                    const syncEl = document.getElementById('adminLastSyncTime');
-                    if (syncEl) syncEl.textContent = `Lưu lúc ${new Date().toLocaleTimeString('vi-VN')}`;
-
                     updateResidentUI();
                     renderEvaluationAnalytics();
                     showToast(`Đã nạp chính xác & lưu trữ lâu dài toàn bộ ${parsedResidents.length} căn hộ vào hệ thống!`, "Nạp thành công");
                 } catch(err) {
                     console.error("Lỗi đọc Excel:", err);
                     showToast("Lỗi phân tích file Excel! Vui lòng kiểm tra định dạng file.", "Lỗi", true);
+                } finally {
+                    // Reset input để có thể chọn lại file cùng tên nếu cần
+                    event.target.value = '';
                 }
             };
             reader.readAsArrayBuffer(file);
