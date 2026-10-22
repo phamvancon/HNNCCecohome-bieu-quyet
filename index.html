@@ -833,16 +833,16 @@ service cloud.firestore {
                             </div>
                             <div>
                                 <h4 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
-                                    Quản Lý Danh Sách Chủ Sở Hữu Cư Dân (File Excel)
-                                    <span id="adminResidentCountBadge" class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">5 căn hộ</span>
+                                    Quản Lý Danh Sách Chủ Sở Hữu Căn Hộ
+                                    <span id="adminResidentCountBadge" class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">0 căn hộ</span>
                                 </h4>
-                                <p class="text-xs text-slate-500">Tải file Excel (VD: <span class="font-mono font-semibold text-slate-700">DANH SÁCH CHỦ SỞ HỮU check in 2026.xlsx</span>) để nạp CSDL xác thực biểu quyết & đánh giá.</p>
+                                <p class="text-xs text-slate-500">Chuẩn hóa cấu trúc: <strong>Mã Căn Hộ | Họ Tên Chủ Sở Hữu | Diện tích (m2) | Quốc tịch | Giới tính | Điện thoại | QH với CH</strong></p>
                             </div>
                         </div>
 
                         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                            <button onclick="window.downloadResidentTemplate()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition flex items-center gap-1.5">
-                                <i class="fa-solid fa-file-arrow-down text-slate-600"></i> Tải file mẫu
+                            <button onclick="window.downloadResidentTemplate()" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-arrow-down text-emerald-600"></i> Tải file mẫu chuẩn Excel
                             </button>
                             <button onclick="window.clearAllResidentsData()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-lg border border-rose-200 transition flex items-center gap-1.5">
                                 <i class="fa-solid fa-trash-can"></i> Xóa CSDL Cư Dân
@@ -850,49 +850,71 @@ service cloud.firestore {
                         </div>
                     </div>
 
+                    <!-- Statistics Summary Mini-Cards -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] text-slate-500 uppercase font-bold block">Tổng Căn Hộ</span>
+                            <span id="statResidentTotalRooms" class="text-lg font-black text-slate-800">0</span>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] text-slate-500 uppercase font-bold block">Tổng Diện Tích (m²)</span>
+                            <span id="statResidentTotalArea" class="text-lg font-black text-brand-700">0 m²</span>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] text-slate-500 uppercase font-bold block">Số ĐT Có Thể Xác Thực</span>
+                            <span id="statResidentWithPhone" class="text-lg font-black text-emerald-600">0</span>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] text-slate-500 uppercase font-bold block">Trạng Thái Đồng Bộ</span>
+                            <span id="adminExcelSyncBadge" class="text-xs font-bold text-amber-600">Chờ nạp file</span>
+                        </div>
+                    </div>
+
                     <!-- File Drag/Drop or Browse Box -->
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                         <div class="lg:col-span-7">
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-emerald-300 border-dashed rounded-xl cursor-pointer bg-emerald-50/40 hover:bg-emerald-50 transition">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-emerald-600 mb-2 animate-bounce"></i>
-                                    <p class="text-xs text-slate-700 font-bold"><span class="text-emerald-700 underline">Nhấp để chọn file Excel</span> hoặc kéo thả file vào đây</p>
-                                    <p class="text-[10px] text-slate-500 mt-1">Hỗ trợ: .XLSX, .XLS, .CSV (Tự nhận dạng: Mã căn, Tên chủ hộ, Số điện thoại, Diện tích)</p>
+                            <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-emerald-300 border-dashed rounded-xl cursor-pointer bg-emerald-50/40 hover:bg-emerald-50 transition">
+                                <div class="flex flex-col items-center justify-center text-center px-4">
+                                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-emerald-600 mb-1 animate-bounce"></i>
+                                    <p class="text-xs text-slate-700 font-bold"><span class="text-emerald-700 underline">Nhấp để nạp file Excel danh sách</span> hoặc kéo thả vào đây</p>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">Tự động khớp 7 cột: Mã Căn Hộ, Họ Tên Chủ Sở Hữu, Diện tích (m2), Quốc tịch, Giới tính, Điện thoại, QH với CH</p>
                                 </div>
                                 <input type="file" id="adminExcelResidentInput" onchange="window.handleResidentExcelUpload(event)" accept=".xlsx, .xls, .csv" class="hidden">
                             </label>
                         </div>
 
                         <!-- Search and Quick Stats -->
-                        <div class="lg:col-span-5 bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+                        <div class="lg:col-span-5 bg-slate-50 rounded-xl p-3 border border-slate-200 space-y-2">
                             <div class="flex justify-between items-center text-xs">
-                                <span class="font-bold text-slate-700">Tra cứu nhanh cư dân:</span>
-                                <span id="excelParsedStatusText" class="text-[11px] font-semibold text-emerald-700">Sẵn sàng tra cứu</span>
+                                <span class="font-bold text-slate-700"><i class="fa-solid fa-magnifying-glass text-slate-400 mr-1"></i> Tra cứu danh sách:</span>
+                                <span id="excelParsedStatusText" class="text-[11px] font-semibold text-emerald-700">Sẵn sàng</span>
                             </div>
                             <div>
-                                <input type="text" id="adminResidentSearchInput" oninput="window.filterAdminResidentTable()" placeholder="Gõ tìm Mã căn (A-08...), Tên hoặc SĐT..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                <input type="text" id="adminResidentSearchInput" oninput="window.filterAdminResidentTable()" placeholder="Tìm Mã căn (A-08...), Họ tên, SĐT, Quan hệ..." class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             </div>
-                            <div class="text-[11px] text-slate-500 flex items-center justify-between">
-                                <span>Đồng bộ: <strong class="text-emerald-700">Firebase Firestore Cloud</strong></span>
-                                <span>Trạng thái: <strong class="text-slate-800" id="adminExcelSyncBadge">Đã nạp</strong></span>
+                            <div class="flex items-center justify-between text-[10px] text-slate-500">
+                                <span>Lưu trữ: <strong class="text-emerald-700">Firebase Firestore Cloud</strong></span>
+                                <span id="excelLastUpdatedTime">Cập nhật: Mặc định</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Mini Table preview for uploaded residents -->
-                    <div class="overflow-x-auto max-h-48 border border-slate-200 rounded-xl custom-scrollbar">
+                    <!-- Table Preview Matching Exact 7 Columns from Screenshot -->
+                    <div class="overflow-x-auto max-h-64 border border-slate-200 rounded-xl custom-scrollbar shadow-inner">
                         <table class="w-full text-left text-xs text-slate-600">
-                            <thead class="bg-slate-100 text-slate-800 font-bold uppercase text-[10px] sticky top-0">
+                            <thead class="bg-slate-200 text-slate-800 font-bold uppercase text-[10px] sticky top-0 border-b border-slate-300">
                                 <tr>
-                                    <th class="px-3 py-2">STT</th>
-                                    <th class="px-3 py-2">Mã Căn</th>
-                                    <th class="px-3 py-2">Chủ Sở Hữu</th>
-                                    <th class="px-3 py-2">Số Điện Thoại</th>
-                                    <th class="px-3 py-2">Diện Tích (m²)</th>
-                                    <th class="px-3 py-2 text-right">Tỷ Lệ (%)</th>
+                                    <th class="px-3 py-2 text-center w-10">STT</th>
+                                    <th class="px-3 py-2">Mã Căn Hộ</th>
+                                    <th class="px-3 py-2">Họ Tên Chủ Sở Hữu</th>
+                                    <th class="px-3 py-2 text-right">Diện tích (m2)</th>
+                                    <th class="px-3 py-2 text-center">Quốc tịch</th>
+                                    <th class="px-3 py-2 text-center">Giới tính</th>
+                                    <th class="px-3 py-2">Điện thoại</th>
+                                    <th class="px-3 py-2 text-center">QH với CH</th>
                                 </tr>
                             </thead>
-                            <tbody id="adminResidentTableBody" class="divide-y divide-slate-100 font-medium">
+                            <tbody id="adminResidentTableBody" class="divide-y divide-slate-100 font-medium bg-white">
                                 <!-- Populated dynamically -->
                             </tbody>
                         </table>
@@ -1097,13 +1119,13 @@ service cloud.firestore {
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Official Resident Database default seeded list
+        // Official Resident Database default seeded list with exact columns
         const DEFAULT_RESIDENT_DB = [
-            { room: "A-08.15", name: "Nguyễn Văn Hùng", phone: "0981234567", area: 68.5, ratio: "0.16%" },
-            { room: "B-03.02", name: "Phạm Thị Mai", phone: "0905111222", area: 72.0, ratio: "0.17%" },
-            { room: "A-15.01", name: "Lê Quốc Bảo", phone: "0914333444", area: 59.8, ratio: "0.14%" },
-            { room: "A-12.08", name: "Nguyễn Văn A", phone: "0989999888", area: 68.5, ratio: "0.16%" },
-            { room: "B-12.04", name: "Lê Thị Thu", phone: "0935556677", area: 65.2, ratio: "0.15%" }
+            { room: "A-08.15", name: "Nguyễn Văn Hùng", area: 68.5, nationality: "Việt Nam", gender: "Nam", phone: "0981234567", relation: "Chủ hộ" },
+            { room: "B-03.02", name: "Phạm Thị Mai", area: 72.0, nationality: "Việt Nam", gender: "Nữ", phone: "0905111222", relation: "Chủ hộ" },
+            { room: "A-15.01", name: "Lê Quốc Bảo", area: 59.8, nationality: "Việt Nam", gender: "Nam", phone: "0914333444", relation: "Chủ hộ" },
+            { room: "A-12.08", name: "Nguyễn Văn A", area: 68.5, nationality: "Việt Nam", gender: "Nam", phone: "0989999888", relation: "Ủy quyền" },
+            { room: "B-12.04", name: "Lê Thị Thu", area: 65.2, nationality: "Việt Nam", gender: "Nữ", phone: "0935556677", relation: "Vợ" }
         ];
 
         const DEFAULT_VOTING_ITEMS = [
@@ -1432,16 +1454,16 @@ service cloud.firestore {
                     saveToLocalStorage(LOCAL_STORAGE_KEYS.EVAL, state.evalList);
                     renderEvaluationAnalytics();
                 }, (error) => {
-                    handlePermissionFallback("Đồng bộ Đánh giá BQL", error);
+                    handlePermissionFallback("Đồng bộ Đánh giá", error);
                     renderEvaluationAnalytics();
                 });
             } catch (err) {
-                handlePermissionFallback("Lắng nghe Đánh giá BQL", err);
+                handlePermissionFallback("Lắng nghe Đánh giá", err);
                 renderEvaluationAnalytics();
             }
         }
 
-        // Excel File Parser using SheetJS
+        // Excel File Parser using SheetJS with exact column structure
         function handleResidentExcelUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1467,25 +1489,43 @@ service cloud.firestore {
 
                     const parsedList = [];
                     rawRows.forEach((row) => {
-                        let room = "", name = "", phone = "", area = "", ratio = "";
+                        let room = "", name = "", area = "", nationality = "", gender = "", phone = "", relation = "";
                         
                         Object.keys(row).forEach(key => {
-                            const k = key.toLowerCase().trim();
+                            const k = key.toLowerCase().trim().replace(/\s+/g, ' ');
                             const val = String(row[key] || '').trim();
 
-                            if (k.includes('căn') || k.includes('phòng') || k.includes('mã ch') || k.includes('ch') || k.includes('room')) {
+                            // 1. Mã Căn Hộ
+                            if (k.includes('mã căn') || k.includes('mã ch') || k.includes('căn hộ') || k.includes('phòng') || k === 'ch' || k === 'room') {
                                 if (!room) room = val;
-                            } else if (k.includes('tên') || k.includes('họ') || k.includes('chủ hộ') || k.includes('sở hữu') || k.includes('owner')) {
+                            } 
+                            // 2. Họ Tên Chủ Sở Hữu
+                            else if (k.includes('chủ sở hữu') || k.includes('họ tên') || k.includes('họ và tên') || k.includes('chủ hộ') || k.includes('owner')) {
                                 if (!name) name = val;
-                            } else if (k.includes('thoại') || k.includes('sđt') || k.includes('phone') || k.includes('tel') || k.includes('mobile')) {
-                                if (!phone) phone = val;
-                            } else if (k.includes('diện tích') || k.includes('area') || k.includes('m2') || k.includes('dt')) {
+                            } 
+                            // 3. Diện tích (m2)
+                            else if (k.includes('diện tích') || k.includes('m2') || k.includes('area') || k === 'dt') {
                                 if (!area) area = val;
-                            } else if (k.includes('tỷ lệ') || k.includes('biểu quyết') || k.includes('ratio') || k.includes('%')) {
-                                if (!ratio) ratio = val;
+                            } 
+                            // 4. Quốc tịch
+                            else if (k.includes('quốc tịch') || k.includes('nationality')) {
+                                if (!nationality) nationality = val;
+                            } 
+                            // 5. Giới tính
+                            else if (k.includes('giới tính') || k.includes('gender') || k === 'phái') {
+                                if (!gender) gender = val;
+                            } 
+                            // 6. Điện thoại
+                            else if (k.includes('điện thoại') || k.includes('sđt') || k.includes('phone') || k.includes('tel') || k.includes('mobile')) {
+                                if (!phone) phone = val;
+                            } 
+                            // 7. QH với CH (Quan hệ với Chủ hộ)
+                            else if (k.includes('qh với ch') || k.includes('quan hệ') || k.includes('qh') || k.includes('vai trò') || k.includes('relation')) {
+                                if (!relation) relation = val;
                             }
                         });
 
+                        // Normalize phone number
                         phone = phone.replace(/[^0-9]/g, '');
                         if (phone.length === 9 && !phone.startsWith('0')) phone = '0' + phone;
 
@@ -1493,15 +1533,17 @@ service cloud.firestore {
                             parsedList.push({
                                 room: room.toUpperCase(),
                                 name: name || "Chủ hộ",
-                                phone: phone || "",
                                 area: parseFloat(area) || 0,
-                                ratio: ratio ? (String(ratio).includes('%') ? ratio : ratio + '%') : (area ? ((parseFloat(area)/42000)*100).toFixed(2)+'%' : '--')
+                                nationality: nationality || "Việt Nam",
+                                gender: gender || "--",
+                                phone: phone || "",
+                                relation: relation || "Chủ hộ"
                             });
                         }
                     });
 
                     if (parsedList.length === 0) {
-                        showToast("Không tìm thấy cột Mã căn hoặc Tên chủ hộ trong file!", "warning");
+                        showToast("Không tìm thấy cột Mã Căn Hộ hoặc Họ Tên trong file!", "warning");
                         if (statusText) statusText.innerText = "Sai định dạng cột";
                         return;
                     }
@@ -1524,7 +1566,7 @@ service cloud.firestore {
                     }
 
                     updateResidentUI();
-                    showToast(`Đã nạp thành công ${parsedList.length} căn hộ!`);
+                    showToast(`Đã nạp thành công ${parsedList.length} căn hộ vào CSDL!`);
                     if (statusText) statusText.innerText = `Đã nạp ${parsedList.length} căn hộ`;
                 } catch (err) {
                     console.error("Lỗi đọc file Excel:", err);
@@ -2103,45 +2145,76 @@ service cloud.firestore {
             e.preventDefault();
             const room = (document.getElementById('voteQuickRoom')?.value || '').trim().toUpperCase();
             const phone = (document.getElementById('voteQuickPhone')?.value || '').trim().replace(/[^0-9]/g, '');
+            const form = document.getElementById('votingQuickVerifyForm');
+            const badge = document.getElementById('votingVerifiedBadge');
+            const ownerEl = document.getElementById('votingVerifiedOwnerName');
+            const areaEl = document.getElementById('votingVerifiedAreaRatio');
 
             const matched = state.residentsList.find(r => {
                 const matchRoom = (r.room || '').trim().toUpperCase() === room;
                 const rPhone = (r.phone || '').trim().replace(/[^0-9]/g, '');
-                return matchRoom && (rPhone.endsWith(phone) || phone.endsWith(rPhone));
+                const matchPhone = rPhone && phone && (rPhone.endsWith(phone) || phone.endsWith(rPhone));
+                return matchRoom && matchPhone;
             });
 
             if (!matched) {
-                showToast("Mã căn hộ hoặc SĐT không đúng trong danh sách!", "warning");
+                showToast("Không tìm thấy thông tin căn hộ hoặc SĐT không khớp!", "warning");
                 return;
             }
 
             state.votingVerifiedResident = matched;
-            document.getElementById('votingQuickVerifyForm')?.classList.add('hidden');
-            const badge = document.getElementById('votingVerifiedBadge');
+            if (form) form.classList.add('hidden');
             if (badge) badge.classList.remove('hidden');
+            if (ownerEl) ownerEl.innerText = `Căn: ${matched.room} - ${matched.name}`;
 
-            const ownerNameEl = document.getElementById('votingVerifiedOwnerName');
-            const areaRatioEl = document.getElementById('votingVerifiedAreaRatio');
-            if (ownerNameEl) ownerNameEl.innerText = `Căn: ${matched.room} - ${matched.name}`;
-            if (areaRatioEl) areaRatioEl.innerText = `Tư cách: Hợp lệ | Diện tích: ${matched.area || '--'} m² (${matched.ratio || '--'})`;
+            let totalArea = 0;
+            state.residentsList.forEach(r => totalArea += (Number(r.area) || 0));
+            const ratio = totalArea > 0 ? ((Number(matched.area) || 0) / totalArea * 100).toFixed(2) : '0.00';
+            if (areaEl) areaEl.innerText = `Tư cách: Hợp lệ | Diện tích: ${matched.area || 0} m² (${ratio}%) | ${matched.relation || 'Chủ sở hữu'}`;
 
-            showToast(`Xác thực quyền biểu quyết Căn ${matched.room} thành công!`);
+            // Pre-fill BQL evaluation fields if the resident visits that tab later
+            const verifyRoom = document.getElementById('verifyRoom');
+            const verifyName = document.getElementById('verifyName');
+            const verifyPhone = document.getElementById('verifyPhone');
+            if (verifyRoom) verifyRoom.value = matched.room;
+            if (verifyName) verifyName.value = matched.name;
+            if (verifyPhone) verifyPhone.value = matched.phone;
+
+            showToast(`Xác thực thành công Căn ${matched.room}!`);
         }
 
         function resetVotingVerification() {
             state.votingVerifiedResident = null;
-            document.getElementById('votingQuickVerifyForm')?.classList.remove('hidden');
-            document.getElementById('votingVerifiedBadge')?.classList.add('hidden');
+            const form = document.getElementById('votingQuickVerifyForm');
+            const badge = document.getElementById('votingVerifiedBadge');
+            if (form) form.classList.remove('hidden');
+            if (badge) badge.classList.add('hidden');
         }
 
-        // Resident UI updates for Admin Table
+        // Resident UI updates for Admin Table matching exact 7 columns
         function updateResidentUI(filterQuery = '') {
             const badge = document.getElementById('adminResidentCountBadge');
             const syncBadge = document.getElementById('adminExcelSyncBadge');
             const tbody = document.getElementById('adminResidentTableBody');
+            const statRooms = document.getElementById('statResidentTotalRooms');
+            const statArea = document.getElementById('statResidentTotalArea');
+            const statPhone = document.getElementById('statResidentWithPhone');
 
-            if (badge) badge.innerText = `${state.residentsList.length} căn hộ`;
-            if (syncBadge) syncBadge.innerText = state.residentsList.length > 0 ? "Đã nạp" : "Chưa có dữ liệu";
+            const totalCount = state.residentsList.length;
+            if (badge) badge.innerText = `${totalCount} căn hộ`;
+            if (syncBadge) syncBadge.innerText = totalCount > 0 ? "Đã nạp (" + totalCount + " căn)" : "Chưa có dữ liệu";
+
+            // Calculate totals
+            let totalAreaM2 = 0;
+            let withPhoneCount = 0;
+            state.residentsList.forEach(r => {
+                if (r.area) totalAreaM2 += Number(r.area) || 0;
+                if (r.phone && r.phone.length >= 9) withPhoneCount++;
+            });
+
+            if (statRooms) statRooms.innerText = totalCount;
+            if (statArea) statArea.innerText = totalAreaM2 ? `${totalAreaM2.toFixed(1)} m²` : '0 m²';
+            if (statPhone) statPhone.innerText = `${withPhoneCount} / ${totalCount}`;
 
             if (!tbody) return;
 
@@ -2150,24 +2223,41 @@ service cloud.firestore {
                 if (!q) return true;
                 return (r.room || '').toLowerCase().includes(q) ||
                        (r.name || '').toLowerCase().includes(q) ||
-                       (r.phone || '').includes(q);
+                       (r.phone || '').includes(q) ||
+                       (r.relation || '').toLowerCase().includes(q) ||
+                       (r.nationality || '').toLowerCase().includes(q) ||
+                       (r.gender || '').toLowerCase().includes(q);
             });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-3 py-6 text-center text-slate-400 text-xs">Không tìm thấy thông tin cư dân.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="px-3 py-6 text-center text-slate-400 text-xs">Không tìm thấy thông tin chủ sở hữu nào. Hãy tải lên file Excel hoặc kiểm tra từ khóa tìm kiếm.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filtered.map((r, i) => `
-                <tr class="hover:bg-slate-50 transition">
-                    <td class="px-3 py-2 text-slate-400 font-mono text-[11px]">${i + 1}</td>
+            tbody.innerHTML = filtered.map((r, i) => {
+                // Relation badge color
+                const rel = r.relation || 'Chủ hộ';
+                let relBadge = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                if (rel.toLowerCase().includes('ủy quyền')) relBadge = "bg-amber-50 text-amber-700 border-amber-200";
+                else if (rel.toLowerCase().includes('vợ') || rel.toLowerCase().includes('chồng') || rel.toLowerCase().includes('con')) relBadge = "bg-indigo-50 text-indigo-700 border-indigo-200";
+
+                return `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="px-3 py-2 text-center text-slate-400 font-mono text-[11px]">${i + 1}</td>
                     <td class="px-3 py-2 font-bold text-slate-900">${r.room || '--'}</td>
-                    <td class="px-3 py-2 text-slate-700">${r.name || '--'}</td>
-                    <td class="px-3 py-2 text-slate-600 font-mono">${r.phone ? (r.phone.slice(0, -3) + '***') : '--'}</td>
-                    <td class="px-3 py-2 text-slate-700">${r.area ? (r.area + ' m²') : '--'}</td>
-                    <td class="px-3 py-2 text-right font-bold text-brand-700">${r.ratio || '--'}</td>
+                    <td class="px-3 py-2 text-slate-800 font-semibold">${r.name || '--'}</td>
+                    <td class="px-3 py-2 text-right font-bold text-brand-700">${r.area ? (Number(r.area).toFixed(1) + ' m²') : '--'}</td>
+                    <td class="px-3 py-2 text-center text-slate-600">${r.nationality || 'Việt Nam'}</td>
+                    <td class="px-3 py-2 text-center text-slate-600">${r.gender || '--'}</td>
+                    <td class="px-3 py-2 text-slate-700 font-mono">${r.phone ? (r.phone.slice(0, -3) + '***') : '<span class="text-rose-400 italic">Chưa có</span>'}</td>
+                    <td class="px-3 py-2 text-center">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${relBadge}">
+                            ${rel}
+                        </span>
+                    </td>
                 </tr>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function filterAdminResidentTable() {
@@ -2177,16 +2267,18 @@ service cloud.firestore {
 
         function downloadResidentTemplate() {
             const sampleData = [
-                ["Mã Căn Hộ", "Họ Tên Chủ Sở Hữu", "Số Điện Thoại", "Diện Tích (m2)", "Tỷ Lệ Biểu Quyết (%)"],
-                ["A-08.15", "Nguyễn Văn Hùng", "0981234567", 68.5, "0.16%"],
-                ["B-03.02", "Phạm Thị Mai", "0905111222", 72.0, "0.17%"],
-                ["A-15.01", "Lê Quốc Bảo", "0914333444", 59.8, "0.14%"]
+                ["Mã Căn Hộ", "Họ Tên Chủ Sở Hữu", "Diện tích (m2)", "Quốc tịch", "Giới tính", "Điện thoại", "QH với CH"],
+                ["A-08.15", "Nguyễn Văn Hùng", 68.5, "Việt Nam", "Nam", "0981234567", "Chủ hộ"],
+                ["B-03.02", "Phạm Thị Mai", 72.0, "Việt Nam", "Nữ", "0905111222", "Chủ hộ"],
+                ["A-15.01", "Lê Quốc Bảo", 59.8, "Việt Nam", "Nam", "0914333444", "Chủ hộ"],
+                ["A-12.08", "Nguyễn Văn A", 68.5, "Việt Nam", "Nam", "0989999888", "Ủy quyền"],
+                ["B-12.04", "Lê Thị Thu", 65.2, "Việt Nam", "Nữ", "0935556677", "Vợ"]
             ];
             const ws = XLSX.utils.aoa_to_sheet(sampleData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "DanhSachMau");
-            XLSX.writeFile(wb, "Mau_Danh_Sach_Cu_Dan_Ecohome_2026.xlsx");
-            showToast("Đã tải xuống file mẫu Excel!");
+            XLSX.utils.book_append_sheet(wb, ws, "DANH_SACH_CHU_SO_HUU");
+            XLSX.writeFile(wb, "DANH_SACH_CHU_SO_HUU_Ecohome_2026.xlsx");
+            showToast("Đã tải xuống file mẫu Excel đúng 7 cột chuẩn!");
         }
 
         // Admin Management Controls
