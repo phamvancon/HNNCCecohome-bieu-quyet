@@ -310,6 +310,146 @@
                     <p class="text-xs text-slate-500 leading-relaxed">Gửi câu hỏi trực tiếp đến Ban Quản Trị và Ban Điều Hành để được giải đáp trong hội nghị.</p>
                 </div>
             </div>
+
+            <!-- ========================================== -->
+            <!-- REALTIME BQL EVALUATION ANALYTICS & LOG    -->
+            <!-- ========================================== -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+                <!-- Header & Controls -->
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-base font-black shadow-xs">
+                                <i class="fa-solid fa-chart-pie"></i>
+                            </div>
+                            <h3 class="font-black text-slate-900 text-base sm:text-xl">
+                                Kết Quả Khảo Sát & Phân Tích Đánh Giá Vận Hành BQL
+                            </h3>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                Realtime
+                            </span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-500">
+                            Công khai minh bạch điểm đánh giá chất lượng dịch vụ của N&H Real Estate Management theo từng tiêu chuẩn Hợp đồng.
+                        </p>
+                    </div>
+
+                    <!-- Period Filter & Action CTA -->
+                    <div class="flex items-center gap-2.5 flex-wrap w-full md:w-auto justify-between md:justify-end">
+                        <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                            <span class="text-xs font-bold text-slate-600 pl-2 whitespace-nowrap"><i class="fa-solid fa-calendar-check text-amber-500 mr-1"></i> Kỳ:</span>
+                            <select id="homeEvalPeriodFilter" onchange="renderHomeEvaluationDashboard()" class="bg-white px-3 py-1.5 text-xs font-bold text-slate-800 rounded-xl border border-slate-200 shadow-xs focus:outline-none cursor-pointer">
+                                <option value="ALL">Tất Cả Các Kỳ</option>
+                                <option value="YEAR-2026">Cả Năm 2026</option>
+                                <option value="Q1-2026">Quý 1 / 2026</option>
+                                <option value="Q2-2026">Quý 2 / 2026</option>
+                                <option value="Q3-2026">Quý 3 / 2026</option>
+                                <option value="Q4-2026">Quý 4 / 2026</option>
+                            </select>
+                        </div>
+                        <button onclick="switchTab('evaluation')" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs rounded-xl shadow-md transition flex items-center gap-1.5 whitespace-nowrap active:scale-95">
+                            <i class="fa-solid fa-pen-to-square"></i> Đánh Giá Ngay
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 High-level Executive KPI Cards on Home -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1 relative overflow-hidden">
+                        <span class="text-[10px] sm:text-xs font-extrabold uppercase text-amber-800 tracking-wider block">Điểm Trung Bình</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl sm:text-4xl font-black text-amber-600" id="homeEvalAvgScore">4.8</span>
+                            <span class="text-xs text-amber-700 font-bold">/ 5.0</span>
+                        </div>
+                        <div class="text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1" id="homeEvalGradeBadge">
+                            Xuất sắc (Vượt chuẩn)
+                        </div>
+                    </div>
+
+                    <div class="p-4 sm:p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-1">
+                        <span class="text-[10px] sm:text-xs font-extrabold uppercase text-emerald-800 tracking-wider block">Tỷ Lệ Tham Gia</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl sm:text-4xl font-black text-emerald-700" id="homeEvalTurnoutRate">80.3%</span>
+                        </div>
+                        <span class="text-[10px] sm:text-xs text-emerald-900 font-medium block" id="homeEvalTotalCount">128 Căn / CSDL</span>
+                    </div>
+
+                    <div class="p-4 sm:p-5 rounded-2xl bg-indigo-50/70 border border-indigo-200/80 space-y-1">
+                        <span class="text-[10px] sm:text-xs font-extrabold uppercase text-indigo-800 tracking-wider block">Độ Hài Lòng (4 - 5★)</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl sm:text-4xl font-black text-indigo-700" id="homeEvalSatisfactionRate">96.2%</span>
+                        </div>
+                        <span class="text-[10px] sm:text-xs text-indigo-800 font-medium block">Đồng thuận tích cực</span>
+                    </div>
+
+                    <div class="p-4 sm:p-5 rounded-2xl bg-purple-50/70 border border-purple-200/80 space-y-1">
+                        <span class="text-[10px] sm:text-xs font-extrabold uppercase text-purple-800 tracking-wider block">Tiêu Chuẩn Cam Kết</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl sm:text-4xl font-black text-purple-700" id="homeEvalSlaStatus">6/6</span>
+                            <span class="text-xs text-purple-600 font-bold">hạng mục</span>
+                        </div>
+                        <span class="text-[10px] sm:text-xs text-purple-800 font-medium block">Đạt chỉ số SLA $\ge$ 80%</span>
+                    </div>
+                </div>
+
+                <!-- 6 Standard Criteria Breakdown on Home -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-brand-600"></i> Điểm Chi Tiết 6 Hạng Mục Vận Hành Theo Chuẩn Hợp Đồng
+                        </h4>
+                        <span class="text-[11px] font-bold text-slate-500 hidden sm:inline">Cam kết SLA chuẩn: $\ge$ 4.0/5.0</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5" id="homeEvalCriteriaGrid">
+                        <!-- Rendered dynamically by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Participating Apartments Transparent Log Table -->
+                <div class="pt-3 border-t border-slate-100 space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div class="space-y-0.5">
+                            <div class="flex items-center gap-2">
+                                <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                    <i class="fa-solid fa-users text-amber-500"></i> Danh Sách Căn Hộ Đã Tham Gia Đánh Giá BQL
+                                </h4>
+                                <span class="text-xs bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full border border-amber-300" id="homeEvalParticipantCountBadge">
+                                    0 căn hộ
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-500">Danh sách ghi nhận công khai tiến độ tham gia đánh giá của các chủ sở hữu căn hộ.</p>
+                        </div>
+
+                        <!-- Search input for participating apartments -->
+                        <div class="w-full sm:w-72 relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="homeEvalSearchInput" oninput="filterHomeEvalParticipants()" placeholder="Tìm căn hộ, tên chủ hộ..." class="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Participant Table View -->
+                    <div class="overflow-x-auto max-h-72 border border-slate-200 rounded-2xl custom-scrollbar shadow-inner">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-100 text-slate-800 font-bold uppercase text-[10px] sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-3 py-2.5 text-center w-12">STT</th>
+                                    <th class="px-3 py-2.5">Mã Căn Hộ</th>
+                                    <th class="px-3 py-2.5">Chủ Sở Hữu / Người Đánh Giá</th>
+                                    <th class="px-3 py-2.5 text-center">Kỳ Đánh Giá</th>
+                                    <th class="px-3 py-2.5 text-center font-bold text-amber-700">Điểm TB</th>
+                                    <th class="px-3 py-2.5 text-center">Trạng Thái SLA</th>
+                                    <th class="px-3 py-2.5">Ý Kiến / Nhận Xét Cư Dân</th>
+                                    <th class="px-3 py-2.5 text-center">Thời Gian Gửi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="homeEvalParticipantTableBody" class="divide-y divide-slate-100 font-medium bg-white">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- ========================================== -->
@@ -2144,6 +2284,7 @@
                 if (starDistEl) starDistEl.innerHTML = `<p class="text-xs text-slate-400 italic py-4">Chưa có phân bổ số sao.</p>`;
                 if (commentsEl) commentsEl.innerHTML = `<p class="text-xs text-slate-400 italic py-4 col-span-2 text-center">Chưa có nhận xét nào.</p>`;
                 if (commentsBadge) commentsBadge.textContent = `0 ý kiến`;
+                renderHomeEvaluationDashboard();
                 return;
             }
 
@@ -2336,6 +2477,227 @@
                     }).join('');
                 }
             }
+
+            renderHomeEvaluationDashboard();
+        };
+
+        window.renderHomeEvaluationDashboard = function() {
+            const avgEl = document.getElementById('homeEvalAvgScore');
+            const turnoutEl = document.getElementById('homeEvalTurnoutRate');
+            const totalCountEl = document.getElementById('homeEvalTotalCount');
+            const satEl = document.getElementById('homeEvalSatisfactionRate');
+            const slaStatusEl = document.getElementById('homeEvalSlaStatus');
+            const gradeBadge = document.getElementById('homeEvalGradeBadge');
+            const criteriaGrid = document.getElementById('homeEvalCriteriaGrid');
+            const countBadge = document.getElementById('homeEvalParticipantCountBadge');
+
+            const selectedPeriod = document.getElementById('homeEvalPeriodFilter')?.value || 'ALL';
+            let list = state.evalList || [];
+
+            if (selectedPeriod !== 'ALL') {
+                list = list.filter(e => e.period === selectedPeriod);
+            }
+
+            const count = list.length;
+            const totalResidents = state.residentsList?.length || 600;
+            const turnoutRate = totalResidents > 0 ? ((count / totalResidents) * 100).toFixed(1) : '0';
+
+            if (turnoutEl) turnoutEl.textContent = `${turnoutRate}%`;
+            if (totalCountEl) totalCountEl.textContent = `${count} Căn / ${totalResidents} Căn CSDL`;
+            if (countBadge) countBadge.textContent = `${count} căn hộ`;
+
+            const criteriaMeta = {
+                c1: { title: "An Ninh, Trật Tự & Kiểm Soát Ra Vào", desc: "Cổng, hầm xe, camera 24/7", icon: "fa-shield-halved" },
+                c2: { title: "Vệ Sinh Môi Trường & Rác Thải", desc: "Hành lang, phòng rác, cảnh quan", icon: "fa-broom" },
+                c3: { title: "Vận Hành Kỹ Thuật Tòa Nhà", desc: "Thang máy, PCCC, điện nước", icon: "fa-screwdriver-wrench" },
+                c4: { title: "Tiếp Nhận & Xử Lý Ý Kiến", desc: "Tốc độ xử lý yêu cầu cư dân", icon: "fa-headset" },
+                c5: { title: "Minh Bạch Quản Lý Tài Chính", desc: "Thu phí rõ ràng, thông báo kịp thời", icon: "fa-scale-balanced" },
+                c6: { title: "Tác Phong & Thái Độ Phục Vụ", desc: "Lịch sự, tôn trọng, tận tình", icon: "fa-user-tie" }
+            };
+
+            if (count === 0) {
+                if (avgEl) avgEl.textContent = "5.0";
+                if (satEl) satEl.textContent = "100%";
+                if (slaStatusEl) slaStatusEl.textContent = "6/6";
+                if (gradeBadge) {
+                    gradeBadge.textContent = "Chưa có dữ liệu kỳ này";
+                    gradeBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1 bg-slate-100 text-slate-600";
+                }
+                if (criteriaGrid) {
+                    criteriaGrid.innerHTML = Object.keys(criteriaMeta).map(k => `
+                        <div class="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <span class="font-bold text-xs text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid ${criteriaMeta[k].icon} text-amber-500"></i> ${criteriaMeta[k].title}
+                                </span>
+                                <span class="text-xs font-black text-slate-400">5.0/5.0</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-1.5">
+                                <div class="bg-slate-300 h-1.5 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                filterHomeEvalParticipants();
+                return;
+            }
+
+            const avgC = { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0, c6: 0 };
+            let totalScores = 0;
+            let satisfiedCount = 0;
+
+            list.forEach(e => {
+                const c1 = Number(e.c1) || 5;
+                const c2 = Number(e.c2) || 5;
+                const c3 = Number(e.c3) || 5;
+                const c4 = Number(e.c4) || 5;
+                const c5 = Number(e.c5) || 5;
+                const c6 = Number(e.c6) || 5;
+
+                avgC.c1 += c1;
+                avgC.c2 += c2;
+                avgC.c3 += c3;
+                avgC.c4 += c4;
+                avgC.c5 += c5;
+                avgC.c6 += c6;
+
+                const rowAvg = (c1 + c2 + c3 + c4 + c5 + c6) / 6;
+                if (rowAvg >= 3.8) satisfiedCount++;
+            });
+
+            let passSlaCriteriaCount = 0;
+            for (let k in avgC) {
+                avgC[k] = (avgC[k] / count).toFixed(2);
+                totalScores += parseFloat(avgC[k]);
+                if (parseFloat(avgC[k]) >= 4.0) passSlaCriteriaCount++;
+            }
+
+            const overall = (totalScores / 6).toFixed(2);
+            if (avgEl) avgEl.textContent = overall;
+
+            const satRate = ((satisfiedCount / count) * 100).toFixed(1);
+            if (satEl) satEl.textContent = `${satRate}%`;
+            if (slaStatusEl) slaStatusEl.textContent = `${passSlaCriteriaCount}/6`;
+
+            if (gradeBadge) {
+                if (overall >= 4.5) {
+                    gradeBadge.textContent = "Xuất sắc (Vượt chuẩn HĐ)";
+                    gradeBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1 bg-emerald-100 text-emerald-800 border border-emerald-300";
+                } else if (overall >= 4.0) {
+                    gradeBadge.textContent = "Đạt chuẩn Tốt (Cam kết SLA)";
+                    gradeBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1 bg-brand-100 text-brand-800 border border-brand-300";
+                } else if (overall >= 3.0) {
+                    gradeBadge.textContent = "Cần chấn chỉnh & cải thiện";
+                    gradeBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1 bg-amber-100 text-amber-900 border border-amber-300";
+                } else {
+                    gradeBadge.textContent = "Không đạt SLA Hợp đồng";
+                    gradeBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1 bg-rose-100 text-rose-800 border border-rose-300";
+                }
+            }
+
+            if (criteriaGrid) {
+                criteriaGrid.innerHTML = Object.keys(avgC).map(k => {
+                    const score = parseFloat(avgC[k]);
+                    const percent = Math.min(100, Math.round((score / 5) * 100));
+                    const isSla = score >= 4.0;
+
+                    return `
+                        <div class="p-3.5 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2 hover:border-amber-300 hover:shadow-sm transition">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg ${isSla ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'} flex items-center justify-center text-xs flex-shrink-0">
+                                        <i class="fa-solid ${criteriaMeta[k].icon}"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-xs text-slate-900 leading-tight">${criteriaMeta[k].title}</h5>
+                                        <span class="text-[10px] text-slate-400">${criteriaMeta[k].desc}</span>
+                                    </div>
+                                </div>
+                                <div class="text-right flex-shrink-0">
+                                    <span class="font-black text-xs text-slate-900">${score}</span>
+                                    <span class="text-[10px] text-slate-400">/5</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-[10px] pt-1">
+                                <span class="font-bold ${isSla ? 'text-emerald-700' : 'text-rose-600'}">
+                                    <i class="fa-solid ${isSla ? 'fa-circle-check text-emerald-500' : 'fa-triangle-exclamation text-rose-500'}"></i> ${isSla ? 'Đạt SLA' : 'Dưới SLA'}
+                                </span>
+                                <span class="font-mono text-slate-500 font-bold">${percent}% Hài lòng</span>
+                            </div>
+
+                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+                                <div class="h-2 rounded-full transition-all duration-700 ${isSla ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : 'bg-gradient-to-r from-amber-500 to-rose-500'}" style="width: ${percent}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            filterHomeEvalParticipants();
+        };
+
+        window.filterHomeEvalParticipants = function() {
+            const tbody = document.getElementById('homeEvalParticipantTableBody');
+            if (!tbody) return;
+
+            const selectedPeriod = document.getElementById('homeEvalPeriodFilter')?.value || 'ALL';
+            const query = document.getElementById('homeEvalSearchInput')?.value?.toLowerCase().trim() || '';
+
+            let list = state.evalList || [];
+            if (selectedPeriod !== 'ALL') {
+                list = list.filter(e => e.period === selectedPeriod);
+            }
+
+            if (query) {
+                list = list.filter(e =>
+                    (e.room && e.room.toLowerCase().includes(query)) ||
+                    (e.name && e.name.toLowerCase().includes(query)) ||
+                    (e.comment && e.comment.toLowerCase().includes(query))
+                );
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400 italic">Chưa có căn hộ nào gửi đánh giá trong kỳ này hoặc không tìm thấy kết quả.</td></tr>`;
+                return;
+            }
+
+            // Sort most recent first
+            const sorted = [...list].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            tbody.innerHTML = sorted.map((e, idx) => {
+                const avg = (((e.c1 || 5) + (e.c2 || 5) + (e.c3 || 5) + (e.c4 || 5) + (e.c5 || 5) + (e.c6 || 5)) / 6).toFixed(1);
+                const isSatisfied = parseFloat(avg) >= 4.0;
+                const timeStr = e.timestamp ? new Date(e.timestamp).toLocaleDateString('vi-VN') + ' ' + new Date(e.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Hôm nay';
+
+                return `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="px-3 py-2 text-center text-slate-400 font-mono">${idx + 1}</td>
+                        <td class="px-3 py-2 font-black text-slate-900 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full ${isSatisfied ? 'bg-emerald-500' : 'bg-amber-500'}"></span>
+                            ${e.room}
+                        </td>
+                        <td class="px-3 py-2 font-bold text-slate-800">${e.name || 'Chủ sở hữu'}</td>
+                        <td class="px-3 py-2 text-center font-semibold text-slate-600">
+                            <span class="px-2 py-0.5 rounded bg-slate-100 text-[10px] border border-slate-200">${e.period}</span>
+                        </td>
+                        <td class="px-3 py-2 text-center font-black ${isSatisfied ? 'text-emerald-700' : 'text-amber-700'}">
+                            ★ ${avg}/5.0
+                        </td>
+                        <td class="px-3 py-2 text-center">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isSatisfied ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'}">
+                                ${isSatisfied ? 'Hài lòng (Đạt SLA)' : 'Cần khắc phục'}
+                            </span>
+                        </td>
+                        <td class="px-3 py-2 text-slate-700 max-w-xs truncate" title="${e.comment || ''}">
+                            ${e.comment ? `"${e.comment}"` : '<span class="text-slate-400 italic font-normal">Không có nhận xét thêm</span>'}
+                        </td>
+                        <td class="px-3 py-2 text-center font-mono text-[10px] text-slate-400 whitespace-nowrap">
+                            ${timeStr}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         };
 
         window.renderVotingItems = function() {
