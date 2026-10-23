@@ -288,9 +288,9 @@
 
                 <!-- 6 Criteria Performance Breakdown -->
                 <div class="space-y-3">
-                    <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-600">Chi Tiết 6 Tiêu Chuẩn Hợp Đồng Quản Lý Vận Hành</h2>
+                    <h2 id="homeCriteriaSectionTitle" class="text-xs font-extrabold uppercase tracking-wider text-slate-600">Chi Tiết Các Tiêu Chuẩn Hợp Đồng Quản Lý Vận Hành</h2>
                     <div id="homeCriteriaBreakdownGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                        <!-- Populated dynamically via renderHomeCriteriaBreakdown -->
+                        <!-- Populated dynamically via renderHomeEvalAnalytics -->
                     </div>
                 </div>
 
@@ -527,74 +527,14 @@
 
                 <div id="evaluationFormWrapper" class="space-y-6 opacity-60 pointer-events-none transition-opacity">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <h2 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-brand-600"></i> Bước 2: Chấm Điểm 6 Tiêu Chuẩn Nghiệp Vụ Vận Hành
+                        <h2 id="evalFormStep2Title" class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-brand-600"></i> Bước 2: Chấm Điểm Các Tiêu Chuẩn Nghiệp Vụ Vận Hành
                         </h2>
                         <span class="text-xs text-slate-500 italic">* Thang điểm từ 1 đến 5 sao</span>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Criteria 1 -->
-                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/90 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-extrabold text-xs text-slate-900">1. An Ninh, Trật Tự & Kiểm Soát Ra Vào</span>
-                                <span id="scoreBadge-crit1" class="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">5 ★</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500">Bảo vệ tuần tra 24/7, kiểm soát khách ra vào, quản lý bãi đỗ xe trật tự, an toàn tài sản.</p>
-                            <div class="flex items-center gap-2 pt-1" id="stars-crit1">
-                                <!-- Populated dynamically by initAllRatingStars -->
-                            </div>
-                        </div>
-
-                        <!-- Criteria 2 -->
-                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/90 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-extrabold text-xs text-slate-900">2. Vệ Sinh Môi Trường & Thu Gom Rác</span>
-                                <span id="scoreBadge-crit2" class="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">5 ★</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500">Sạch sẽ hành lang, sảnh, thang máy, hầm xe, thu gom rác đúng giờ, khử mùi hố rác hiệu quả.</p>
-                            <div class="flex items-center gap-2 pt-1" id="stars-crit2"></div>
-                        </div>
-
-                        <!-- Criteria 3 -->
-                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/90 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-extrabold text-xs text-slate-900">3. Vận Hành Kỹ Thuật (Thang Máy, Điện, Nước, PCCC)</span>
-                                <span id="scoreBadge-crit3" class="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">5 ★</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500">Thang máy hoạt động ổn định, bảo dưỡng định kỳ hệ thống bơm nước, chiếu sáng sự cố và hệ thống PCCC.</p>
-                            <div class="flex items-center gap-2 pt-1" id="stars-crit3"></div>
-                        </div>
-
-                        <!-- Criteria 4 -->
-                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/90 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-extrabold text-xs text-slate-900">4. Tiếp Nhận & Phản Hồi Kiến Nghị Cư Dân</span>
-                                <span id="scoreBadge-crit4" class="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">5 ★</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500">Lắng nghe ý kiến qua hotline/nhóm Zalo, xử lý nhanh sự cố trong vòng 24h, thông báo kịp thời khi sửa chữa.</p>
-                            <div class="flex items-center gap-2 pt-1" id="stars-crit4"></div>
-                        </div>
-
-                        <!-- Criteria 5 -->
-                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/90 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-extrabold text-xs text-slate-900">5. Quản Lý Tài Chính & Thu Chi Phí Dịch Vụ</span>
-                                <span id="scoreBadge-crit5" class="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">5 ★</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500">Bảng kê chi phí minh bạch, phát hành hóa đơn đúng hạn, quyết toán công khai quỹ vận hành cùng BQT.</p>
-                            <div class="flex items-center gap-2 pt-1" id="stars-crit5"></div>
-                        </div>
-
-                        <!-- Criteria 6 -->
-                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/90 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-extrabold text-xs text-slate-900">6. Đạo Đức Nghề Nghiệp & Thái Độ Phục Vụ</span>
-                                <span id="scoreBadge-crit6" class="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">5 ★</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500">Lễ phép, nhã nhặn, trang phục chỉnh tề, tận tâm hỗ trợ người già, trẻ em và cư dân khi gặp khó khăn.</p>
-                            <div class="flex items-center gap-2 pt-1" id="stars-crit6"></div>
-                        </div>
+                    <div id="evalCriteriaDynamicGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Dynamically rendered via renderEvalCriteriaForm() -->
                     </div>
 
                     <!-- Feedback Comment Box -->
@@ -824,6 +764,63 @@
                             <i class="fa-solid fa-lock-open"></i> Cấp Quyền Mở Ngay
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- 1.8 ADMIN EVALUATION CRITERIA CUSTOMIZATION CARD -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-amber-500/30 shadow-sm space-y-5">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Tùy Chỉnh Tiêu Chí Đánh Giá Vận Hành (BQL)</h3>
+                                <span id="adminCriteriaCountBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">6 tiêu chí</span>
+                            </div>
+                            <p class="text-xs text-slate-500">Thêm mới, chỉnh sửa nội dung hoặc xóa các tiêu chuẩn đánh giá chất lượng BQL theo hợp đồng thực tế.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="resetDefaultEvalCriteria()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 transition flex items-center gap-1.5 active:scale-95" title="Khôi phục 6 tiêu chí mặc định">
+                            <i class="fa-solid fa-rotate-left"></i> Mặc Định (6 TC)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add / Edit Criterion Form -->
+                <div class="bg-amber-50/60 rounded-2xl p-4 border border-amber-200/80 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span id="adminCriterionFormTitle" class="text-xs font-extrabold text-amber-950 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-plus text-amber-600"></i> Thêm Tiêu Chí Đánh Giá Mới
+                        </span>
+                        <button id="btnCancelEditCriterion" onclick="cancelEditEvalCriterion()" class="hidden text-[11px] font-bold text-slate-500 hover:text-slate-800 underline">
+                            Hủy chỉnh sửa
+                        </button>
+                    </div>
+                    <input type="hidden" id="editCriterionIdInput" value="">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                        <div class="md:col-span-5">
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Tên Tiêu Chí Đánh Giá (*)</label>
+                            <input type="text" id="adminCritTitleInput" placeholder="VD: An Ninh, Trật Tự & Kiểm Soát Ra Vào" class="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        </div>
+                        <div class="md:col-span-5">
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Mô Tả Chi Tiết Nghiệp Vụ (*)</label>
+                            <input type="text" id="adminCritDescInput" placeholder="VD: Bảo vệ tuần tra 24/7, kiểm soát khách ra vào, quản lý bãi xe..." class="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        </div>
+                        <div class="md:col-span-2 flex items-end">
+                            <button id="btnSaveCriterion" onclick="handleSaveEvalCriterion()" class="w-full py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-plus"></i> <span>Thêm Mới</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Criteria List Table -->
+                <div id="adminCriteriaListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- Dynamically populated via renderAdminCriteriaList() -->
                 </div>
             </div>
 
@@ -1133,12 +1130,46 @@
 
         // Global State
         const ADMIN_PIN = "215151365";
+        const DEFAULT_EVAL_CRITERIA = [
+            {
+                id: 'crit1',
+                title: 'An Ninh, Trật Tự & Kiểm Soát Ra Vào',
+                desc: 'Bảo vệ tuần tra 24/7, kiểm soát khách ra vào, quản lý bãi đỗ xe trật tự, an toàn tài sản.'
+            },
+            {
+                id: 'crit2',
+                title: 'Vệ Sinh Môi Trường & Thu Gom Rác',
+                desc: 'Sạch sẽ hành lang, sảnh, thang máy, hầm xe, thu gom rác đúng giờ, khử mùi hố rác hiệu quả.'
+            },
+            {
+                id: 'crit3',
+                title: 'Vận Hành Kỹ Thuật (Thang Máy, Điện, Nước, PCCC)',
+                desc: 'Thang máy hoạt động ổn định, bảo dưỡng định kỳ hệ thống bơm nước, chiếu sáng sự cố và hệ thống PCCC.'
+            },
+            {
+                id: 'crit4',
+                title: 'Tiếp Nhận & Phản Hồi Kiến Nghị Cư Dân',
+                desc: 'Lắng nghe ý kiến qua hotline/nhóm Zalo, xử lý nhanh sự cố trong vòng 24h, thông báo kịp thời khi sửa chữa.'
+            },
+            {
+                id: 'crit5',
+                title: 'Quản Lý Tài Chính & Thu Chi Phí Dịch Vụ',
+                desc: 'Bảng kê chi phí minh bạch, phát hành hóa đơn đúng hạn, quyết toán công khai quỹ vận hành cùng BQT.'
+            },
+            {
+                id: 'crit6',
+                title: 'Đạo Đức Nghề Nghiệp & Thái Độ Phục Vụ',
+                desc: 'Lễ phép, nhã nhặn, trang phục chỉnh tề, tận tâm hỗ trợ người già, trẻ em và cư dân khi gặp khó khăn.'
+            }
+        ];
+
         const state = {
             navConfig: {
                 defaultHomeTab: 'home',
                 visibleTabs: { home: true, voting: true, evaluation: true, documents: true, qa: true }
             },
             votingOpen: false, // Default is locked until Admin unlocks
+            evalCriteria: JSON.parse(JSON.stringify(DEFAULT_EVAL_CRITERIA)),
             verifiedResident: null,
             residentsList: [],
             evaluations: [],
@@ -1709,14 +1740,17 @@
                 // Prefill existing evaluation if present
                 const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR_2026';
                 const existing = state.evaluations.find(ev => isRoomMatch(ev.room, resident.room) && ev.period === period);
+                const criteriaList = getActiveEvalCriteria();
                 if (existing && existing.scores) {
-                    for (let i = 1; i <= 6; i++) {
-                        setRating(`crit${i}`, existing.scores[`crit${i}`] || 5);
-                    }
+                    criteriaList.forEach(c => {
+                        setRating(c.id, existing.scores[c.id] || 5);
+                    });
                     if (document.getElementById('evalFeedbackText')) {
                         document.getElementById('evalFeedbackText').value = existing.feedback || '';
                     }
                     showToast(`Căn ${resident.room} đã có phiếu kỳ này. Bạn có thể cập nhật lại điểm số.`, 'info');
+                } else {
+                    criteriaList.forEach(c => setRating(c.id, 5));
                 }
             }
         }
@@ -1821,32 +1855,71 @@
         window.onEvalPeriodChange = function(period) {
             if (state.verifiedResident) {
                 const existing = state.evaluations.find(ev => isRoomMatch(ev.room, state.verifiedResident.room) && ev.period === period);
+                const criteriaList = getActiveEvalCriteria();
                 if (existing && existing.scores) {
-                    for (let i = 1; i <= 6; i++) setRating(`crit${i}`, existing.scores[`crit${i}`] || 5);
+                    criteriaList.forEach(c => setRating(c.id, existing.scores[c.id] || 5));
                     if (document.getElementById('evalFeedbackText')) document.getElementById('evalFeedbackText').value = existing.feedback || '';
                     showToast(`Đã nạp phiếu đánh giá ${period} của căn ${state.verifiedResident.room}!`, 'info');
                 } else {
-                    for (let i = 1; i <= 6; i++) setRating(`crit${i}`, 5);
+                    criteriaList.forEach(c => setRating(c.id, 5));
                     if (document.getElementById('evalFeedbackText')) document.getElementById('evalFeedbackText').value = '';
                 }
             }
         };
 
-        window.initAllRatingStars = function() {
-            for (let c = 1; c <= 6; c++) {
-                const container = document.getElementById(`stars-crit${c}`);
-                if (!container) continue;
-                let html = '';
+        function getActiveEvalCriteria() {
+            if (!state.evalCriteria || !Array.isArray(state.evalCriteria) || state.evalCriteria.length === 0) {
+                state.evalCriteria = JSON.parse(JSON.stringify(DEFAULT_EVAL_CRITERIA));
+            }
+            return state.evalCriteria;
+        }
+
+        window.renderEvalCriteriaForm = function() {
+            const criteriaList = getActiveEvalCriteria();
+            const grid = document.getElementById('evalCriteriaDynamicGrid');
+            const step2Title = document.getElementById('evalFormStep2Title');
+            if (step2Title) {
+                step2Title.innerHTML = `<i class="fa-solid fa-list-check text-brand-600"></i> Bước 2: Chấm Điểm ${criteriaList.length} Tiêu Chuẩn Nghiệp Vụ Vận Hành`;
+            }
+            if (!grid) return;
+
+            // Sync currentFormScores keys with active criteria
+            const newScores = {};
+            criteriaList.forEach(c => {
+                newScores[c.id] = state.currentFormScores[c.id] !== undefined ? state.currentFormScores[c.id] : 5;
+            });
+            state.currentFormScores = newScores;
+
+            grid.innerHTML = criteriaList.map((c, idx) => {
+                const currentScore = state.currentFormScores[c.id] || 5;
+                let starsHtml = '';
                 for (let s = 1; s <= 5; s++) {
-                    html += `
-                        <button type="button" onclick="setRating('crit${c}', ${s})" class="star-btn text-xl sm:text-2xl transition hover:scale-110 focus:outline-none star-active active:scale-95" data-crit="crit${c}" data-star="${s}">
+                    const activeClass = s <= currentScore ? 'star-active' : 'star-inactive';
+                    starsHtml += `
+                        <button type="button" onclick="setRating('${c.id}', ${s})" class="star-btn text-xl sm:text-2xl transition hover:scale-110 focus:outline-none ${activeClass} active:scale-95" data-crit="${c.id}" data-star="${s}">
                             <i class="fa-solid fa-star"></i>
                         </button>
                     `;
                 }
-                container.innerHTML = html;
-            }
+                return `
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/90 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="font-extrabold text-xs text-slate-900">${idx + 1}. ${c.title}</span>
+                            <span id="scoreBadge-${c.id}" class="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 flex-shrink-0">${currentScore} ★</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">${c.desc || ''}</p>
+                        <div class="flex items-center gap-2 pt-1" id="stars-${c.id}">
+                            ${starsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
             updateAverageFormScore();
+        };
+
+        window.initAllRatingStars = function() {
+            renderEvalCriteriaForm();
         };
 
         window.setRating = function(crit, star) {
@@ -1868,11 +1941,157 @@
         };
 
         function updateAverageFormScore() {
-            const vals = Object.values(state.currentFormScores);
-            const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1);
+            const criteriaList = getActiveEvalCriteria();
+            if (criteriaList.length === 0) return;
+            const sum = criteriaList.reduce((acc, c) => acc + (Number(state.currentFormScores[c.id]) || 5), 0);
+            const avg = (sum / criteriaList.length).toFixed(1);
             const el = document.getElementById('currentFormAverageScore');
             if (el) el.textContent = `${avg} / 5.0 ★`;
         }
+
+        // Admin Evaluation Criteria Management Functions
+        async function persistEvalCriteriaConfig() {
+            localStorage.setItem('ecohome_eval_criteria', JSON.stringify(state.evalCriteria));
+            renderEvalCriteriaForm();
+            renderAdminCriteriaList();
+            renderHomeEvalAnalytics(document.getElementById('homeEvalPeriodFilter')?.value || 'ALL');
+
+            if (db) {
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'eval_criteria'), {
+                        items: state.evalCriteria,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+                } catch (e) {}
+            }
+        }
+
+        window.renderAdminCriteriaList = function() {
+            const list = getActiveEvalCriteria();
+            const container = document.getElementById('adminCriteriaListContainer');
+            const badge = document.getElementById('adminCriteriaCountBadge');
+            if (badge) badge.textContent = `${list.length} tiêu chí`;
+            if (!container) return;
+
+            container.innerHTML = list.map((c, idx) => `
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-3 hover:border-amber-300 transition">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-black text-[10px]">TC #${idx + 1}</span>
+                            <h4 class="font-extrabold text-xs text-slate-900">${c.title}</h4>
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">${c.desc || ''}</p>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button onclick="startEditEvalCriterion('${c.id}')" class="p-2 rounded-lg bg-white border border-slate-200 text-indigo-600 hover:bg-indigo-50 text-xs transition" title="Chỉnh sửa nội dung">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteEvalCriterion('${c.id}')" class="p-2 rounded-lg bg-white border border-slate-200 text-rose-600 hover:bg-rose-50 text-xs transition" title="Xóa tiêu chí">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.handleSaveEvalCriterion = async function() {
+            const idInput = document.getElementById('editCriterionIdInput');
+            const titleInput = document.getElementById('adminCritTitleInput');
+            const descInput = document.getElementById('adminCritDescInput');
+
+            const title = titleInput?.value.trim();
+            const desc = descInput?.value.trim();
+            const editId = idInput?.value.trim();
+
+            if (!title) {
+                showToast('Vui lòng nhập Tên tiêu chí đánh giá!', 'error');
+                titleInput?.focus();
+                return;
+            }
+
+            if (editId) {
+                const idx = state.evalCriteria.findIndex(c => c.id === editId);
+                if (idx !== -1) {
+                    state.evalCriteria[idx].title = title;
+                    state.evalCriteria[idx].desc = desc || 'Tiêu chuẩn đánh giá chất lượng vận hành.';
+                    showToast(`Đã cập nhật tiêu chí "${title}"!`, 'success');
+                }
+            } else {
+                const newId = 'crit_' + Date.now();
+                state.evalCriteria.push({
+                    id: newId,
+                    title: title,
+                    desc: desc || 'Tiêu chuẩn đánh giá chất lượng vận hành.'
+                });
+                state.currentFormScores[newId] = 5;
+                showToast(`Đã thêm tiêu chí mới "${title}"!`, 'success');
+            }
+
+            cancelEditEvalCriterion();
+            await persistEvalCriteriaConfig();
+        };
+
+        window.startEditEvalCriterion = function(id) {
+            const item = state.evalCriteria.find(c => c.id === id);
+            if (!item) return;
+
+            document.getElementById('editCriterionIdInput').value = item.id;
+            document.getElementById('adminCritTitleInput').value = item.title;
+            document.getElementById('adminCritDescInput').value = item.desc || '';
+
+            const formTitle = document.getElementById('adminCriterionFormTitle');
+            if (formTitle) {
+                formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-600"></i> Đang Chỉnh Sửa Tiêu Chí: <span class="text-indigo-700">${item.title}</span>`;
+            }
+
+            const btnSave = document.getElementById('btnSaveCriterion');
+            if (btnSave) {
+                btnSave.className = 'w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5';
+                btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>Lưu Cập Nhật</span>';
+            }
+
+            document.getElementById('btnCancelEditCriterion')?.classList.remove('hidden');
+            document.getElementById('adminCritTitleInput')?.focus();
+        };
+
+        window.cancelEditEvalCriterion = function() {
+            document.getElementById('editCriterionIdInput').value = '';
+            document.getElementById('adminCritTitleInput').value = '';
+            document.getElementById('adminCritDescInput').value = '';
+
+            const formTitle = document.getElementById('adminCriterionFormTitle');
+            if (formTitle) {
+                formTitle.innerHTML = '<i class="fa-solid fa-circle-plus text-amber-600"></i> Thêm Tiêu Chí Đánh Giá Mới';
+            }
+
+            const btnSave = document.getElementById('btnSaveCriterion');
+            if (btnSave) {
+                btnSave.className = 'w-full py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5';
+                btnSave.innerHTML = '<i class="fa-solid fa-plus"></i> <span>Thêm Mới</span>';
+            }
+
+            document.getElementById('btnCancelEditCriterion')?.classList.add('hidden');
+        };
+
+        window.deleteEvalCriterion = async function(id) {
+            if (state.evalCriteria.length <= 1) {
+                showToast('Hệ thống cần tối thiểu 1 tiêu chí để đánh giá!', 'error');
+                return;
+            }
+            const target = state.evalCriteria.find(c => c.id === id);
+            state.evalCriteria = state.evalCriteria.filter(c => c.id !== id);
+            delete state.currentFormScores[id];
+            cancelEditEvalCriterion();
+            await persistEvalCriteriaConfig();
+            showToast(`Đã xóa tiêu chí "${target?.title || ''}"!`, 'info');
+        };
+
+        window.resetDefaultEvalCriteria = async function() {
+            state.evalCriteria = JSON.parse(JSON.stringify(DEFAULT_EVAL_CRITERIA));
+            cancelEditEvalCriterion();
+            await persistEvalCriteriaConfig();
+            showToast('Đã khôi phục 6 tiêu chuẩn đánh giá mặc định!', 'success');
+        };
 
         window.handleEvaluationSubmit = function() {
             if (!state.verifiedResident) {
@@ -1891,8 +2110,15 @@
             try {
                 const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR_2026';
                 const feedback = document.getElementById('evalFeedbackText')?.value.trim() || '';
-                const scores = { ...state.currentFormScores };
-                const avgScore = parseFloat((Object.values(scores).reduce((a, b) => a + b, 0) / 6).toFixed(2));
+                const criteriaList = getActiveEvalCriteria();
+                const scores = {};
+                let sumScores = 0;
+                criteriaList.forEach(c => {
+                    const val = Number(state.currentFormScores[c.id]) || 5;
+                    scores[c.id] = val;
+                    sumScores += val;
+                });
+                const avgScore = parseFloat((sumScores / (criteriaList.length || 1)).toFixed(2));
 
                 const record = {
                     id: `${normalizeRoom(state.verifiedResident.room)}_${period}`,
@@ -2048,6 +2274,7 @@
             let list = state.evaluations || [];
             if (period !== 'ALL') list = list.filter(e => e.period === period);
 
+            const criteriaList = getActiveEvalCriteria();
             const total = list.length;
             const totalUnits = state.residentsList.length || state.attendance.totalUnits || 600;
             const turnout = ((total / totalUnits) * 100).toFixed(1);
@@ -2056,14 +2283,18 @@
             let satisfied = 0;
             let feedbackCount = 0;
 
-            const critTotals = { crit1: 0, crit2: 0, crit3: 0, crit4: 0, crit5: 0, crit6: 0 };
+            const critTotals = {};
+            criteriaList.forEach(c => { critTotals[c.id] = 0; });
 
             list.forEach(ev => {
                 avg += (ev.average || 0);
                 if (ev.average >= 4.0) satisfied++;
                 if (ev.feedback && ev.feedback.length > 5) feedbackCount++;
                 if (ev.scores) {
-                    for (let c = 1; c <= 6; c++) critTotals[`crit${c}`] += (ev.scores[`crit${c}`] || 0);
+                    criteriaList.forEach(c => {
+                        const scoreVal = ev.scores[c.id] !== undefined ? Number(ev.scores[c.id]) : (ev.average || 5);
+                        critTotals[c.id] += scoreVal;
+                    });
                 }
             });
 
@@ -2084,27 +2315,21 @@
                 else slaText.textContent = 'Xếp loại: Cần chấn chỉnh dịch vụ';
             }
 
-            // Criteria breakdown cards
-            const critNames = [
-                "1. An ninh & Trật tự",
-                "2. Vệ sinh & Rác thải",
-                "3. Kỹ thuật (Thang máy, PCCC)",
-                "4. Xử lý kiến nghị",
-                "5. Minh bạch tài chính",
-                "6. Thái độ phục vụ"
-            ];
+            const secTitle = document.getElementById('homeCriteriaSectionTitle');
+            if (secTitle) {
+                secTitle.textContent = `Chi Tiết ${criteriaList.length} Tiêu Chuẩn Hợp Đồng Quản Lý Vận Hành`;
+            }
 
             const grid = document.getElementById('homeCriteriaBreakdownGrid');
             if (grid) {
-                let html = '';
-                for (let i = 1; i <= 6; i++) {
-                    const cAvg = total > 0 ? (critTotals[`crit${i}`] / total).toFixed(1) : '5.0';
+                grid.innerHTML = criteriaList.map((c, idx) => {
+                    const cAvg = total > 0 ? (critTotals[c.id] / total).toFixed(1) : '5.0';
                     const pct = Math.round((parseFloat(cAvg) / 5) * 100);
-                    html += `
+                    return `
                         <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                            <div class="flex items-center justify-between text-xs font-bold">
-                                <span class="text-slate-800">${critNames[i - 1]}</span>
-                                <span class="text-amber-600">${cAvg} ★</span>
+                            <div class="flex items-center justify-between gap-2 text-xs font-bold">
+                                <span class="text-slate-800 truncate" title="${idx + 1}. ${c.title}">${idx + 1}. ${c.title}</span>
+                                <span class="text-amber-600 flex-shrink-0">${cAvg} ★</span>
                             </div>
                             <div class="w-full bg-slate-200 rounded-full h-2 mt-2 overflow-hidden">
                                 <div class="bg-amber-500 h-2 rounded-full" style="width: ${pct}%"></div>
@@ -2115,8 +2340,7 @@
                             </div>
                         </div>
                     `;
-                }
-                grid.innerHTML = html;
+                }).join('');
             }
 
             renderHomeParticipantTable(list);
@@ -2427,6 +2651,7 @@
                 return;
             }
 
+            const criteriaList = getActiveEvalCriteria();
             const wb = XLSX.utils.book_new();
 
             // Sheet 1: Summary Statistics
@@ -2435,32 +2660,31 @@
                 ["Thời gian xuất:", new Date().toLocaleString('vi-VN')],
                 ["Tổng số phiếu:", state.evaluations.length],
                 [],
-                ["TIÊU CHUẨN ĐÁNH GIÁ HỢP ĐỒNG", "ĐIỂM BÌNH QUÂN (1-5★)", "TỶ LỆ ĐẠT CHUẨN SLA (%)"]
+                ["TIÊU CHUẨN ĐÁNH GIÁ HỢP ĐỒNG", "MÔ TẢ NGHIỆP VỤ", "ĐIỂM BÌNH QUÂN (1-5★)", "TỶ LỆ ĐẠT CHUẨN SLA (%)"]
             ];
 
-            const critTitles = [
-                "1. An ninh trật tự & Kiểm soát ra vào",
-                "2. Vệ sinh môi trường & Thu gom rác",
-                "3. Kỹ thuật (Thang máy, PCCC, điện nước)",
-                "4. Tiếp nhận & Xử lý kiến nghị cư dân",
-                "5. Minh bạch tài chính & Thu chi",
-                "6. Thái độ & Đạo đức nghề nghiệp nhân viên"
-            ];
-
-            for (let c = 1; c <= 6; c++) {
-                const totalC = state.evaluations.reduce((a, b) => a + (b.scores?.[`crit${c}`] || 0), 0);
+            criteriaList.forEach((c, idx) => {
+                const totalC = state.evaluations.reduce((a, b) => {
+                    const val = b.scores?.[c.id] !== undefined ? Number(b.scores[c.id]) : (b.average || 5);
+                    return a + val;
+                }, 0);
                 const avgC = (totalC / state.evaluations.length).toFixed(2);
                 const pct = Math.round((parseFloat(avgC) / 5) * 100);
-                summaryRows.push([critTitles[c - 1], avgC, `${pct}%`]);
-            }
+                summaryRows.push([`${idx + 1}. ${c.title}`, c.desc || '', avgC, `${pct}%`]);
+            });
             const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
             XLSX.utils.book_append_sheet(wb, wsSummary, "BaoCaoTongHop");
 
             // Sheet 2: Detailed Resident Evaluations
-            const detailRows = [
-                ["Mã Căn", "Chủ Sở Hữu", "Điện Thoại", "Diện Tích", "QH Với CH", "Kỳ Đánh Giá", "Tiêu Chí 1", "Tiêu Chí 2", "Tiêu Chí 3", "Tiêu Chí 4", "Tiêu Chí 5", "Tiêu Chí 6", "Điểm TB", "Ý Kiến Góp Ý", "Thời Gian Gửi"]
+            const detailHeaders = [
+                "Mã Căn", "Chủ Sở Hữu", "Điện Thoại", "Diện Tích", "QH Với CH", "Kỳ Đánh Giá",
+                ...criteriaList.map((c, idx) => `TC${idx + 1}: ${c.title}`),
+                "Điểm TB", "Ý Kiến Góp Ý", "Thời Gian Gửi"
             ];
+            const detailRows = [detailHeaders];
+
             state.evaluations.forEach(e => {
+                const critScores = criteriaList.map(c => e.scores?.[c.id] !== undefined ? e.scores[c.id] : '');
                 detailRows.push([
                     e.room,
                     e.name,
@@ -2468,12 +2692,7 @@
                     e.area,
                     e.relation || 'Chủ hộ',
                     e.period,
-                    e.scores?.crit1 || 5,
-                    e.scores?.crit2 || 5,
-                    e.scores?.crit3 || 5,
-                    e.scores?.crit4 || 5,
-                    e.scores?.crit5 || 5,
-                    e.scores?.crit6 || 5,
+                    ...critScores,
                     e.average,
                     e.feedback || '',
                     e.updatedAt || ''
@@ -2554,7 +2773,19 @@
         };
 
         window.addEventListener('DOMContentLoaded', async () => {
+            // Load Custom Evaluation Criteria Config
+            const savedCriteria = localStorage.getItem('ecohome_eval_criteria');
+            if (savedCriteria) {
+                try {
+                    const parsed = JSON.parse(savedCriteria);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        state.evalCriteria = parsed;
+                    }
+                } catch (e) {}
+            }
+
             initAllRatingStars();
+            renderAdminCriteriaList();
 
             // Load Navigation Config
             const savedNav = localStorage.getItem('ecohome_nav_config');
@@ -2637,6 +2868,16 @@
                         if (snap.exists() && snap.data()?.isOpen !== undefined) {
                             state.votingOpen = snap.data().isOpen;
                             updateVotingGateUI();
+                        }
+                    }, () => {});
+
+                    onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'eval_criteria'), (snap) => {
+                        if (snap.exists() && Array.isArray(snap.data()?.items) && snap.data().items.length > 0) {
+                            state.evalCriteria = snap.data().items;
+                            localStorage.setItem('ecohome_eval_criteria', JSON.stringify(state.evalCriteria));
+                            renderEvalCriteriaForm();
+                            renderAdminCriteriaList();
+                            renderHomeEvalAnalytics(document.getElementById('homeEvalPeriodFilter')?.value || 'ALL');
                         }
                     }, () => {});
 
