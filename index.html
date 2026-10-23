@@ -273,7 +273,7 @@
                         <div class="flex items-baseline gap-2 mt-2">
                             <span id="homeSatisfactionRate" class="text-3xl font-black text-blue-700">0%</span>
                         </div>
-                        <p class="text-[11px] font-medium text-blue-800 mt-1">Mục tiêu chuẩn SLA: $\ge 80\%$</p>
+                        <p class="text-[11px] font-medium text-blue-800 mt-1">Mục tiêu chuẩn SLA: ≥ 80%</p>
                     </div>
 
                     <div class="bg-gradient-to-br from-purple-500/10 to-purple-500/5 rounded-2xl p-4 border border-purple-200/80">
@@ -609,7 +609,7 @@
                             <span>Điểm Đánh Giá Bình Quân Của Phiếu:</span>
                             <span id="currentFormAverageScore" class="text-lg font-black text-amber-600">5.0 / 5.0 ★</span>
                         </div>
-                        <button onclick="handleEvaluationSubmit()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-brand-600 to-emerald-700 hover:from-brand-700 hover:to-emerald-800 text-white font-extrabold text-xs sm:text-sm rounded-2xl shadow-md transition active:scale-95 flex items-center justify-center gap-2">
+                        <button id="btnSubmitEval" onclick="handleEvaluationSubmit()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-brand-600 to-emerald-700 hover:from-brand-700 hover:to-emerald-800 text-white font-extrabold text-xs sm:text-sm rounded-2xl shadow-md transition active:scale-95 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-paper-plane"></i> Gửi Phiếu Đánh Giá Chính Thức
                         </button>
                     </div>
@@ -1015,7 +1015,7 @@
     </div>
 
     <!-- Evaluation Success Feedback Modal -->
-    <div id="evalSuccessModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+    <div id="evalSuccessModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4" style="display: none;">
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in-95 duration-200">
             <div class="text-center space-y-3">
                 <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
@@ -1071,6 +1071,9 @@
         </div>
     </div>
 
+    <!-- Celebration Confetti Canvas -->
+    <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-[100]" style="display: none;"></canvas>
+
     <!-- Firebase Help Modal -->
     <div id="firebaseHelpModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-100 space-y-4">
@@ -1117,7 +1120,13 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            signInAnonymously(auth).catch(() => {});
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js").then(({ signInWithCustomToken }) => {
+                    signInWithCustomToken(auth, __initial_auth_token).catch(() => {});
+                });
+            } else {
+                signInAnonymously(auth).catch(() => {});
+            }
         } catch (e) {
             console.warn("Firebase running in offline storage mode.");
         }
@@ -1141,9 +1150,9 @@
             adminResidentLimit: 'ALL'
         };
 
-        // IndexedDB Storage Engine for Permanent Resident & Evaluation Storage
+        // IndexedDB Storage Engine for Permanent Resident & Evaluation Storage (Version 2)
         const DB_NAME = 'EcohomeNhonBinh_Storage_2026';
-        const DB_VERSION = 1;
+        const DB_VERSION = 2;
 
         function getIDB() {
             return new Promise((resolve) => {
@@ -1163,9 +1172,15 @@
             try {
                 const idb = await getIDB();
                 if (!idb) return;
-                const tx = idb.transaction(storeName, 'readwrite');
-                tx.objectStore(storeName).put(data, key);
-            } catch (e) {}
+                return new Promise((resolve) => {
+                    const tx = idb.transaction(storeName, 'readwrite');
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => resolve(false);
+                    tx.objectStore(storeName).put(data, key);
+                });
+            } catch (e) {
+                console.warn('IDB save error:', e);
+            }
         }
 
         async function getFromIndexedDB(storeName, key) {
@@ -1179,6 +1194,112 @@
                     req.onerror = () => res(null);
                 });
             } catch (e) { return null; }
+        }
+
+        // Lightweight Web Audio Chime Feedback
+        function playSuccessChime() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const now = ctx.currentTime;
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(523.25, now);
+                osc1.frequency.exponentialRampToValueAtTime(659.25, now + 0.12);
+
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(783.99, now + 0.12);
+                osc2.frequency.exponentialRampToValueAtTime(1046.50, now + 0.28);
+
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc1.start(now);
+                osc2.start(now + 0.12);
+                osc1.stop(now + 0.3);
+                osc2.stop(now + 0.65);
+            } catch (e) {}
+        }
+
+        // Lightweight Native Canvas Confetti Effect
+        function launchCelebrationConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            canvas.style.display = 'block';
+
+            const colors = ['#10b981', '#059669', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'];
+            const particles = [];
+            const particleCount = 75;
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: canvas.width / 2 + (Math.random() - 0.5) * 200,
+                    y: canvas.height * 0.4 + (Math.random() - 0.5) * 100,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: -Math.random() * 12 - 4,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10,
+                    tiltAngle: Math.random() * Math.PI,
+                    tiltSpeed: Math.random() * 0.08 + 0.04,
+                    alpha: 1
+                });
+            }
+
+            let animationFrameId;
+            const startTime = performance.now();
+
+            function frame(currentTime) {
+                const elapsed = currentTime - startTime;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                let alive = 0;
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.28; // Gravity
+                    p.tiltAngle += p.tiltSpeed;
+                    p.tilt = Math.sin(p.tiltAngle) * 12;
+
+                    if (elapsed > 1800) {
+                        p.alpha = Math.max(0, 1 - (elapsed - 1800) / 700);
+                    }
+
+                    if (p.alpha > 0 && p.y < canvas.height + 50) {
+                        alive++;
+                        ctx.save();
+                        ctx.globalAlpha = p.alpha;
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.rect(p.x + p.tilt, p.y, p.size, p.size * 0.6);
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                });
+
+                if (alive > 0 && elapsed < 2600) {
+                    animationFrameId = requestAnimationFrame(frame);
+                } else {
+                    cancelAnimationFrame(animationFrameId);
+                    canvas.style.display = 'none';
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(frame);
         }
 
         function removeAccents(str) {
@@ -1746,6 +1867,14 @@
                 return;
             }
 
+            const btnSubmit = document.getElementById('btnSubmitEval');
+            const originalBtnContent = btnSubmit ? btnSubmit.innerHTML : '';
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.classList.add('opacity-75', 'cursor-not-allowed');
+                btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang Lưu Trữ & Đồng Bộ Dữ Liệu...';
+            }
+
             const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR_2026';
             const feedback = document.getElementById('evalFeedbackText')?.value.trim() || '';
             const scores = { ...state.currentFormScores };
@@ -1772,37 +1901,64 @@
                 state.evaluations.unshift(record);
             }
 
+            // Triple-layer permanent persistence: LocalStorage + IndexedDB + Cloud Firestore
             localStorage.setItem('ecohome_evaluations', JSON.stringify(state.evaluations));
             await saveToIndexedDB('evalStore', 'eval_list', state.evaluations);
 
             if (db) {
                 try {
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eval_items', record.id), record, { merge: true });
-                } catch (e) {}
+                } catch (e) {
+                    console.warn('Cloud sync offline or queued:', e);
+                }
             }
 
+            // Update UI analytics
             renderHomeEvalAnalytics();
             renderAdminEvalTable();
 
+            // Sound + Visual Celebration Confetti
+            playSuccessChime();
+            launchCelebrationConfetti();
+
             // Display rich success feedback modal
-            showEvaluationSuccessModal(record);
+            setTimeout(() => {
+                showEvaluationSuccessModal(record);
+                if (btnSubmit) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.classList.remove('opacity-75', 'cursor-not-allowed');
+                    btnSubmit.innerHTML = originalBtnContent;
+                }
+            }, 350);
         };
 
         window.showEvaluationSuccessModal = function(record) {
             const periodsMap = { YEAR_2026: 'Cả Năm 2026', Q1_2026: 'Quý 1 / 2026', Q2_2026: 'Quý 2 / 2026', Q3_2026: 'Quý 3 / 2026', Q4_2026: 'Quý 4 / 2026' };
-            document.getElementById('succModalRoom').textContent = `Căn ${record.room}`;
-            document.getElementById('succModalName').textContent = record.name;
-            document.getElementById('succModalPeriod').textContent = periodsMap[record.period] || record.period;
-            document.getElementById('succModalScore').textContent = `${record.average} / 5.0 ★`;
-            document.getElementById('succModalTime').textContent = new Date(record.updatedAt).toLocaleString('vi-VN');
+            const roomEl = document.getElementById('succModalRoom');
+            const nameEl = document.getElementById('succModalName');
+            const periodEl = document.getElementById('succModalPeriod');
+            const scoreEl = document.getElementById('succModalScore');
+            const timeEl = document.getElementById('succModalTime');
+
+            if (roomEl) roomEl.textContent = `Căn ${record.room}`;
+            if (nameEl) nameEl.textContent = record.name;
+            if (periodEl) periodEl.textContent = periodsMap[record.period] || record.period;
+            if (scoreEl) scoreEl.textContent = `${record.average} / 5.0 ★`;
+            if (timeEl) timeEl.textContent = new Date(record.updatedAt).toLocaleString('vi-VN');
 
             const modal = document.getElementById('evalSuccessModal');
-            if (modal) modal.classList.remove('hidden');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.remove('hidden');
+            }
         };
 
         window.closeEvalSuccessModal = function() {
             const modal = document.getElementById('evalSuccessModal');
-            if (modal) modal.classList.add('hidden');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.add('hidden');
+            }
         };
 
         window.setVotingGateState = async function(isOpen) {
@@ -1937,7 +2093,7 @@
                                 <div class="bg-amber-500 h-2 rounded-full" style="width: ${pct}%"></div>
                             </div>
                             <div class="flex justify-between text-[10px] text-slate-400 mt-1">
-                                <span>SLA Mục tiêu: $\ge 80\%$</span>
+                                <span>SLA Mục tiêu: ≥ 80%</span>
                                 <span class="font-bold text-slate-700">${pct}%</span>
                             </div>
                         </div>
@@ -2471,7 +2627,15 @@
                         const items = [];
                         snap.forEach(d => items.push(d.data()));
                         if (items.length > 0) {
-                            state.evaluations = items;
+                            // Merge cloud records with local store, preserving latest updates
+                            const existingMap = new Map();
+                            state.evaluations.forEach(ev => existingMap.set(ev.id, ev));
+                            items.forEach(ev => existingMap.set(ev.id, ev));
+
+                            state.evaluations = Array.from(existingMap.values());
+                            localStorage.setItem('ecohome_evaluations', JSON.stringify(state.evaluations));
+                            saveToIndexedDB('evalStore', 'eval_list', state.evaluations);
+
                             renderHomeEvalAnalytics();
                             renderAdminEvalTable();
                         }
