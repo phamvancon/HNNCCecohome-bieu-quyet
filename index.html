@@ -47,6 +47,38 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
+    <script>
+        // Global Navigation Switcher defined early to prevent ReferenceErrors
+        window.switchTab = function(tabId) {
+            const allTabs = ['home', 'voting', 'evaluation', 'documents', 'qa', 'admin'];
+            allTabs.forEach(t => {
+                const el = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-${t}`);
+                const mobBtn = document.getElementById(`mob-tab-${t}`);
+
+                if (el) {
+                    if (t === tabId) el.classList.remove('hidden');
+                    else el.classList.add('hidden');
+                }
+
+                if (btn) {
+                    if (t === tabId) {
+                        btn.classList.add('active', 'bg-brand-600', 'text-white', 'shadow-xs');
+                        btn.classList.remove('text-slate-300');
+                    } else {
+                        btn.classList.remove('active', 'bg-brand-600', 'text-white', 'shadow-xs');
+                        btn.classList.add('text-slate-300');
+                    }
+                }
+
+                if (mobBtn) {
+                    if (t === tabId) mobBtn.classList.add('bg-slate-800', 'text-emerald-400');
+                    else mobBtn.classList.remove('bg-slate-800', 'text-emerald-400');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    </script>
 </head>
 <body class="flex flex-col min-h-screen text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
 
@@ -229,7 +261,7 @@
                             Thống Kê Đánh Giá Đơn Vị Quản Lý Vận Hành (BQL)
                         </h2>
                         <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                            Dữ liệu tổng hợp từ các phiếu đánh giá của cư dân theo 6 tiêu chuẩn Hợp đồng Quản lý vận hành.
+                            Dữ liệu tổng hợp từ các phiếu đánh giá của cư dân theo các tiêu chuẩn Hợp đồng Quản lý vận hành.
                         </p>
                     </div>
 
@@ -286,7 +318,7 @@
                     </div>
                 </div>
 
-                <!-- 6 Criteria Performance Breakdown -->
+                <!-- Criteria Performance Breakdown -->
                 <div class="space-y-3">
                     <h2 id="homeCriteriaSectionTitle" class="text-xs font-extrabold uppercase tracking-wider text-slate-600">Chi Tiết Các Tiêu Chuẩn Hợp Đồng Quản Lý Vận Hành</h2>
                     <div id="homeCriteriaBreakdownGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -294,32 +326,55 @@
                     </div>
                 </div>
 
-                <div class="space-y-3 pt-3 border-t border-slate-100">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div>
-                            <h2 class="text-sm font-extrabold text-slate-900">Danh Sách Căn Hộ Đã Tham Gia Đánh Giá (Công Khai & Minh Bạch)</h2>
-                            <p class="text-xs text-slate-500">Ghi nhận minh bạch kết quả khảo sát từ các chủ sở hữu đã xác thực.</p>
+                <div class="space-y-3 pt-4 border-t border-slate-200">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h2 class="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-shield-halved text-emerald-600"></i>
+                                    Danh Sách Căn Hộ Đã Tham Gia Đánh Giá (Công Khai & Minh Bạch)
+                                </h2>
+                                <span id="homePublicLogCountBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    0 căn hộ
+                                </span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                                    <i class="fa-solid fa-database text-[9px]"></i>
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500">
+                                Dữ liệu được khóa bảo vệ đa tầng, hiển thị tức thì và không bao giờ tự động ẩn hoặc mất.
+                            </p>
                         </div>
-                        <div class="w-full sm:w-64">
-                            <input type="text" id="homeParticipantSearch" oninput="filterHomeParticipantLog(this.value)" placeholder="Tìm mã căn, tên chủ hộ..." class="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="relative w-full sm:w-64">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="homeParticipantSearch" oninput="filterHomeParticipantLog(this.value)" placeholder="Tìm mã căn, tên chủ hộ, nhận xét..." class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <button onclick="forceSyncAndRefreshEvaluations()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border border-slate-300 transition flex items-center gap-1.5 active:scale-95" title="Làm mới danh sách ngay lập tức">
+                                <i class="fa-solid fa-arrows-rotate text-brand-600"></i> Làm Mới
+                            </button>
+                            <button onclick="exportEvaluationExcel()" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold border border-emerald-200 transition flex items-center gap-1.5 active:scale-95">
+                                <i class="fa-solid fa-file-excel text-emerald-600"></i> Tải Danh Sách (.xlsx)
+                            </button>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto rounded-2xl border border-slate-200 custom-scrollbar max-h-80">
+                    <div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs custom-scrollbar max-h-[460px]">
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-[10px] tracking-wider sticky top-0 z-10">
+                            <thead class="bg-slate-900 text-white font-bold uppercase text-[10px] tracking-wider sticky top-0 z-10">
                                 <tr>
-                                    <th class="py-2.5 px-3">Mã Căn</th>
-                                    <th class="py-2.5 px-3">Chủ Sở Hữu</th>
-                                    <th class="py-2.5 px-3">Kỳ Đánh Giá</th>
-                                    <th class="py-2.5 px-3">Điểm TB</th>
-                                    <th class="py-2.5 px-3">Ý Kiến Nhận Xét</th>
-                                    <th class="py-2.5 px-3 text-right">Thời Gian</th>
+                                    <th class="py-3 px-3 w-12 text-center">STT</th>
+                                    <th class="py-3 px-3">Mã Căn Hộ</th>
+                                    <th class="py-3 px-3">Chủ Sở Hữu / Đại Diện</th>
+                                    <th class="py-3 px-3">Kỳ Đánh Giá</th>
+                                    <th class="py-3 px-3">Điểm TB & Xếp Loại</th>
+                                    <th class="py-3 px-3">Ý Kiến Nhận Xét Thực Tế</th>
+                                    <th class="py-3 px-3 text-right">Thời Gian & Lưu Trữ</th>
                                 </tr>
                             </thead>
                             <tbody id="homeParticipantTableBody" class="divide-y divide-slate-100 bg-white text-slate-700">
                                 <tr>
-                                    <td colspan="6" class="py-6 text-center text-slate-400 italic">Chưa có dữ liệu đánh giá nào được gửi.</td>
+                                    <td colspan="7" class="py-8 text-center text-slate-400 italic">Chưa có dữ liệu đánh giá nào được gửi.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -448,7 +503,7 @@
                             Phiếu Đánh Giá Đơn Vị Quản Lý Vận Hành (BQL)
                         </h2>
                         <p class="text-xs sm:text-sm text-slate-500">
-                            Đánh giá dựa trên 6 tiêu chuẩn nghiệp vụ vận hành chuẩn quy định pháp luật và hợp đồng dịch vụ tòa nhà.
+                            Đánh giá dựa trên các tiêu chuẩn nghiệp vụ vận hành chuẩn quy định pháp luật và hợp đồng dịch vụ tòa nhà.
                         </p>
                     </div>
 
@@ -639,7 +694,7 @@
                 </div>
             </div>
 
-            <!-- 1. NAVIGATION & DEFAULT HOME TAB CUSTOMIZATION CARD -->
+            <!-- NAVIGATION & DEFAULT HOME TAB CUSTOMIZATION CARD -->
             <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-indigo-500/30 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
@@ -727,7 +782,7 @@
                 </div>
             </div>
 
-            <!-- 1.5 ADMIN VOTING GATE CONTROL -->
+            <!-- ADMIN VOTING GATE CONTROL -->
             <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-emerald-500/30 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
@@ -767,7 +822,7 @@
                 </div>
             </div>
 
-            <!-- 1.8 ADMIN EVALUATION CRITERIA CUSTOMIZATION CARD -->
+            <!-- ADMIN EVALUATION CRITERIA CUSTOMIZATION CARD -->
             <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-amber-500/30 shadow-sm space-y-5">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
@@ -944,11 +999,22 @@
 
                 <!-- Admin Evaluation Log Viewer -->
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                         <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-list-ol text-amber-500"></i> Quản Lý Phiếu Đánh Giá BQL
+                            <i class="fa-solid fa-list-ol text-amber-500"></i> Quản Lý & Sao Lưu Phiếu Đánh Giá BQL (<span id="adminEvalTotalBadge">0</span> phiếu)
                         </h3>
-                        <button onclick="exportEvaluationExcel()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition">Xuất Excel</button>
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <button onclick="backupEvaluationsJSON()" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200 transition flex items-center gap-1" title="Sao lưu toàn bộ phiếu đánh giá ra file JSON">
+                                <i class="fa-solid fa-download"></i> Sao Lưu JSON
+                            </button>
+                            <label class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-300 transition cursor-pointer flex items-center gap-1" title="Khôi phục phiếu đánh giá từ file JSON">
+                                <i class="fa-solid fa-upload text-brand-600"></i> Khôi Phục
+                                <input type="file" accept=".json" class="hidden" onchange="restoreEvaluationsJSON(event)">
+                            </label>
+                            <button onclick="exportEvaluationExcel()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition flex items-center gap-1">
+                                <i class="fa-solid fa-file-excel"></i> Xuất Excel
+                            </button>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto rounded-xl border border-slate-200 max-h-60 custom-scrollbar">
@@ -1168,7 +1234,7 @@
                 defaultHomeTab: 'home',
                 visibleTabs: { home: true, voting: true, evaluation: true, documents: true, qa: true }
             },
-            votingOpen: false, // Default is locked until Admin unlocks
+            votingOpen: false,
             evalCriteria: JSON.parse(JSON.stringify(DEFAULT_EVAL_CRITERIA)),
             verifiedResident: null,
             residentsList: [],
@@ -1178,10 +1244,135 @@
             qaList: [],
             attendance: { totalUnits: 600, directUnits: 0, proxyUnits: 0, attendanceRate: 0 },
             currentFormScores: { crit1: 5, crit2: 5, crit3: 5, crit4: 5, crit5: 5, crit6: 5 },
-            adminResidentLimit: 'ALL'
+            adminResidentLimit: 'ALL',
+            lastSubmittedEvalId: null
         };
 
-        // IndexedDB Storage Engine for Permanent Resident & Evaluation Storage (Version 2)
+        const EVAL_LS_PRIMARY_KEY = 'ecohome_evaluations';
+        const EVAL_LS_VAULT_KEY = 'ecohome_evaluations_permanent_vault_v2';
+        const EVAL_DELETED_IDS_KEY = 'ecohome_evaluations_deleted_ids';
+
+        function getDeletedEvalIds() {
+            try {
+                const raw = localStorage.getItem(EVAL_DELETED_IDS_KEY);
+                return raw ? new Set(JSON.parse(raw)) : new Set();
+            } catch (e) {
+                return new Set();
+            }
+        }
+
+        function markEvalIdDeleted(id) {
+            try {
+                const set = getDeletedEvalIds();
+                set.add(id);
+                localStorage.setItem(EVAL_DELETED_IDS_KEY, JSON.stringify(Array.from(set)));
+            } catch (e) {}
+        }
+
+        function unmarkEvalIdDeleted(id) {
+            try {
+                const set = getDeletedEvalIds();
+                if (set.has(id)) {
+                    set.delete(id);
+                    localStorage.setItem(EVAL_DELETED_IDS_KEY, JSON.stringify(Array.from(set)));
+                }
+            } catch (e) {}
+        }
+
+        function mergeEvaluationLists(...lists) {
+            const deletedIds = getDeletedEvalIds();
+            const map = new Map();
+
+            lists.forEach(list => {
+                if (!Array.isArray(list)) return;
+                list.forEach(item => {
+                    if (!item || !item.room) return;
+                    const period = item.period || 'YEAR_2026';
+                    const canonicalId = item.id || `${normalizeRoom(item.room)}_${period}`;
+                    if (deletedIds.has(canonicalId)) return;
+
+                    const normalizedItem = {
+                        ...item,
+                        id: canonicalId,
+                        room: String(item.room).trim().toUpperCase(),
+                        name: String(item.name || 'Chủ Sở Hữu').trim(),
+                        period: period,
+                        average: parseFloat(Number(item.average || 5).toFixed(2)),
+                        updatedAt: item.updatedAt || new Date().toISOString()
+                    };
+
+                    const existing = map.get(canonicalId);
+                    if (!existing) {
+                        map.set(canonicalId, normalizedItem);
+                    } else {
+                        const tNew = new Date(normalizedItem.updatedAt || 0).getTime();
+                        const tOld = new Date(existing.updatedAt || 0).getTime();
+                        if (tNew >= tOld) {
+                            map.set(canonicalId, normalizedItem);
+                        }
+                    }
+                });
+            });
+
+            return Array.from(map.values()).sort((a, b) => {
+                return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime();
+            });
+        }
+
+        async function persistEvaluationsEverywhere(singleRecord = null) {
+            let lsPrimary = [];
+            let lsVault = [];
+            try { lsPrimary = JSON.parse(localStorage.getItem(EVAL_LS_PRIMARY_KEY) || '[]'); } catch (e) {}
+            try { lsVault = JSON.parse(localStorage.getItem(EVAL_LS_VAULT_KEY) || '[]'); } catch (e) {}
+
+            const merged = mergeEvaluationLists(
+                lsPrimary,
+                lsVault,
+                state.evaluations,
+                singleRecord ? [singleRecord] : []
+            );
+
+            state.evaluations = merged;
+
+            try {
+                const serialized = JSON.stringify(merged);
+                localStorage.setItem(EVAL_LS_PRIMARY_KEY, serialized);
+                localStorage.setItem(EVAL_LS_VAULT_KEY, serialized);
+            } catch (e) {}
+
+            saveToIndexedDB('evalStore', 'eval_list', merged).catch(() => {});
+            saveToIndexedDB('evalStore', 'eval_backup_vault', merged).catch(() => {});
+
+            if (db && singleRecord && singleRecord.id) {
+                setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eval_items', singleRecord.id), singleRecord, { merge: true }).catch(() => {});
+            }
+        }
+
+        async function loadAndReconcileEvaluations() {
+            let lsPrimary = [];
+            let lsVault = [];
+            try { lsPrimary = JSON.parse(localStorage.getItem(EVAL_LS_PRIMARY_KEY) || '[]'); } catch (e) {}
+            try { lsVault = JSON.parse(localStorage.getItem(EVAL_LS_VAULT_KEY) || '[]'); } catch (e) {}
+
+            let idbPrimary = [];
+            let idbVault = [];
+            try {
+                idbPrimary = (await getFromIndexedDB('evalStore', 'eval_list')) || [];
+                idbVault = (await getFromIndexedDB('evalStore', 'eval_backup_vault')) || [];
+            } catch (e) {}
+
+            const merged = mergeEvaluationLists(lsPrimary, lsVault, idbPrimary, idbVault, state.evaluations);
+            state.evaluations = merged;
+
+            try {
+                const serialized = JSON.stringify(merged);
+                localStorage.setItem(EVAL_LS_PRIMARY_KEY, serialized);
+                localStorage.setItem(EVAL_LS_VAULT_KEY, serialized);
+            } catch (e) {}
+
+            return merged;
+        }
+
         const DB_NAME = 'EcohomeNhonBinh_Storage_2026';
         const DB_VERSION = 2;
 
@@ -1240,7 +1431,6 @@
             } catch (e) { return null; }
         }
 
-        // Lightweight Web Audio Chime Feedback
         function playSuccessChime() {
             try {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -1273,7 +1463,6 @@
             } catch (e) {}
         }
 
-        // Lightweight Native Canvas Confetti Effect
         function launchCelebrationConfetti() {
             const canvas = document.getElementById('confettiCanvas');
             if (!canvas) return;
@@ -1314,7 +1503,7 @@
                 particles.forEach(p => {
                     p.x += p.vx;
                     p.y += p.vy;
-                    p.vy += 0.28; // Gravity
+                    p.vy += 0.28;
                     p.tiltAngle += p.tiltSpeed;
                     p.tilt = Math.sin(p.tiltAngle) * 12;
 
@@ -1365,14 +1554,12 @@
                 .replace(/^CANHO|^CAN/i, '');
         }
 
-        // Smart room matching supporting variations like A-08.15 vs A8.15 vs A0815
         function isRoomMatch(inputStr, targetStr) {
             const r1 = normalizeRoom(inputStr);
             const r2 = normalizeRoom(targetStr);
             if (!r1 || !r2) return false;
             if (r1 === r2) return true;
 
-            // Extract block characters and numeric segments
             const extractParts = (s) => {
                 const letters = s.match(/^[A-Z]+/i)?.[0] || '';
                 const nums = s.replace(/^[A-Z]+/i, '').replace(/\D+/g, '');
@@ -1391,15 +1578,12 @@
         function normalizePhone(phone) {
             if (!phone) return '';
             let s = String(phone).replace(/\s+/g, '').replace(/[-.,()]/g, '');
-            // Scientific notation handling (e.g. 9.81E+08)
             if (s.includes('e') || s.includes('E') || s.includes('+')) {
                 const num = Number(phone);
                 if (!isNaN(num) && num > 0) s = String(Math.round(num));
             }
-            // Auto convert +84 or 84 to 0
             if (s.startsWith('+84')) s = '0' + s.slice(3);
             else if (s.startsWith('84') && s.length >= 11) s = '0' + s.slice(2);
-            // Prepend leading 0 for 9-digit phones
             if (s.length === 9 && !s.startsWith('0')) s = '0' + s;
             return s;
         }
@@ -1431,46 +1615,6 @@
             if (converted && converted !== original && (original.startsWith('+84') || original.startsWith('84'))) {
                 inputEl.value = converted;
             }
-        };
-
-        window.switchTab = function(tabId) {
-            const allTabs = ['home', 'voting', 'evaluation', 'documents', 'qa', 'admin'];
-            const cfg = state.navConfig || {};
-            const visibleTabs = cfg.visibleTabs || { home: true, voting: true, evaluation: true, documents: true, qa: true };
-            const defaultHome = cfg.defaultHomeTab || 'home';
-
-            if (tabId !== 'admin' && visibleTabs[tabId] === false) {
-                tabId = defaultHome;
-            }
-
-            allTabs.forEach(t => {
-                const el = document.getElementById(`view-${t}`);
-                const btn = document.getElementById(`tab-${t}`);
-                const mobBtn = document.getElementById(`mob-tab-${t}`);
-
-                if (el) {
-                    if (t === tabId) el.classList.remove('hidden');
-                    else el.classList.add('hidden');
-                }
-
-                if (btn) {
-                    if (t === tabId) {
-                        btn.classList.add('active', 'bg-brand-600', 'text-white', 'shadow-xs');
-                        btn.classList.remove('text-slate-300');
-                    } else {
-                        btn.classList.remove('active', 'bg-brand-600', 'text-white', 'shadow-xs');
-                        btn.classList.add('text-slate-300');
-                    }
-                }
-
-                if (mobBtn) {
-                    if (t === tabId) mobBtn.classList.add('bg-slate-800', 'text-emerald-400');
-                    else mobBtn.classList.remove('bg-slate-800', 'text-emerald-400');
-                }
-            });
-
-            applyNavConfigUI();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.goToDefaultHome = function() {
@@ -1567,7 +1711,6 @@
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, { type: 'array', raw: false, cellDates: true });
 
-                    // Find the best sheet with resident data
                     let targetSheetName = workbook.SheetNames[0];
                     for (const name of workbook.SheetNames) {
                         const low = removeAccents(name);
@@ -1584,7 +1727,6 @@
                         return;
                     }
 
-                    // Locate header row matching resident database columns
                     let headerIdx = -1;
                     for (let i = 0; i < Math.min(rows.length, 30); i++) {
                         const line = rows[i].map(c => removeAccents(String(c)));
@@ -1640,7 +1782,6 @@
                     localStorage.setItem('ecohome_residents_count', parsedList.length);
                     await saveToIndexedDB('residentStore', 'residents_list', parsedList);
 
-                    // Sync to Cloud Firestore in chunks if available
                     if (db) {
                         try {
                             const chunkSize = 200;
@@ -1651,7 +1792,6 @@
                         } catch (e) {}
                     }
 
-                    // Automatically update attendance total units to match uploaded database
                     if (document.getElementById('adminTotalUnitsInput')) {
                         document.getElementById('adminTotalUnitsInput').value = parsedList.length;
                         calculateAttendanceRate();
@@ -1702,7 +1842,6 @@
         function syncVerificationAcrossTabs(resident) {
             state.verifiedResident = resident;
 
-            // Update Voting Verification Gate
             const vBadge = document.getElementById('votingVerificationStatusBadge');
             const vCard = document.getElementById('votingVerifiedCard');
             if (vBadge && vCard) {
@@ -1717,7 +1856,6 @@
                 document.getElementById('vCardRatio').textContent = `${ratio}%`;
             }
 
-            // Update Evaluation Verification Gate
             const eBadge = document.getElementById('evalVerifiedStatusBadge');
             const eCard = document.getElementById('evalVerifiedDetailCard');
             const eForm = document.getElementById('evaluationFormWrapper');
@@ -1737,7 +1875,6 @@
                 document.getElementById('eCardPhone').textContent = resident.phone;
                 document.getElementById('eCardArea').textContent = `${resident.area} m²`;
 
-                // Prefill existing evaluation if present
                 const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR_2026';
                 const existing = state.evaluations.find(ev => isRoomMatch(ev.room, resident.room) && ev.period === period);
                 const criteriaList = getActiveEvalCriteria();
@@ -1825,7 +1962,6 @@
             syncVerificationAcrossTabs(found);
             showToast(`Xác thực thành công! Đã mở phiếu đánh giá Căn ${found.room}.`, 'success');
 
-            // Smooth scroll to the criteria section for best user experience
             setTimeout(() => {
                 const formEl = document.getElementById('evaluationFormWrapper');
                 if (formEl) formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1883,7 +2019,6 @@
             }
             if (!grid) return;
 
-            // Sync currentFormScores keys with active criteria
             const newScores = {};
             criteriaList.forEach(c => {
                 newScores[c.id] = state.currentFormScores[c.id] !== undefined ? state.currentFormScores[c.id] : 5;
@@ -1949,7 +2084,6 @@
             if (el) el.textContent = `${avg} / 5.0 ★`;
         }
 
-        // Admin Evaluation Criteria Management Functions
         async function persistEvalCriteriaConfig() {
             localStorage.setItem('ecohome_eval_criteria', JSON.stringify(state.evalCriteria));
             renderEvalCriteriaForm();
@@ -2104,7 +2238,7 @@
             if (btnSubmit) {
                 btnSubmit.disabled = true;
                 btnSubmit.classList.add('opacity-75', 'cursor-not-allowed');
-                btnSubmit.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã Ghi Nhận Phiếu...';
+                btnSubmit.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Đang Lưu Trữ & Đồng Bộ...';
             }
 
             try {
@@ -2119,11 +2253,14 @@
                     sumScores += val;
                 });
                 const avgScore = parseFloat((sumScores / (criteriaList.length || 1)).toFixed(2));
+                const canonicalId = `${normalizeRoom(state.verifiedResident.room)}_${period}`;
+
+                unmarkEvalIdDeleted(canonicalId);
 
                 const record = {
-                    id: `${normalizeRoom(state.verifiedResident.room)}_${period}`,
-                    room: state.verifiedResident.room,
-                    name: state.verifiedResident.name,
+                    id: canonicalId,
+                    room: String(state.verifiedResident.room).trim().toUpperCase(),
+                    name: String(state.verifiedResident.name).trim(),
                     phone: state.verifiedResident.phone,
                     area: state.verifiedResident.area,
                     relation: state.verifiedResident.relation || 'Chủ hộ',
@@ -2134,33 +2271,24 @@
                     updatedAt: new Date().toISOString()
                 };
 
-                const existingIdx = state.evaluations.findIndex(ev => ev.id === record.id);
-                if (existingIdx !== -1) {
-                    state.evaluations[existingIdx] = record;
-                } else {
-                    state.evaluations.unshift(record);
+                state.lastSubmittedEvalId = canonicalId;
+
+                persistEvaluationsEverywhere(record);
+
+                const homePeriodSelect = document.getElementById('homeEvalPeriodFilter');
+                if (homePeriodSelect && homePeriodSelect.value !== 'ALL' && homePeriodSelect.value !== period) {
+                    homePeriodSelect.value = 'ALL';
                 }
+                const homeSearchInput = document.getElementById('homeParticipantSearch');
+                if (homeSearchInput) homeSearchInput.value = '';
 
-                // 1. Instant synchronous save to LocalStorage
-                try {
-                    localStorage.setItem('ecohome_evaluations', JSON.stringify(state.evaluations));
-                } catch (e) {}
-
-                // 2. Non-blocking background persistence to IndexedDB & Cloud Firestore
-                saveToIndexedDB('evalStore', 'eval_list', state.evaluations).catch(() => {});
-                if (db) {
-                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eval_items', record.id), record, { merge: true }).catch(() => {});
-                }
-
-                // 3. Immediate UI Analytics & Table Refresh
-                renderHomeEvalAnalytics();
+                renderHomeEvalAnalytics(homePeriodSelect ? homePeriodSelect.value : 'ALL');
                 renderAdminEvalTable();
 
-                // 4. Instant Audio + Confetti + Receipt Modal
                 playSuccessChime();
                 launchCelebrationConfetti();
                 showEvaluationSuccessModal(record);
-                showToast(`Đã ghi nhận phiếu đánh giá của Căn ${record.room} thành công!`, 'success');
+                showToast(`Đã ghi nhận & lưu vĩnh viễn đánh giá Căn ${record.room}!`, 'success');
             } catch (err) {
                 console.error('Submit evaluation error:', err);
                 showToast('Có lỗi khi xử lý phiếu: ' + err.message, 'error');
@@ -2171,108 +2299,24 @@
                         btnSubmit.classList.remove('opacity-75', 'cursor-not-allowed');
                         btnSubmit.innerHTML = originalBtnContent;
                     }
-                }, 200);
+                }, 300);
             }
         };
 
-        window.showEvaluationSuccessModal = function(record) {
-            const periodsMap = { YEAR_2026: 'Cả Năm 2026', Q1_2026: 'Quý 1 / 2026', Q2_2026: 'Quý 2 / 2026', Q3_2026: 'Quý 3 / 2026', Q4_2026: 'Quý 4 / 2026' };
-            const roomEl = document.getElementById('succModalRoom');
-            const nameEl = document.getElementById('succModalName');
-            const periodEl = document.getElementById('succModalPeriod');
-            const scoreEl = document.getElementById('succModalScore');
-            const timeEl = document.getElementById('succModalTime');
+        window.renderHomeEvalAnalytics = function(period = null) {
+            const filterEl = document.getElementById('homeEvalPeriodFilter');
+            const activePeriod = period !== null ? period : (filterEl?.value || 'ALL');
 
-            if (roomEl) roomEl.textContent = `Căn ${record.room}`;
-            if (nameEl) nameEl.textContent = record.name;
-            if (periodEl) periodEl.textContent = periodsMap[record.period] || record.period;
-            if (scoreEl) scoreEl.textContent = `${record.average} / 5.0 ★`;
-            if (timeEl) timeEl.textContent = new Date(record.updatedAt).toLocaleString('vi-VN');
-
-            const modal = document.getElementById('evalSuccessModal');
-            if (modal) {
-                modal.style.display = 'flex';
-                modal.classList.remove('hidden');
-            }
-        };
-
-        window.closeEvalSuccessModal = function() {
-            const modal = document.getElementById('evalSuccessModal');
-            if (modal) {
-                modal.style.display = 'none';
-                modal.classList.add('hidden');
-            }
-        };
-
-        window.setVotingGateState = async function(isOpen) {
-            state.votingOpen = isOpen;
-            localStorage.setItem('ecohome_voting_open', JSON.stringify(isOpen));
-            updateVotingGateUI();
-
-            if (db) {
-                try {
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'voting'), { isOpen: isOpen, updatedAt: new Date().toISOString() }, { merge: true });
-                } catch (e) {}
+            let lsPrimary = [];
+            try { lsPrimary = JSON.parse(localStorage.getItem(EVAL_LS_PRIMARY_KEY) || '[]'); } catch (e) {}
+            if (lsPrimary.length > state.evaluations.length) {
+                state.evaluations = mergeEvaluationLists(state.evaluations, lsPrimary);
             }
 
-            if (isOpen) {
-                showToast('Đã MỞ CỔNG BIỂU QUYẾT cho toàn bộ Cư dân!', 'success');
-            } else {
-                showToast('Đã TẠM KHÓA CỔNG BIỂU QUYẾT!', 'info');
-            }
-        };
-
-        window.updateVotingGateUI = function() {
-            const isOpen = state.votingOpen === true;
-
-            // Voting Screen UI
-            const lockedNotice = document.getElementById('votingLockedNotice');
-            const itemsContainer = document.getElementById('votingItemsContainer');
-            const gateBadge = document.getElementById('votingGateBadge');
-
-            if (lockedNotice && itemsContainer && gateBadge) {
-                if (isOpen) {
-                    lockedNotice.classList.add('hidden');
-                    itemsContainer.classList.remove('hidden');
-                    gateBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5';
-                    gateBadge.innerHTML = '<i class="fa-solid fa-lock-open text-emerald-600"></i> Đang Mở Biểu Quyết';
-                } else {
-                    lockedNotice.classList.remove('hidden');
-                    itemsContainer.classList.add('hidden');
-                    gateBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1.5';
-                    gateBadge.innerHTML = '<i class="fa-solid fa-lock text-amber-600"></i> Đang Tạm Khóa';
-                }
-            }
-
-            // Admin Control UI
-            const adminStatusText = document.getElementById('adminVotingStatusText');
-            const btnLock = document.getElementById('btnLockVoting');
-            const btnUnlock = document.getElementById('btnUnlockVoting');
-
-            if (adminStatusText) {
-                if (isOpen) {
-                    adminStatusText.className = 'text-xs font-black px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300';
-                    adminStatusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Trạng Thái: ĐANG MỞ BIỂU QUYẾT';
-                } else {
-                    adminStatusText.className = 'text-xs font-black px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300';
-                    adminStatusText.innerHTML = '<i class="fa-solid fa-lock text-amber-600 mr-1"></i> Trạng Thái: ĐANG TẠM KHÓA';
-                }
-            }
-
-            if (btnLock && btnUnlock) {
-                if (isOpen) {
-                    btnLock.classList.remove('opacity-50');
-                    btnUnlock.classList.add('opacity-50');
-                } else {
-                    btnLock.classList.add('opacity-50');
-                    btnUnlock.classList.remove('opacity-50');
-                }
-            }
-        };
-
-        window.renderHomeEvalAnalytics = function(period = 'ALL') {
             let list = state.evaluations || [];
-            if (period !== 'ALL') list = list.filter(e => e.period === period);
+            if (activePeriod !== 'ALL') {
+                list = list.filter(e => e.period === activePeriod);
+            }
 
             const criteriaList = getActiveEvalCriteria();
             const total = list.length;
@@ -2287,13 +2331,17 @@
             criteriaList.forEach(c => { critTotals[c.id] = 0; });
 
             list.forEach(ev => {
-                avg += (ev.average || 0);
-                if (ev.average >= 4.0) satisfied++;
-                if (ev.feedback && ev.feedback.length > 5) feedbackCount++;
+                avg += (Number(ev.average) || 0);
+                if (Number(ev.average) >= 4.0) satisfied++;
+                if (ev.feedback && ev.feedback.trim().length > 2) feedbackCount++;
                 if (ev.scores) {
                     criteriaList.forEach(c => {
-                        const scoreVal = ev.scores[c.id] !== undefined ? Number(ev.scores[c.id]) : (ev.average || 5);
+                        const scoreVal = ev.scores[c.id] !== undefined ? Number(ev.scores[c.id]) : (Number(ev.average) || 5);
                         critTotals[c.id] += scoreVal;
+                    });
+                } else {
+                    criteriaList.forEach(c => {
+                        critTotals[c.id] += (Number(ev.average) || 5);
                     });
                 }
             });
@@ -2306,6 +2354,11 @@
             document.getElementById('homeTurnoutRate').textContent = `Tỷ lệ: ${turnout}% căn hộ`;
             document.getElementById('homeSatisfactionRate').textContent = `${satRate}%`;
             document.getElementById('homeFeedbackCount').textContent = feedbackCount;
+
+            const publicCountBadge = document.getElementById('homePublicLogCountBadge');
+            if (publicCountBadge) {
+                publicCountBadge.textContent = `${total} căn hộ đã đánh giá`;
+            }
 
             const slaText = document.getElementById('homeSlaRatingText');
             if (slaText) {
@@ -2343,33 +2396,87 @@
                 }).join('');
             }
 
-            renderHomeParticipantTable(list);
+            const searchQuery = document.getElementById('homeParticipantSearch')?.value || '';
+            if (searchQuery.trim()) {
+                filterHomeParticipantLog(searchQuery);
+            } else {
+                renderHomeParticipantTable(list);
+            }
         };
 
         window.filterHomeEvalAnalytics = function(val) {
             renderHomeEvalAnalytics(val);
         };
 
+        function formatDateTimeVN(isoStr) {
+            if (!isoStr) return '---';
+            const d = new Date(isoStr);
+            if (isNaN(d.getTime())) return '---';
+            const time = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            const date = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            return `${time} - ${date}`;
+        }
+
         function renderHomeParticipantTable(list) {
             const tbody = document.getElementById('homeParticipantTableBody');
             if (!tbody) return;
             if (!list || list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400 italic">Chưa có dữ liệu đánh giá nào được gửi.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400 italic">Chưa có căn hộ nào gửi phiếu đánh giá trong mục này.</td></tr>';
                 return;
             }
 
             const periodsMap = { YEAR_2026: 'Cả Năm 2026', Q1_2026: 'Quý 1/2026', Q2_2026: 'Quý 2/2026', Q3_2026: 'Quý 3/2026', Q4_2026: 'Quý 4/2026' };
 
-            tbody.innerHTML = list.map(ev => `
-                <tr class="hover:bg-slate-50/80 transition">
-                    <td class="py-2.5 px-3 font-extrabold text-slate-900">${ev.room}</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800">${ev.name}</td>
-                    <td class="py-2.5 px-3 text-slate-600">${periodsMap[ev.period] || ev.period}</td>
-                    <td class="py-2.5 px-3 font-black text-amber-600">${ev.average} ★</td>
-                    <td class="py-2.5 px-3 text-slate-600 max-w-xs truncate">${ev.feedback || '<span class="text-slate-300 italic">Hài lòng</span>'}</td>
-                    <td class="py-2.5 px-3 text-right text-slate-400 text-[11px]">${ev.updatedAt ? new Date(ev.updatedAt).toLocaleDateString('vi-VN') : '---'}</td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = list.map((ev, index) => {
+                const isJustSubmitted = state.lastSubmittedEvalId && ev.id === state.lastSubmittedEvalId;
+                const avgNum = parseFloat(ev.average || 5);
+                let slaBadge = '';
+                if (avgNum >= 4.5) {
+                    slaBadge = '<span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">Xuất sắc</span>';
+                } else if (avgNum >= 4.0) {
+                    slaBadge = '<span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">Đạt chuẩn</span>';
+                } else {
+                    slaBadge = '<span class="px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold">Cần khắc phục</span>';
+                }
+
+                const rowHighlight = isJustSubmitted
+                    ? 'bg-emerald-50/90 border-l-4 border-l-emerald-500 transition-all'
+                    : 'hover:bg-slate-50/90 transition';
+
+                const feedbackHtml = ev.feedback && ev.feedback.trim()
+                    ? `<p class="text-slate-700 font-medium break-words max-w-md">${ev.feedback}</p>`
+                    : `<span class="text-emerald-700/80 italic text-[11px]"><i class="fa-regular fa-face-smile mr-1"></i>Đồng thuận & Hài lòng dịch vụ</span>`;
+
+                return `
+                    <tr class="${rowHighlight}">
+                        <td class="py-3 px-3 text-center font-bold text-slate-400">${index + 1}</td>
+                        <td class="py-3 px-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-black text-slate-900 text-xs px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200">${ev.room}</span>
+                                ${isJustSubmitted ? '<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-extrabold text-[9px] uppercase animate-pulse">Mới</span>' : ''}
+                            </div>
+                        </td>
+                        <td class="py-3 px-3">
+                            <span class="font-bold text-slate-900 block">${ev.name}</span>
+                            <span class="text-[10px] text-slate-500 font-medium">${ev.relation || 'Chủ hộ'}${ev.area ? ` • ${ev.area} m²` : ''}</span>
+                        </td>
+                        <td class="py-3 px-3">
+                            <span class="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100 text-[11px]">${periodsMap[ev.period] || ev.period}</span>
+                        </td>
+                        <td class="py-3 px-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-black text-amber-600 text-sm">${avgNum.toFixed(1)} ★</span>
+                                ${slaBadge}
+                            </div>
+                        </td>
+                        <td class="py-3 px-3">${feedbackHtml}</td>
+                        <td class="py-3 px-3 text-right">
+                            <span class="text-slate-700 font-semibold text-[11px] block">${formatDateTimeVN(ev.updatedAt)}</span>
+                            <span class="text-[10px] text-emerald-600 font-bold inline-flex items-center gap-1"><i class="fa-solid fa-circle-check text-[9px]"></i> Đã lưu vĩnh viễn</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         window.filterHomeParticipantLog = function(query) {
@@ -2378,9 +2485,106 @@
             let list = state.evaluations || [];
             if (period !== 'ALL') list = list.filter(e => e.period === period);
             if (clean) {
-                list = list.filter(e => removeAccents(e.room).includes(clean) || removeAccents(e.name).includes(clean));
+                list = list.filter(e =>
+                    removeAccents(e.room).includes(clean) ||
+                    removeAccents(e.name).includes(clean) ||
+                    removeAccents(e.feedback || '').includes(clean)
+                );
             }
             renderHomeParticipantTable(list);
+        };
+
+        window.forceSyncAndRefreshEvaluations = async function() {
+            await loadAndReconcileEvaluations();
+            renderHomeEvalAnalytics();
+            renderAdminEvalTable();
+            showToast(`Đã đồng bộ và kiểm tra an toàn ${state.evaluations.length} phiếu đánh giá!`, 'success');
+        };
+
+        window.showEvaluationSuccessModal = function(record) {
+            const modal = document.getElementById('evalSuccessModal');
+            if (!modal) return;
+
+            document.getElementById('succModalRoom').textContent = record.room;
+            document.getElementById('succModalName').textContent = `${record.name} (${record.relation || 'Chủ hộ'})`;
+            document.getElementById('succModalPeriod').textContent = record.period;
+            document.getElementById('succModalScore').textContent = `${record.average} / 5.0 ★`;
+            document.getElementById('succModalTime').textContent = formatDateTimeVN(record.updatedAt);
+
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
+        };
+
+        window.closeEvalSuccessModal = function() {
+            const modal = document.getElementById('evalSuccessModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.add('hidden');
+            }
+        };
+
+        window.setVotingGateState = async function(isOpen) {
+            state.votingOpen = isOpen;
+            localStorage.setItem('ecohome_voting_open', JSON.stringify(isOpen));
+            updateVotingGateUI();
+
+            if (db) {
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'voting'), { isOpen: isOpen, updatedAt: new Date().toISOString() }, { merge: true });
+                } catch (e) {}
+            }
+
+            if (isOpen) {
+                showToast('Đã MỞ CỔNG BIỂU QUYẾT cho toàn bộ Cư dân!', 'success');
+            } else {
+                showToast('Đã TẠM KHÓA CỔNG BIỂU QUYẾT!', 'info');
+            }
+        };
+
+        window.updateVotingGateUI = function() {
+            const isOpen = state.votingOpen === true;
+
+            const lockedNotice = document.getElementById('votingLockedNotice');
+            const itemsContainer = document.getElementById('votingItemsContainer');
+            const gateBadge = document.getElementById('votingGateBadge');
+
+            if (lockedNotice && itemsContainer && gateBadge) {
+                if (isOpen) {
+                    lockedNotice.classList.add('hidden');
+                    itemsContainer.classList.remove('hidden');
+                    gateBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5';
+                    gateBadge.innerHTML = '<i class="fa-solid fa-lock-open text-emerald-600"></i> Đang Mở Biểu Quyết';
+                } else {
+                    lockedNotice.classList.remove('hidden');
+                    itemsContainer.classList.add('hidden');
+                    gateBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1.5';
+                    gateBadge.innerHTML = '<i class="fa-solid fa-lock text-amber-600"></i> Đang Tạm Khóa';
+                }
+            }
+
+            const adminStatusText = document.getElementById('adminVotingStatusText');
+            const btnLock = document.getElementById('btnLockVoting');
+            const btnUnlock = document.getElementById('btnUnlockVoting');
+
+            if (adminStatusText) {
+                if (isOpen) {
+                    adminStatusText.className = 'text-xs font-black px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300';
+                    adminStatusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Trạng Thái: ĐANG MỞ BIỂU QUYẾT';
+                } else {
+                    adminStatusText.className = 'text-xs font-black px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300';
+                    adminStatusText.innerHTML = '<i class="fa-solid fa-lock text-amber-600 mr-1"></i> Trạng Thái: ĐANG TẠM KHÓA';
+                }
+            }
+
+            if (btnLock && btnUnlock) {
+                if (isOpen) {
+                    btnLock.classList.remove('opacity-50');
+                    btnUnlock.classList.add('opacity-50');
+                } else {
+                    btnLock.classList.add('opacity-50');
+                    btnUnlock.classList.remove('opacity-50');
+                }
+            }
         };
 
         window.renderVotingItems = function() {
@@ -2582,19 +2786,21 @@
 
         window.renderAdminEvalTable = function() {
             const tbody = document.getElementById('adminEvalTableBody');
-            if (!tbody) return;
+            const totalBadge = document.getElementById('adminEvalTotalBadge');
             const list = state.evaluations || [];
+            if (totalBadge) totalBadge.textContent = list.length;
+            if (!tbody) return;
             if (list.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Chưa có phiếu đánh giá.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = list.map((ev, idx) => `
+            tbody.innerHTML = list.map((ev) => `
                 <tr class="hover:bg-slate-50">
                     <td class="py-2 px-2.5 font-bold text-slate-900">${ev.room}</td>
                     <td class="py-2 px-2.5 text-slate-800">${ev.name}</td>
                     <td class="py-2 px-2.5 text-slate-600">${ev.period}</td>
-                    <td class="py-2 px-2.5 font-black text-amber-600">${ev.average} ★</td>
+                    <td class="py-2 px-2.5 font-black text-amber-600">${Number(ev.average || 5).toFixed(1)} ★</td>
                     <td class="py-2 px-2.5 text-right">
                         <button onclick="deleteAdminEval('${ev.id}')" class="text-rose-500 hover:text-rose-700 p-1" title="Xóa phiếu"><i class="fa-solid fa-trash"></i></button>
                     </td>
@@ -2603,12 +2809,61 @@
         };
 
         window.deleteAdminEval = async function(id) {
+            markEvalIdDeleted(id);
             state.evaluations = state.evaluations.filter(e => e.id !== id);
-            localStorage.setItem('ecohome_evaluations', JSON.stringify(state.evaluations));
+            try {
+                const serialized = JSON.stringify(state.evaluations);
+                localStorage.setItem(EVAL_LS_PRIMARY_KEY, serialized);
+                localStorage.setItem(EVAL_LS_VAULT_KEY, serialized);
+            } catch (e) {}
             await saveToIndexedDB('evalStore', 'eval_list', state.evaluations);
+            await saveToIndexedDB('evalStore', 'eval_backup_vault', state.evaluations);
             renderAdminEvalTable();
             renderHomeEvalAnalytics();
             showToast('Đã xóa phiếu đánh giá!');
+        };
+
+        window.backupEvaluationsJSON = function() {
+            if (!state.evaluations || state.evaluations.length === 0) {
+                showToast('Chưa có phiếu đánh giá nào để sao lưu!', 'error');
+                return;
+            }
+            const blob = new Blob([JSON.stringify(state.evaluations, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SAO_LUU_PHIEU_DANH_GIA_BQL_ECOHOME_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Đã tải file sao lưu ${state.evaluations.length} phiếu đánh giá!`);
+        };
+
+        window.restoreEvaluationsJSON = function(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                try {
+                    const imported = JSON.parse(evt.target.result);
+                    if (!Array.isArray(imported)) {
+                        showToast('File JSON không đúng định dạng danh sách phiếu đánh giá!', 'error');
+                        return;
+                    }
+                    imported.forEach(item => {
+                        if (item && item.id) unmarkEvalIdDeleted(item.id);
+                    });
+                    state.evaluations = mergeEvaluationLists(state.evaluations, imported);
+                    await persistEvaluationsEverywhere();
+                    renderHomeEvalAnalytics();
+                    renderAdminEvalTable();
+                    showToast(`Khôi phục & hợp nhất thành công ${state.evaluations.length} phiếu đánh giá!`, 'success');
+                } catch (err) {
+                    showToast('Lỗi đọc file JSON: ' + err.message, 'error');
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
         };
 
         window.calculateAttendanceRate = function() {
@@ -2654,7 +2909,6 @@
             const criteriaList = getActiveEvalCriteria();
             const wb = XLSX.utils.book_new();
 
-            // Sheet 1: Summary Statistics
             const summaryRows = [
                 ["BÁO CÁO TỔNG HỢP ĐÁNH GIÁ ĐƠN VỊ QUẢN LÝ VẬN HÀNH ECOHOME NHƠN BÌNH 2026"],
                 ["Thời gian xuất:", new Date().toLocaleString('vi-VN')],
@@ -2675,7 +2929,6 @@
             const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
             XLSX.utils.book_append_sheet(wb, wsSummary, "BaoCaoTongHop");
 
-            // Sheet 2: Detailed Resident Evaluations
             const detailHeaders = [
                 "Mã Căn", "Chủ Sở Hữu", "Điện Thoại", "Diện Tích", "QH Với CH", "Kỳ Đánh Giá",
                 ...criteriaList.map((c, idx) => `TC${idx + 1}: ${c.title}`),
@@ -2773,7 +3026,6 @@
         };
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // Load Custom Evaluation Criteria Config
             const savedCriteria = localStorage.getItem('ecohome_eval_criteria');
             if (savedCriteria) {
                 try {
@@ -2787,48 +3039,33 @@
             initAllRatingStars();
             renderAdminCriteriaList();
 
-            // Load Navigation Config
             const savedNav = localStorage.getItem('ecohome_nav_config');
             if (savedNav) {
                 try { state.navConfig = JSON.parse(savedNav); } catch (e) {}
             }
 
-            // Load Resident Database from IndexedDB
             const savedResidents = await getFromIndexedDB('residentStore', 'residents_list');
             if (savedResidents && savedResidents.length > 0) {
                 state.residentsList = savedResidents;
             }
 
-            // Load Evaluations
-            const savedEvals = await getFromIndexedDB('evalStore', 'eval_list');
-            if (savedEvals && savedEvals.length > 0) {
-                state.evaluations = savedEvals;
-            } else {
-                const lsEvals = localStorage.getItem('ecohome_evaluations');
-                if (lsEvals) {
-                    try { state.evaluations = JSON.parse(lsEvals); } catch (e) {}
-                }
-            }
+            await loadAndReconcileEvaluations();
 
-            // Load Attendance Config
             const savedAtt = localStorage.getItem('ecohome_attendance');
             if (savedAtt) {
                 try { state.attendance = JSON.parse(savedAtt); } catch (e) {}
             }
 
-            // Load Voting Gate State
             const savedVotingOpen = localStorage.getItem('ecohome_voting_open');
             if (savedVotingOpen !== null) {
                 try { state.votingOpen = JSON.parse(savedVotingOpen); } catch (e) {}
             }
 
-            // Load QA List
             const savedQA = localStorage.getItem('ecohome_qa_list');
             if (savedQA) {
                 try { state.qaList = JSON.parse(savedQA); } catch (e) {}
             }
 
-            // Render all initial components
             renderVotingItems();
             renderDocuments();
             renderQA();
@@ -2839,7 +3076,6 @@
             applyNavConfigUI();
             updateVotingGateUI();
 
-            // Check URL Hash for Deep Linking
             const hash = window.location.hash.replace('#', '');
             if (['voting', 'evaluation', 'documents', 'qa', 'admin'].includes(hash)) {
                 switchTab(hash);
@@ -2847,7 +3083,6 @@
                 goToDefaultHome();
             }
 
-            // Cloud Firestore Subscriptions (Non-blocking)
             if (db) {
                 try {
                     onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'navigation'), (snap) => {
@@ -2882,18 +3117,11 @@
                     }, () => {});
 
                     onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'eval_items'), (snap) => {
-                        const items = [];
-                        snap.forEach(d => items.push(d.data()));
-                        if (items.length > 0) {
-                            // Merge cloud records with local store, preserving latest updates
-                            const existingMap = new Map();
-                            state.evaluations.forEach(ev => existingMap.set(ev.id, ev));
-                            items.forEach(ev => existingMap.set(ev.id, ev));
-
-                            state.evaluations = Array.from(existingMap.values());
-                            localStorage.setItem('ecohome_evaluations', JSON.stringify(state.evaluations));
-                            saveToIndexedDB('evalStore', 'eval_list', state.evaluations);
-
+                        const cloudItems = [];
+                        snap.forEach(d => cloudItems.push(d.data()));
+                        if (cloudItems.length > 0) {
+                            state.evaluations = mergeEvaluationLists(state.evaluations, cloudItems);
+                            persistEvaluationsEverywhere();
                             renderHomeEvalAnalytics();
                             renderAdminEvalTable();
                         }
