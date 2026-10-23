@@ -342,9 +342,40 @@
                         </p>
                     </div>
 
-                    <button onclick="copyVotingLink()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 flex items-center gap-2 transition active:scale-95">
-                        <i class="fa-solid fa-share-nodes text-brand-600"></i> Sao Chép Liên Kết
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <span id="votingGateBadge" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-lock"></i> Đang Tạm Khóa
+                        </span>
+                        <button onclick="copyVotingLink()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 flex items-center gap-2 transition active:scale-95">
+                            <i class="fa-solid fa-share-nodes text-brand-600"></i> Sao Chép Liên Kết
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Banner displayed when voting is LOCKED by Admin -->
+                <div id="votingLockedNotice" class="p-6 rounded-2xl bg-amber-50/80 border-2 border-amber-300 text-amber-950 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-200 text-amber-800 flex items-center justify-center text-2xl flex-shrink-0">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-sm sm:text-base text-amber-950">Cổng Biểu Quyết Trực Tuyến Đang Tạm Khóa</h4>
+                            <p class="text-xs text-amber-800 mt-0.5">
+                                Đoàn Chủ Tịch Hội Nghị chưa phát lệnh mở cổng biểu quyết. Vui lòng theo dõi chương trình Hội nghị, nội dung các mục biểu quyết sẽ tự động mở khi Ban Quản Trị cấp quyền.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-bold text-amber-900">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/80 border border-amber-200">
+                            <i class="fa-regular fa-clock"></i> Chờ hiệu lệnh mở biểu quyết
+                        </span>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/80 border border-amber-200">
+                            <i class="fa-solid fa-shield-check"></i> Bảo đảm tính công bằng & minh bạch
+                        </span>
+                        <button onclick="switchTab('documents')" class="text-indigo-700 underline hover:text-indigo-900 ml-auto">
+                            Xem trước tài liệu tờ trình &rarr;
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Resident Quick Verification Gate for Voting -->
@@ -756,6 +787,46 @@
                 </div>
             </div>
 
+            <!-- 1.5 ADMIN VOTING GATE CONTROL -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-emerald-500/30 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold">
+                            <i class="fa-solid fa-check-to-slot"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Quản Lý Cấp Quyền Mở / Khóa Cổng Biểu Quyết</h3>
+                            <p class="text-xs text-slate-500">Quyết định thời điểm cư dân được phép xem 11 mục và tiến hành biểu quyết.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <span id="adminVotingStatusText" class="text-xs font-black px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300">
+                            Trạng Thái: ĐANG KHÓA
+                        </span>
+                    </div>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wide">Quyền Mở Biểu Quyết Trực Tuyến</h4>
+                        <p class="text-xs text-slate-600">
+                            - <strong>ĐANG KHÓA:</strong> Cư dân sẽ thấy bảng thông báo tạm khóa, ẩn danh sách 11 mục biểu quyết.<br>
+                            - <strong>ĐÃ MỞ:</strong> Cư dân xác thực thông tin căn hộ và có thể xem chi tiết tài liệu biểu quyết ngay.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <button onclick="setVotingGateState(false)" id="btnLockVoting" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-lock"></i> Khóa Biểu Quyết
+                        </button>
+                        <button onclick="setVotingGateState(true)" id="btnUnlockVoting" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-lock-open"></i> Cấp Quyền Mở Ngay
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-5">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                     <div>
@@ -943,6 +1014,63 @@
         </div>
     </div>
 
+    <!-- Evaluation Success Feedback Modal -->
+    <div id="evalSuccessModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <div class="text-center space-y-3">
+                <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div>
+                    <span class="text-[11px] font-extrabold text-emerald-700 uppercase tracking-wider bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                        Ghi Nhận Thành Công
+                    </span>
+                    <h3 class="text-xl font-black text-slate-900 mt-2">Cảm Ơn Quý Cư Dân!</h3>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Phiếu đánh giá chất lượng Quản lý Vận hành của Quý Cư dân đã được ghi nhận vào hệ thống minh bạch của Hội nghị.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Receipt Summary Box -->
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-xs space-y-2">
+                <div class="flex justify-between items-center py-1 border-b border-slate-200/60">
+                    <span class="text-slate-500 font-medium">Mã Căn Hộ:</span>
+                    <span id="succModalRoom" class="font-extrabold text-slate-900 text-sm">---</span>
+                </div>
+                <div class="flex justify-between items-center py-1 border-b border-slate-200/60">
+                    <span class="text-slate-500 font-medium">Chủ Sở Hữu / Người ĐG:</span>
+                    <span id="succModalName" class="font-bold text-slate-800">---</span>
+                </div>
+                <div class="flex justify-between items-center py-1 border-b border-slate-200/60">
+                    <span class="text-slate-500 font-medium">Kỳ Khảo Sát:</span>
+                    <span id="succModalPeriod" class="font-bold text-indigo-700">---</span>
+                </div>
+                <div class="flex justify-between items-center py-1 border-b border-slate-200/60">
+                    <span class="text-slate-500 font-medium">Điểm Đánh Giá TB:</span>
+                    <span id="succModalScore" class="font-black text-amber-600 text-sm">---</span>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-slate-500 font-medium">Thời Gian Ghi Nhận:</span>
+                    <span id="succModalTime" class="font-medium text-slate-600 text-[11px]">---</span>
+                </div>
+            </div>
+
+            <div class="text-[11px] text-slate-500 bg-amber-50/70 p-3 rounded-xl border border-amber-200/60 italic leading-relaxed">
+                <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i> Ban Quản Trị sẽ tổng hợp đầy đủ kết quả và các ý kiến đóng góp này để yêu cầu Đơn vị Quản lý Vận hành (BQL) giải trình và nâng cao chất lượng phục vụ cư dân.
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <button onclick="goToDefaultHome(); closeEvalSuccessModal();" class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                    <i class="fa-solid fa-chart-line mr-1"></i> Xem Bảng Điểm
+                </button>
+                <button onclick="closeEvalSuccessModal()" class="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition">
+                    <i class="fa-solid fa-check mr-1"></i> Hoàn Tất
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Help Modal -->
     <div id="firebaseHelpModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-100 space-y-4">
@@ -1001,6 +1129,7 @@
                 defaultHomeTab: 'home',
                 visibleTabs: { home: true, voting: true, evaluation: true, documents: true, qa: true }
             },
+            votingOpen: false, // Default is locked until Admin unlocks
             verifiedResident: null,
             residentsList: [],
             evaluations: [],
@@ -1655,7 +1784,91 @@
             renderHomeEvalAnalytics();
             renderAdminEvalTable();
 
-            showToast(`Căn ${record.room} đã gửi phiếu đánh giá thành công! Điểm TB: ${avgScore}★`, 'success');
+            // Display rich success feedback modal
+            showEvaluationSuccessModal(record);
+        };
+
+        window.showEvaluationSuccessModal = function(record) {
+            const periodsMap = { YEAR_2026: 'Cả Năm 2026', Q1_2026: 'Quý 1 / 2026', Q2_2026: 'Quý 2 / 2026', Q3_2026: 'Quý 3 / 2026', Q4_2026: 'Quý 4 / 2026' };
+            document.getElementById('succModalRoom').textContent = `Căn ${record.room}`;
+            document.getElementById('succModalName').textContent = record.name;
+            document.getElementById('succModalPeriod').textContent = periodsMap[record.period] || record.period;
+            document.getElementById('succModalScore').textContent = `${record.average} / 5.0 ★`;
+            document.getElementById('succModalTime').textContent = new Date(record.updatedAt).toLocaleString('vi-VN');
+
+            const modal = document.getElementById('evalSuccessModal');
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        window.closeEvalSuccessModal = function() {
+            const modal = document.getElementById('evalSuccessModal');
+            if (modal) modal.classList.add('hidden');
+        };
+
+        window.setVotingGateState = async function(isOpen) {
+            state.votingOpen = isOpen;
+            localStorage.setItem('ecohome_voting_open', JSON.stringify(isOpen));
+            updateVotingGateUI();
+
+            if (db) {
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'voting'), { isOpen: isOpen, updatedAt: new Date().toISOString() }, { merge: true });
+                } catch (e) {}
+            }
+
+            if (isOpen) {
+                showToast('Đã MỞ CỔNG BIỂU QUYẾT cho toàn bộ Cư dân!', 'success');
+            } else {
+                showToast('Đã TẠM KHÓA CỔNG BIỂU QUYẾT!', 'info');
+            }
+        };
+
+        window.updateVotingGateUI = function() {
+            const isOpen = state.votingOpen === true;
+
+            // Voting Screen UI
+            const lockedNotice = document.getElementById('votingLockedNotice');
+            const itemsContainer = document.getElementById('votingItemsContainer');
+            const gateBadge = document.getElementById('votingGateBadge');
+
+            if (lockedNotice && itemsContainer && gateBadge) {
+                if (isOpen) {
+                    lockedNotice.classList.add('hidden');
+                    itemsContainer.classList.remove('hidden');
+                    gateBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5';
+                    gateBadge.innerHTML = '<i class="fa-solid fa-lock-open text-emerald-600"></i> Đang Mở Biểu Quyết';
+                } else {
+                    lockedNotice.classList.remove('hidden');
+                    itemsContainer.classList.add('hidden');
+                    gateBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1.5';
+                    gateBadge.innerHTML = '<i class="fa-solid fa-lock text-amber-600"></i> Đang Tạm Khóa';
+                }
+            }
+
+            // Admin Control UI
+            const adminStatusText = document.getElementById('adminVotingStatusText');
+            const btnLock = document.getElementById('btnLockVoting');
+            const btnUnlock = document.getElementById('btnUnlockVoting');
+
+            if (adminStatusText) {
+                if (isOpen) {
+                    adminStatusText.className = 'text-xs font-black px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300';
+                    adminStatusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Trạng Thái: ĐANG MỞ BIỂU QUYẾT';
+                } else {
+                    adminStatusText.className = 'text-xs font-black px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300';
+                    adminStatusText.innerHTML = '<i class="fa-solid fa-lock text-amber-600 mr-1"></i> Trạng Thái: ĐANG TẠM KHÓA';
+                }
+            }
+
+            if (btnLock && btnUnlock) {
+                if (isOpen) {
+                    btnLock.classList.remove('opacity-50');
+                    btnUnlock.classList.add('opacity-50');
+                } else {
+                    btnLock.classList.add('opacity-50');
+                    btnUnlock.classList.remove('opacity-50');
+                }
+            }
         };
 
         window.renderHomeEvalAnalytics = function(period = 'ALL') {
@@ -2199,6 +2412,12 @@
                 try { state.attendance = JSON.parse(savedAtt); } catch (e) {}
             }
 
+            // Load Voting Gate State
+            const savedVotingOpen = localStorage.getItem('ecohome_voting_open');
+            if (savedVotingOpen !== null) {
+                try { state.votingOpen = JSON.parse(savedVotingOpen); } catch (e) {}
+            }
+
             // Load QA List
             const savedQA = localStorage.getItem('ecohome_qa_list');
             if (savedQA) {
@@ -2214,6 +2433,7 @@
             renderAdminEvalTable();
             updateAttendanceHeaderUI();
             applyNavConfigUI();
+            updateVotingGateUI();
 
             // Check URL Hash for Deep Linking
             const hash = window.location.hash.replace('#', '');
@@ -2237,6 +2457,13 @@
                         if (snap.exists()) {
                             state.attendance = snap.data();
                             updateAttendanceHeaderUI();
+                        }
+                    }, () => {});
+
+                    onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'voting'), (snap) => {
+                        if (snap.exists() && snap.data()?.isOpen !== undefined) {
+                            state.votingOpen = snap.data().isOpen;
+                            updateVotingGateUI();
                         }
                     }, () => {});
 
