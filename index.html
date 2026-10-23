@@ -1157,29 +1157,42 @@
         function getIDB() {
             return new Promise((resolve) => {
                 if (!window.indexedDB) { resolve(null); return; }
-                const req = indexedDB.open(DB_NAME, DB_VERSION);
-                req.onupgradeneeded = (e) => {
-                    const d = e.target.result;
-                    if (!d.objectStoreNames.contains('residentStore')) d.createObjectStore('residentStore');
-                    if (!d.objectStoreNames.contains('evalStore')) d.createObjectStore('evalStore');
-                };
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => resolve(null);
+                const timeout = setTimeout(() => resolve(null), 500);
+                try {
+                    const req = indexedDB.open(DB_NAME, DB_VERSION);
+                    req.onupgradeneeded = (e) => {
+                        const d = e.target.result;
+                        if (!d.objectStoreNames.contains('residentStore')) d.createObjectStore('residentStore');
+                        if (!d.objectStoreNames.contains('evalStore')) d.createObjectStore('evalStore');
+                    };
+                    req.onsuccess = () => { clearTimeout(timeout); resolve(req.result); };
+                    req.onerror = () => { clearTimeout(timeout); resolve(null); };
+                    req.onblocked = () => { clearTimeout(timeout); resolve(null); };
+                } catch (err) {
+                    clearTimeout(timeout);
+                    resolve(null);
+                }
             });
         }
 
         async function saveToIndexedDB(storeName, key, data) {
             try {
                 const idb = await getIDB();
-                if (!idb) return;
+                if (!idb) return false;
                 return new Promise((resolve) => {
-                    const tx = idb.transaction(storeName, 'readwrite');
-                    tx.oncomplete = () => resolve(true);
-                    tx.onerror = () => resolve(false);
-                    tx.objectStore(storeName).put(data, key);
+                    const timeout = setTimeout(() => resolve(false), 500);
+                    try {
+                        const tx = idb.transaction(storeName, 'readwrite');
+                        tx.oncomplete = () => { clearTimeout(timeout); resolve(true); };
+                        tx.onerror = () => { clearTimeout(timeout); resolve(false); };
+                        tx.objectStore(storeName).put(data, key);
+                    } catch (err) {
+                        clearTimeout(timeout);
+                        resolve(false);
+                    }
                 });
             } catch (e) {
-                console.warn('IDB save error:', e);
+                return false;
             }
         }
 
@@ -1861,75 +1874,79 @@
             if (el) el.textContent = `${avg} / 5.0 ★`;
         }
 
-        window.handleEvaluationSubmit = async function() {
+        window.handleEvaluationSubmit = function() {
             if (!state.verifiedResident) {
                 showToast('Vui lòng hoàn tất xác thực căn hộ trước khi gửi!', 'error');
                 return;
             }
 
             const btnSubmit = document.getElementById('btnSubmitEval');
-            const originalBtnContent = btnSubmit ? btnSubmit.innerHTML : '';
+            const originalBtnContent = '<i class="fa-solid fa-paper-plane"></i> Gửi Phiếu Đánh Giá Chính Thức';
             if (btnSubmit) {
                 btnSubmit.disabled = true;
                 btnSubmit.classList.add('opacity-75', 'cursor-not-allowed');
-                btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang Lưu Trữ & Đồng Bộ Dữ Liệu...';
+                btnSubmit.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã Ghi Nhận Phiếu...';
             }
 
-            const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR_2026';
-            const feedback = document.getElementById('evalFeedbackText')?.value.trim() || '';
-            const scores = { ...state.currentFormScores };
-            const avgScore = parseFloat((Object.values(scores).reduce((a, b) => a + b, 0) / 6).toFixed(2));
+            try {
+                const period = document.getElementById('evalPeriodSelect')?.value || 'YEAR_2026';
+                const feedback = document.getElementById('evalFeedbackText')?.value.trim() || '';
+                const scores = { ...state.currentFormScores };
+                const avgScore = parseFloat((Object.values(scores).reduce((a, b) => a + b, 0) / 6).toFixed(2));
 
-            const record = {
-                id: `${normalizeRoom(state.verifiedResident.room)}_${period}`,
-                room: state.verifiedResident.room,
-                name: state.verifiedResident.name,
-                phone: state.verifiedResident.phone,
-                area: state.verifiedResident.area,
-                relation: state.verifiedResident.relation || 'Chủ hộ',
-                period: period,
-                scores: scores,
-                average: avgScore,
-                feedback: feedback,
-                updatedAt: new Date().toISOString()
-            };
+                const record = {
+                    id: `${normalizeRoom(state.verifiedResident.room)}_${period}`,
+                    room: state.verifiedResident.room,
+                    name: state.verifiedResident.name,
+                    phone: state.verifiedResident.phone,
+                    area: state.verifiedResident.area,
+                    relation: state.verifiedResident.relation || 'Chủ hộ',
+                    period: period,
+                    scores: scores,
+                    average: avgScore,
+                    feedback: feedback,
+                    updatedAt: new Date().toISOString()
+                };
 
-            const existingIdx = state.evaluations.findIndex(ev => ev.id === record.id);
-            if (existingIdx !== -1) {
-                state.evaluations[existingIdx] = record;
-            } else {
-                state.evaluations.unshift(record);
-            }
+                const existingIdx = state.evaluations.findIndex(ev => ev.id === record.id);
+                if (existingIdx !== -1) {
+                    state.evaluations[existingIdx] = record;
+                } else {
+                    state.evaluations.unshift(record);
+                }
 
-            // Triple-layer permanent persistence: LocalStorage + IndexedDB + Cloud Firestore
-            localStorage.setItem('ecohome_evaluations', JSON.stringify(state.evaluations));
-            await saveToIndexedDB('evalStore', 'eval_list', state.evaluations);
-
-            if (db) {
+                // 1. Instant synchronous save to LocalStorage
                 try {
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eval_items', record.id), record, { merge: true });
-                } catch (e) {
-                    console.warn('Cloud sync offline or queued:', e);
+                    localStorage.setItem('ecohome_evaluations', JSON.stringify(state.evaluations));
+                } catch (e) {}
+
+                // 2. Non-blocking background persistence to IndexedDB & Cloud Firestore
+                saveToIndexedDB('evalStore', 'eval_list', state.evaluations).catch(() => {});
+                if (db) {
+                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eval_items', record.id), record, { merge: true }).catch(() => {});
                 }
-            }
 
-            // Update UI analytics
-            renderHomeEvalAnalytics();
-            renderAdminEvalTable();
+                // 3. Immediate UI Analytics & Table Refresh
+                renderHomeEvalAnalytics();
+                renderAdminEvalTable();
 
-            // Sound + Visual Celebration Confetti
-            playSuccessChime();
-            launchCelebrationConfetti();
-
-            // Display rich success feedback modal
-            setTimeout(() => {
+                // 4. Instant Audio + Confetti + Receipt Modal
+                playSuccessChime();
+                launchCelebrationConfetti();
                 showEvaluationSuccessModal(record);
-                if (btnSubmit) {
-                    btnSubmit.disabled = false;
-                    btnSubmit.classList.remove('opacity-75', 'cursor-not-allowed');
-                    btnSubmit.innerHTML = originalBtnContent;
-                }
-            }, 350);
+                showToast(`Đã ghi nhận phiếu đánh giá của Căn ${record.room} thành công!`, 'success');
+            } catch (err) {
+                console.error('Submit evaluation error:', err);
+                showToast('Có lỗi khi xử lý phiếu: ' + err.message, 'error');
+            } finally {
+                setTimeout(() => {
+                    if (btnSubmit) {
+                        btnSubmit.disabled = false;
+                        btnSubmit.classList.remove('opacity-75', 'cursor-not-allowed');
+                        btnSubmit.innerHTML = originalBtnContent;
+                    }
+                }, 200);
+            }
         };
 
         window.showEvaluationSuccessModal = function(record) {
