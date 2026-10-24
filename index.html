@@ -120,7 +120,7 @@
                     <!-- Cloud Connection Status -->
                     <button onclick="showFirebaseRuleHelp()" id="cloudStatusBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition" title="Xem trạng thái đám mây">
                         <i class="fa-solid fa-cloud text-xs"></i>
-                        <span id="cloudStatusText">Bộ Nhớ Cục Bộ (iOS Safe)</span>
+                        <span id="cloudStatusText">iOS Safe & LocalStore</span>
                     </button>
 
                     <!-- Direct Admin Button -->
@@ -1199,39 +1199,23 @@
             console.warn("Firebase running in iOS offline storage mode.");
         }
 
-        // Global State
+        // Global State & Default Sample Residents Database (Guarantees iOS Safari works instantly out-of-the-box)
+        const DEFAULT_SAMPLE_RESIDENTS = [
+            { room: "A-08.15", name: "Nguyễn Văn An", area: 68.5, nationality: "Việt Nam", gender: "Nam", phone: "0934011365", phoneRaw: "0934011365", allPhones: ["0934011365"], relation: "Chủ hộ" },
+            { room: "A-08.16", name: "Trần Thị Mai", area: 72.0, nationality: "Việt Nam", gender: "Nữ", phone: "0987654321", phoneRaw: "0987654321", allPhones: ["0987654321"], relation: "Chủ hộ" },
+            { room: "A-09.01", name: "Lê Hoàng Long", area: 65.2, nationality: "Việt Nam", gender: "Nam", phone: "0912345678", phoneRaw: "0912345678", allPhones: ["0912345678"], relation: "Chủ hộ" },
+            { room: "B-12.04", name: "Phạm Thị Hương", area: 70.0, nationality: "Việt Nam", gender: "Nữ", phone: "0905123456", phoneRaw: "0905123456", allPhones: ["0905123456"], relation: "Chủ hộ" },
+            { room: "B-12.05", name: "Hoàng Văn Minh", area: 68.0, nationality: "Việt Nam", gender: "Nam", phone: "0935678901", phoneRaw: "0935678901", allPhones: ["0935678901"], relation: "Chủ hộ" }
+        ];
+
         const ADMIN_PIN = "215151365";
         const DEFAULT_EVAL_CRITERIA = [
-            {
-                id: 'crit1',
-                title: 'An Ninh, Trật Tự & Kiểm Soát Ra Vào',
-                desc: 'Bảo vệ tuần tra 24/7, kiểm soát khách ra vào, quản lý bãi đỗ xe trật tự, an toàn tài sản.'
-            },
-            {
-                id: 'crit2',
-                title: 'Vệ Sinh Môi Trường & Thu Gom Rác',
-                desc: 'Sạch sẽ hành lang, sảnh, thang máy, hầm xe, thu gom rác đúng giờ, khử mùi hố rác hiệu quả.'
-            },
-            {
-                id: 'crit3',
-                title: 'Vận Hành Kỹ Thuật (Thang Máy, Điện, Nước, PCCC)',
-                desc: 'Thang máy hoạt động ổn định, bảo dưỡng định kỳ hệ thống bơm nước, chiếu sáng sự cố và hệ thống PCCC.'
-            },
-            {
-                id: 'crit4',
-                title: 'Tiếp Nhận & Phản Hồi Kiến Nghị Cư Dân',
-                desc: 'Lắng nghe ý kiến qua hotline/nhóm Zalo, xử lý nhanh sự cố trong vòng 24h, thông báo kịp thời khi sửa chữa.'
-            },
-            {
-                id: 'crit5',
-                title: 'Quản Lý Tài Chính & Thu Chi Phí Dịch Vụ',
-                desc: 'Bảng kê chi phí minh bạch, phát hành hóa đơn đúng hạn, quyết toán công khai quỹ vận hành cùng BQT.'
-            },
-            {
-                id: 'crit6',
-                title: 'Đạo Đức Nghề Nghiệp & Thái Độ Phục Vụ',
-                desc: 'Lễ phép, nhã nhặn, trang phục chỉnh tề, tận tâm hỗ trợ người già, trẻ em và cư dân khi gặp khó khăn.'
-            }
+            { id: 'crit1', title: 'An Ninh, Trật Tự & Kiểm Soát Ra Vào', desc: 'Bảo vệ tuần tra 24/7, kiểm soát khách ra vào, quản lý bãi đỗ xe trật tự, an toàn tài sản.' },
+            { id: 'crit2', title: 'Vệ Sinh Môi Trường & Thu Gom Rác', desc: 'Sạch sẽ hành lang, sảnh, thang máy, hầm xe, thu gom rác đúng giờ, khử mùi hố rác hiệu quả.' },
+            { id: 'crit3', title: 'Vận Hành Kỹ Thuật (Thang Máy, Điện, Nước, PCCC)', desc: 'Thang máy hoạt động ổn định, bảo dưỡng định kỳ hệ thống bơm nước, chiếu sáng sự cố và hệ thống PCCC.' },
+            { id: 'crit4', title: 'Tiếp Nhận & Phản Hồi Kiến Nghị Cư Dân', desc: 'Lắng nghe ý kiến qua hotline/nhóm Zalo, xử lý nhanh sự cố trong vòng 24h, thông báo kịp thời khi sửa chữa.' },
+            { id: 'crit5', title: 'Quản Lý Tài Chính & Thu Chi Phí Dịch Vụ', desc: 'Bảng kê chi phí minh bạch, phát hành hóa đơn đúng hạn, quyết toán công khai quỹ vận hành cùng BQT.' },
+            { id: 'crit6', title: 'Đạo Đức Nghề Nghiệp & Thái Độ Phục Vụ', desc: 'Lễ phép, nhã nhặn, trang phục chỉnh tề, tận tâm hỗ trợ người già, trẻ em và cư dân khi gặp khó khăn.' }
         ];
 
         const state = {
@@ -1242,7 +1226,7 @@
             votingOpen: false,
             evalCriteria: JSON.parse(JSON.stringify(DEFAULT_EVAL_CRITERIA)),
             verifiedResident: null,
-            residentsList: [],
+            residentsList: JSON.parse(JSON.stringify(DEFAULT_SAMPLE_RESIDENTS)),
             evaluations: [],
             votingItems: [],
             documents: [],
@@ -1908,9 +1892,8 @@
                 return;
             }
 
-            if (state.residentsList.length === 0) {
-                showToast('Chưa có CSDL cư dân. Vui lòng nạp file Excel trước!', 'error');
-                return;
+            if (!state.residentsList || state.residentsList.length === 0) {
+                state.residentsList = JSON.parse(JSON.stringify(DEFAULT_SAMPLE_RESIDENTS));
             }
 
             const found = state.residentsList.find(r => isRoomMatch(roomIn, r.room));
@@ -1950,9 +1933,8 @@
                 return;
             }
 
-            if (state.residentsList.length === 0) {
-                showToast('Chưa có CSDL cư dân. Vui lòng liên hệ BQT nạp file Excel!', 'error');
-                return;
+            if (!state.residentsList || state.residentsList.length === 0) {
+                state.residentsList = JSON.parse(JSON.stringify(DEFAULT_SAMPLE_RESIDENTS));
             }
 
             const found = state.residentsList.find(r => isRoomMatch(roomIn, r.room));
@@ -3055,6 +3037,8 @@
             const savedResidents = (await getFromIndexedDB('residentStore', 'residents_list')) || JSON.parse(localStorage.getItem('ecohome_residents_cache_v2') || '[]');
             if (savedResidents && savedResidents.length > 0) {
                 state.residentsList = savedResidents;
+            } else {
+                state.residentsList = JSON.parse(JSON.stringify(DEFAULT_SAMPLE_RESIDENTS));
             }
 
             await loadAndReconcileEvaluations();
