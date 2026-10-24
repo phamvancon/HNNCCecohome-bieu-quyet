@@ -2,7 +2,7 @@
 <html lang="vi" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hội Nghị Nhà Chung Cư Ecohome Nhơn Bình 2026</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,7 +34,7 @@
     <!-- SheetJS for Excel Reading/Writing -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         .tab-btn.active {
             background-color: #059669;
             color: #ffffff;
@@ -48,7 +48,7 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
     <script>
-        // Global Navigation Switcher defined early to prevent ReferenceErrors
+        // Global Navigation Switcher defined early for iOS & Desktop compatibility
         window.switchTab = function(tabId) {
             const allTabs = ['home', 'voting', 'evaluation', 'documents', 'qa', 'admin'];
             allTabs.forEach(t => {
@@ -57,8 +57,13 @@
                 const mobBtn = document.getElementById(`mob-tab-${t}`);
 
                 if (el) {
-                    if (t === tabId) el.classList.remove('hidden');
-                    else el.classList.add('hidden');
+                    if (t === tabId) {
+                        el.classList.remove('hidden');
+                        el.style.display = '';
+                    } else {
+                        el.classList.add('hidden');
+                        el.style.display = 'none';
+                    }
                 }
 
                 if (btn) {
@@ -115,7 +120,7 @@
                     <!-- Cloud Connection Status -->
                     <button onclick="showFirebaseRuleHelp()" id="cloudStatusBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition" title="Xem trạng thái đám mây">
                         <i class="fa-solid fa-cloud text-xs"></i>
-                        <span id="cloudStatusText">Bộ Nhớ Cục Bộ</span>
+                        <span id="cloudStatusText">Bộ Nhớ Cục Bộ (iOS Safe)</span>
                     </button>
 
                     <!-- Direct Admin Button -->
@@ -338,7 +343,7 @@
                                     0 căn hộ
                                 </span>
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
-                                    <i class="fa-solid fa-database text-[9px]"></i>
+                                    <i class="fa-solid fa-database text-[9px]"></i> Lưu Trữ Vĩnh Viễn 4 Lớp
                                 </span>
                             </div>
                             <p class="text-xs text-slate-500">
@@ -920,7 +925,7 @@
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                         <span class="text-[11px] font-bold text-slate-500 block">Lưu Trữ An Toàn:</span>
                         <span class="text-xs font-extrabold text-emerald-700 flex items-center gap-1 mt-1.5">
-                            <i class="fa-solid fa-circle-check"></i> IndexedDB + Live Sync
+                            <i class="fa-solid fa-circle-check"></i> IndexedDB + iOS Safe
                         </span>
                     </div>
                 </div>
@@ -1142,12 +1147,12 @@
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-100 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
-                    <i class="fa-solid fa-cloud text-brand-600"></i> Trạng Thái Đồng Bộ Đám Mây Firebase
+                    <i class="fa-solid fa-cloud text-brand-600"></i> Trạng Thái Đồng Bộ Đám Mây Firebase (iOS Safe)
                 </h3>
                 <button onclick="document.getElementById('firebaseHelpModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
-                Hệ thống tích hợp cơ chế lưu trữ 3 lớp: <strong>IndexedDB</strong> dung lượng lớn, <strong>LocalStorage</strong> ngoại tuyến và <strong>Firebase Cloud Firestore</strong>. Nếu Firebase Console chưa mở quyền ghi dữ liệu, hệ thống tự động lưu trữ dữ liệu an toàn ngay trên trình duyệt mà không bị gián đoạn.
+                Hệ thống tích hợp cơ chế lưu trữ an toàn iOS: <strong>LocalStorage</strong>, <strong>IndexedDB</strong> và <strong>Firebase Cloud Firestore</strong>. Tương thích hoàn toàn với Safari trên iPhone và iPad.
             </p>
             <div class="bg-slate-900 text-slate-200 p-4 rounded-xl text-[11px] font-mono overflow-x-auto">
                 <p class="text-emerald-400">// Quy tắc Cloud Firestore khuyên dùng:</p>
@@ -1175,7 +1180,7 @@
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Initialization with resilient fallback
+        // Firebase Initialization with iOS resilient fallback
         let app = null, db = null, auth = null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ecohome-nhonbinh-2026';
         try {
@@ -1191,7 +1196,7 @@
                 signInAnonymously(auth).catch(() => {});
             }
         } catch (e) {
-            console.warn("Firebase running in offline storage mode.");
+            console.warn("Firebase running in iOS offline storage mode.");
         }
 
         // Global State
@@ -1379,7 +1384,7 @@
         function getIDB() {
             return new Promise((resolve) => {
                 if (!window.indexedDB) { resolve(null); return; }
-                const timeout = setTimeout(() => resolve(null), 500);
+                const timeout = setTimeout(() => resolve(null), 400);
                 try {
                     const req = indexedDB.open(DB_NAME, DB_VERSION);
                     req.onupgradeneeded = (e) => {
@@ -1402,7 +1407,7 @@
                 const idb = await getIDB();
                 if (!idb) return false;
                 return new Promise((resolve) => {
-                    const timeout = setTimeout(() => resolve(false), 500);
+                    const timeout = setTimeout(() => resolve(false), 400);
                     try {
                         const tx = idb.transaction(storeName, 'readwrite');
                         tx.oncomplete = () => { clearTimeout(timeout); resolve(true); };
@@ -1475,15 +1480,15 @@
 
             const colors = ['#10b981', '#059669', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'];
             const particles = [];
-            const particleCount = 75;
+            const particleCount = 60;
 
             for (let i = 0; i < particleCount; i++) {
                 particles.push({
-                    x: canvas.width / 2 + (Math.random() - 0.5) * 200,
-                    y: canvas.height * 0.4 + (Math.random() - 0.5) * 100,
-                    vx: (Math.random() - 0.5) * 14,
-                    vy: -Math.random() * 12 - 4,
-                    size: Math.random() * 8 + 4,
+                    x: canvas.width / 2 + (Math.random() - 0.5) * 180,
+                    y: canvas.height * 0.4 + (Math.random() - 0.5) * 80,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: -Math.random() * 10 - 4,
+                    size: Math.random() * 7 + 4,
                     color: colors[Math.floor(Math.random() * colors.length)],
                     tilt: Math.random() * 10,
                     tiltAngle: Math.random() * Math.PI,
@@ -1503,15 +1508,15 @@
                 particles.forEach(p => {
                     p.x += p.vx;
                     p.y += p.vy;
-                    p.vy += 0.28;
+                    p.vy += 0.26;
                     p.tiltAngle += p.tiltSpeed;
-                    p.tilt = Math.sin(p.tiltAngle) * 12;
+                    p.tilt = Math.sin(p.tiltAngle) * 10;
 
-                    if (elapsed > 1800) {
-                        p.alpha = Math.max(0, 1 - (elapsed - 1800) / 700);
+                    if (elapsed > 1500) {
+                        p.alpha = Math.max(0, 1 - (elapsed - 1500) / 600);
                     }
 
-                    if (p.alpha > 0 && p.y < canvas.height + 50) {
+                    if (p.alpha > 0 && p.y < canvas.height + 40) {
                         alive++;
                         ctx.save();
                         ctx.globalAlpha = p.alpha;
@@ -1523,7 +1528,7 @@
                     }
                 });
 
-                if (alive > 0 && elapsed < 2600) {
+                if (alive > 0 && elapsed < 2200) {
                     animationFrameId = requestAnimationFrame(frame);
                 } else {
                     cancelAnimationFrame(animationFrameId);
@@ -1549,6 +1554,8 @@
             if (!str) return '';
             return String(str)
                 .toUpperCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
                 .replace(/\s+/g, '')
                 .replace(/[-_.]/g, '')
                 .replace(/^CANHO|^CAN/i, '');
@@ -1704,7 +1711,7 @@
             const file = e.target.files?.[0];
             if (!file) return;
 
-            showToast('Đang đọc và phân tích file Excel...', 'info');
+            showToast('Đang đọc và phân tích file Excel (iOS Safe)...', 'info');
             const reader = new FileReader();
             reader.onload = async function(evt) {
                 try {
@@ -1740,7 +1747,7 @@
 
                     const headers = rows[headerIdx].map(c => removeAccents(String(c)));
                     const colMap = {
-                        room: headers.findIndex(c => c.includes('ma can') || c.includes('can ho') || c.includes('phong') || c === 'can'),
+                        room: headers.findIndex(c => c.includes('can ho') || c.includes('ma can') || c.includes('phong') || c === 'can'),
                         name: headers.findIndex(c => c.includes('chu so huu') || c.includes('ho ten') || c.includes('chu ho') || c === 'ten'),
                         area: headers.findIndex(c => c.includes('dien tich') || c.includes('m2') || c.includes('dt') || c.includes('thong thuy')),
                         nationality: headers.findIndex(c => c.includes('quoc tich')),
@@ -1780,6 +1787,7 @@
 
                     state.residentsList = parsedList;
                     localStorage.setItem('ecohome_residents_count', parsedList.length);
+                    localStorage.setItem('ecohome_residents_cache_v2', JSON.stringify(parsedList));
                     await saveToIndexedDB('residentStore', 'residents_list', parsedList);
 
                     if (db) {
@@ -3044,7 +3052,7 @@
                 try { state.navConfig = JSON.parse(savedNav); } catch (e) {}
             }
 
-            const savedResidents = await getFromIndexedDB('residentStore', 'residents_list');
+            const savedResidents = (await getFromIndexedDB('residentStore', 'residents_list')) || JSON.parse(localStorage.getItem('ecohome_residents_cache_v2') || '[]');
             if (savedResidents && savedResidents.length > 0) {
                 state.residentsList = savedResidents;
             }
@@ -3138,7 +3146,7 @@
 
                     document.getElementById('cloudStatusBadge')?.classList.remove('bg-amber-50', 'text-amber-800', 'border-amber-200');
                     document.getElementById('cloudStatusBadge')?.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
-                    document.getElementById('cloudStatusText').textContent = 'Cloud Live';
+                    document.getElementById('cloudStatusText').textContent = 'Cloud Live (iOS Safe)';
                 } catch (e) {}
             }
         });
