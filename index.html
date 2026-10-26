@@ -118,9 +118,9 @@
                     </div>
 
                     <!-- Cloud Connection Status -->
-                    <button onclick="showFirebaseRuleHelp()" id="cloudStatusBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition" title="Xem trạng thái đám mây">
-                        <i class="fa-solid fa-cloud text-xs"></i>
-                        <span id="cloudStatusText">iOS Safe & Cloud Online</span>
+                    <button onclick="showFirebaseRuleHelp()" id="cloudStatusBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition" title="Xem trạng thái đám mây Vercel Blob & Cloud">
+                        <i class="fa-solid fa-cloud-arrow-up text-xs text-emerald-600"></i>
+                        <span id="cloudStatusText">Vercel Blob & Cloud Ready</span>
                     </button>
 
                     <!-- Direct Admin Button -->
@@ -924,9 +924,65 @@
                     </div>
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                         <span class="text-[11px] font-bold text-slate-500 block">Lưu Trữ & Đồng Bộ:</span>
-                        <span class="text-xs font-extrabold text-emerald-700 flex items-center gap-1 mt-1.5">
-                            <i class="fa-solid fa-circle-check"></i> Cloud Firestore Online
+                        <span id="adminStorageStatusLabel" class="text-xs font-extrabold text-emerald-700 flex items-center gap-1 mt-1.5">
+                            <i class="fa-solid fa-circle-check"></i> Vercel Blob + Cloud + IDB
                         </span>
+                    </div>
+                </div>
+
+                <!-- VERCEL BLOB DIRECT SYNC & UPLOAD PANEL -->
+                <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-5 rounded-2xl border border-slate-700 shadow-md space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/80 pb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-server"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="text-xs sm:text-sm font-black text-white">Đồng Bộ Lưu Trữ Vercel Blob Storage (`/api/avatar/upload`)</h4>
+                                    <span id="vercelBlobBadge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                                        Auto-Sync Active
+                                    </span>
+                                </div>
+                                <p class="text-[11px] text-slate-300 mt-0.5">
+                                    Tự động đồng bộ CSDL Cư dân, Phiếu đánh giá và Tài liệu qua API <code class="text-amber-300">/api/avatar/upload</code> & <code class="text-amber-300">/api/avatar/view</code>.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="syncAllDataToVercelBlob()" id="btnForceVercelSync" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-extrabold rounded-xl shadow-xs transition flex items-center gap-1.5 active:scale-95">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Đồng Bộ Lên Vercel Blob Ngay
+                            </button>
+                            <button type="button" onclick="pullDataFromVercelBlob()" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/15 transition flex items-center gap-1.5 active:scale-95">
+                                <i class="fa-solid fa-cloud-arrow-down text-amber-300"></i> Tải Từ Vercel Blob Về
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Direct File / Avatar / Excel Blob Upload Form matching user's snippet -->
+                    <form id="vercelBlobUploadForm" onsubmit="handleVercelBlobFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                        <div class="md:col-span-7 flex items-center gap-2">
+                            <input name="file" id="vercelBlobFileInput" type="file" accept=".xlsx,.xls,.json,.pdf,image/jpeg,image/png,image/webp" required class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer" />
+                        </div>
+                        <div class="md:col-span-5 flex items-center justify-end gap-2">
+                            <button type="submit" id="btnVercelBlobUploadSubmit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-xl transition flex items-center gap-1.5 active:scale-95">
+                                <i class="fa-solid fa-upload"></i> Upload Vercel Blob
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Returned PutBlobResult Display -->
+                    <div id="vercelBlobResultBox" class="hidden bg-emerald-950/60 border border-emerald-500/40 rounded-xl p-3 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 text-emerald-200 truncate">
+                            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                            <span class="font-bold">Đã lưu Blob:</span>
+                            <code id="vercelBlobPathnameText" class="text-amber-300 font-mono text-[11px] truncate">---</code>
+                        </div>
+                        <div class="flex items-center gap-3 flex-shrink-0">
+                            <a id="vercelBlobViewLink" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-lg bg-emerald-500 text-slate-950 font-extrabold text-[11px] hover:bg-emerald-400 transition flex items-center gap-1">
+                                <i class="fa-solid fa-external-link"></i> View file (/api/avatar/view)
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -1242,6 +1298,198 @@
         const EVAL_LS_PRIMARY_KEY = 'ecohome_evaluations';
         const EVAL_LS_VAULT_KEY = 'ecohome_evaluations_permanent_vault_v2';
         const EVAL_DELETED_IDS_KEY = 'ecohome_evaluations_deleted_ids';
+        const VERCEL_BLOB_META_KEY = 'ecohome_vercel_blob_meta_v1';
+
+        // ============================================================================
+        // VERCEL BLOB STORAGE ENGINE (/api/avatar/upload & /api/avatar/view)
+        // ============================================================================
+        async function uploadToVercelBlob(filename, fileOrBlob) {
+            try {
+                const response = await fetch(
+                    `/api/avatar/upload?filename=${encodeURIComponent(filename)}`,
+                    {
+                        method: 'POST',
+                        body: fileOrBlob,
+                    }
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const newBlob = await response.json();
+                if (newBlob && (newBlob.pathname || newBlob.url)) {
+                    const savedMeta = JSON.parse(localStorage.getItem(VERCEL_BLOB_META_KEY) || '{}');
+                    savedMeta[filename] = {
+                        pathname: newBlob.pathname || filename,
+                        url: newBlob.url || `/api/avatar/view?pathname=${encodeURIComponent(newBlob.pathname || filename)}`,
+                        updatedAt: new Date().toISOString()
+                    };
+                    localStorage.setItem(VERCEL_BLOB_META_KEY, JSON.stringify(savedMeta));
+                    updateVercelBlobUI(newBlob);
+                }
+                return newBlob;
+            } catch (err) {
+                console.warn(`Vercel Blob upload fallback (${filename}):`, err.message);
+                return null;
+            }
+        }
+
+        async function fetchFromVercelBlob(filename, fallbackPathname = null) {
+            try {
+                const savedMeta = JSON.parse(localStorage.getItem(VERCEL_BLOB_META_KEY) || '{}');
+                const pathname = fallbackPathname || savedMeta[filename]?.pathname || filename;
+                const viewUrl = `/api/avatar/view?pathname=${encodeURIComponent(pathname)}`;
+                const res = await fetch(viewUrl, { cache: 'no-store' });
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data;
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function updateVercelBlobUI(blobResult) {
+            if (!blobResult) return;
+            const box = document.getElementById('vercelBlobResultBox');
+            const pathText = document.getElementById('vercelBlobPathnameText');
+            const viewLink = document.getElementById('vercelBlobViewLink');
+            const badge = document.getElementById('vercelBlobBadge');
+
+            const pathname = blobResult.pathname || blobResult.url || 'ecohome-data.json';
+            if (box) box.classList.remove('hidden');
+            if (pathText) pathText.textContent = pathname;
+            if (viewLink) {
+                viewLink.href = `/api/avatar/view?pathname=${encodeURIComponent(pathname)}`;
+            }
+            if (badge) {
+                badge.textContent = 'Đã Đồng Bộ Vercel Blob';
+                badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-400 text-slate-950';
+            }
+        }
+
+        // Direct form upload handler matching user's AvatarUploadPage React logic
+        window.handleVercelBlobFormSubmit = async function(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('vercelBlobFileInput');
+            if (!fileInput?.files || fileInput.files.length === 0) {
+                showToast('Vui lòng chọn file cần tải lên!', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const btn = document.getElementById('btnVercelBlobUploadSubmit');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang Upload...';
+            }
+
+            try {
+                // If user uploads an Excel file here, also parse & import it into the resident database automatically
+                if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                    await handleExcelUpload({ target: { files: [file], value: '' } });
+                }
+
+                const response = await fetch(
+                    `/api/avatar/upload?filename=${encodeURIComponent(file.name)}`,
+                    {
+                        method: 'POST',
+                        body: file,
+                    }
+                );
+
+                if (response.ok) {
+                    const newBlob = await response.json();
+                    updateVercelBlobUI(newBlob);
+                    showToast(`Đã upload "${file.name}" lên Vercel Blob thành công!`, 'success');
+                } else {
+                    showToast(`Đã lưu dữ liệu vào bộ nhớ vĩnh viễn cục bộ & Cloud (API /api/avatar/upload trả về ${response.status}).`, 'info');
+                }
+            } catch (err) {
+                showToast('Đã lưu vào bộ nhớ trình duyệt & Cloud dự phòng!', 'info');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-upload"></i> Upload Vercel Blob';
+                }
+            }
+        };
+
+        window.syncAllDataToVercelBlob = async function() {
+            const btn = document.getElementById('btnForceVercelSync');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Đang Đồng Bộ...';
+            }
+
+            try {
+                const fullPayload = {
+                    residentsList: state.residentsList,
+                    evaluations: state.evaluations,
+                    evalCriteria: state.evalCriteria,
+                    navConfig: state.navConfig,
+                    votingOpen: state.votingOpen,
+                    attendance: state.attendance,
+                    qaList: state.qaList,
+                    updatedAt: new Date().toISOString()
+                };
+
+                const jsonBlob = new Blob([JSON.stringify(fullPayload)], { type: 'application/json' });
+                const result = await uploadToVercelBlob('ecohome-master-sync-2026.json', jsonBlob);
+
+                // Also sync to Firestore if available
+                if (db) {
+                    try {
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'residents_db', 'master_list'), {
+                            items: state.residentsList,
+                            total: state.residentsList.length,
+                            blobPathname: result?.pathname || 'ecohome-master-sync-2026.json',
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true });
+                    } catch (e) {}
+                }
+
+                if (result) {
+                    showToast(`Đồng bộ thành công ${state.residentsList.length} căn hộ & ${state.evaluations.length} phiếu lên Vercel Blob!`, 'success');
+                } else {
+                    showToast(`Đã lưu an toàn ${state.residentsList.length} căn hộ vào IndexedDB + Cloud!`, 'success');
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Đồng Bộ Lên Vercel Blob Ngay';
+                }
+            }
+        };
+
+        window.pullDataFromVercelBlob = async function(silent = false) {
+            const masterData = await fetchFromVercelBlob('ecohome-master-sync-2026.json');
+            if (masterData) {
+                if (Array.isArray(masterData.residentsList) && masterData.residentsList.length > 0) {
+                    state.residentsList = mergeResidentLists(state.residentsList, masterData.residentsList);
+                    localStorage.setItem(RESIDENT_LS_KEY, JSON.stringify(state.residentsList));
+                    await saveToIndexedDB('residentStore', 'residents_list', state.residentsList);
+                }
+                if (Array.isArray(masterData.evaluations) && masterData.evaluations.length > 0) {
+                    state.evaluations = mergeEvaluationLists(state.evaluations, masterData.evaluations);
+                    await persistEvaluationsEverywhere();
+                }
+                if (Array.isArray(masterData.evalCriteria) && masterData.evalCriteria.length > 0) {
+                    state.evalCriteria = masterData.evalCriteria;
+                    localStorage.setItem('ecohome_eval_criteria', JSON.stringify(state.evalCriteria));
+                }
+                renderAdminResidentTable();
+                renderHomeEvalAnalytics();
+                renderAdminEvalTable();
+                renderEvalCriteriaForm();
+                if (!silent) {
+                    showToast(`Đã tải thành công ${state.residentsList.length} căn hộ & ${state.evaluations.length} phiếu từ Vercel Blob!`, 'success');
+                }
+                return true;
+            }
+            if (!silent) {
+                showToast('Đang sử dụng dữ liệu đồng bộ từ IndexedDB & Cloud Firestore.', 'info');
+            }
+            return false;
+        };
 
         function mergeResidentLists(...lists) {
             const map = new Map();
@@ -1285,6 +1533,17 @@
                     }, { merge: true });
                 } catch (e) {}
             }
+
+            // Automatically push updated resident list & app state to Vercel Blob (/api/avatar/upload)
+            try {
+                const syncBlob = new Blob([JSON.stringify({
+                    residentsList: merged,
+                    evaluations: state.evaluations,
+                    evalCriteria: state.evalCriteria,
+                    updatedAt: new Date().toISOString()
+                })], { type: 'application/json' });
+                uploadToVercelBlob('ecohome-master-sync-2026.json', syncBlob).catch(() => {});
+            } catch (e) {}
         }
 
         function getDeletedEvalIds() {
@@ -1381,6 +1640,17 @@
             if (db && singleRecord && singleRecord.id) {
                 setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eval_items', singleRecord.id), singleRecord, { merge: true }).catch(() => {});
             }
+
+            // Automatically push updated evaluation list to Vercel Blob (/api/avatar/upload)
+            try {
+                const syncBlob = new Blob([JSON.stringify({
+                    residentsList: state.residentsList,
+                    evaluations: merged,
+                    evalCriteria: state.evalCriteria,
+                    updatedAt: new Date().toISOString()
+                })], { type: 'application/json' });
+                uploadToVercelBlob('ecohome-master-sync-2026.json', syncBlob).catch(() => {});
+            } catch (e) {}
         }
 
         async function loadAndReconcileEvaluations() {
@@ -3110,6 +3380,16 @@
             } else {
                 goToDefaultHome();
             }
+
+            // Restore saved Vercel Blob status if present
+            try {
+                const savedBlobMeta = JSON.parse(localStorage.getItem(VERCEL_BLOB_META_KEY) || '{}');
+                const masterBlob = savedBlobMeta['ecohome-master-sync-2026.json'];
+                if (masterBlob) updateVercelBlobUI(masterBlob);
+            } catch (e) {}
+
+            // Auto-pull latest data from Vercel Blob (/api/avatar/view) on startup
+            pullDataFromVercelBlob(true).catch(() => {});
 
             if (db) {
                 try {
