@@ -888,7 +888,7 @@
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                     <div>
                         <div class="inline-flex items-center gap-2 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            <i class="fa-solid fa-file-excel"></i> CƠ SỞ DỮ LIỆU CƯ DÂN (7 CỘT CHUẨN) - ĐỒNG BỘ ONLINE
+                            <i class="fa-solid fa-file-excel"></i> CƠ SỞ DỮ LIỆU CƯ DÂN (7 CỘT CHUẨN) - ĐỒNG BỘ ONLINE VĨNH VIỄN
                         </div>
                         <h3 class="font-extrabold text-slate-900 text-base sm:text-lg mt-2">Quản Lý Danh Sách Chủ Sở Hữu (Nạp File Excel & Đồng Bộ Cloud)</h3>
                         <p class="text-xs text-slate-500">Khớp 7 cột: Mã Căn Hộ | Họ Tên | Diện tích (m2) | Quốc tịch | Giới tính | Điện thoại | QH với CH</p>
@@ -1178,7 +1178,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Initialization with iOS resilient fallback
         let app = null, db = null, auth = null;
@@ -1238,9 +1238,54 @@
             lastSubmittedEvalId: null
         };
 
+        const RESIDENT_LS_KEY = 'ecohome_residents_cache_v3';
         const EVAL_LS_PRIMARY_KEY = 'ecohome_evaluations';
         const EVAL_LS_VAULT_KEY = 'ecohome_evaluations_permanent_vault_v2';
         const EVAL_DELETED_IDS_KEY = 'ecohome_evaluations_deleted_ids';
+
+        function mergeResidentLists(...lists) {
+            const map = new Map();
+            lists.forEach(list => {
+                if (!Array.isArray(list)) return;
+                list.forEach(item => {
+                    if (!item || !item.room) return;
+                    const key = normalizeRoom(item.room);
+                    if (key) {
+                        map.set(key, {
+                            ...item,
+                            room: String(item.room).trim().toUpperCase(),
+                            name: String(item.name || 'Chủ Sở Hữu').trim(),
+                            phone: String(item.phone || '').trim(),
+                            area: Number(item.area) || 70.0
+                        });
+                    }
+                });
+            });
+            return Array.from(map.values());
+        }
+
+        async function persistResidentsEverywhere(newList) {
+            if (!Array.isArray(newList) || newList.length === 0) return;
+            const merged = mergeResidentLists(state.residentsList, newList);
+            state.residentsList = merged;
+
+            try {
+                localStorage.setItem(RESIDENT_LS_KEY, JSON.stringify(merged));
+                localStorage.setItem('ecohome_residents_count', merged.length);
+            } catch (e) {}
+
+            await saveToIndexedDB('residentStore', 'residents_list', merged);
+
+            if (db) {
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'residents_db', 'master_list'), {
+                        items: merged,
+                        total: merged.length,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+                } catch (e) {}
+            }
+        }
 
         function getDeletedEvalIds() {
             try {
@@ -1330,8 +1375,8 @@
                 localStorage.setItem(EVAL_LS_VAULT_KEY, serialized);
             } catch (e) {}
 
-            saveToIndexedDB('evalStore', 'eval_list', merged).catch(() => {});
-            saveToIndexedDB('evalStore', 'eval_backup_vault', merged).catch(() => {});
+            await saveToIndexedDB('evalStore', 'eval_list', merged);
+            await saveToIndexedDB('evalStore', 'eval_backup_vault', merged);
 
             if (db && singleRecord && singleRecord.id) {
                 setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eval_items', singleRecord.id), singleRecord, { merge: true }).catch(() => {});
@@ -1592,16 +1637,6 @@
             return list;
         }
 
-        function isPhoneMatch(inputPhone, targetPhoneRaw) {
-            const cleanInput = normalizePhone(inputPhone);
-            if (!cleanInput) return false;
-            const targetList = extractPhoneList(targetPhoneRaw);
-            if (targetList.includes(cleanInput)) return true;
-            if (targetPhoneRaw && String(targetPhoneRaw).includes(cleanInput)) return true;
-            const inLast9 = cleanInput.slice(-9);
-            return targetList.some(tp => tp.slice(-9) === inLast9);
-        }
-
         window.autoConvertPhoneInput = function(inputEl) {
             if (!inputEl) return;
             const original = inputEl.value;
@@ -1772,21 +1807,7 @@
                         return;
                     }
 
-                    state.residentsList = parsedList;
-                    localStorage.setItem('ecohome_residents_count', parsedList.length);
-                    localStorage.setItem('ecohome_residents_cache_v2', JSON.stringify(parsedList));
-                    await saveToIndexedDB('residentStore', 'residents_list', parsedList);
-
-                    // Sync online to Firebase Cloud
-                    if (db) {
-                        try {
-                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'residents_db', 'master_list'), {
-                                items: parsedList,
-                                total: parsedList.length,
-                                updatedAt: new Date().toISOString()
-                            }, { merge: true });
-                        } catch (e) {}
-                    }
+                    await persistResidentsEverywhere(parsedList);
 
                     if (document.getElementById('adminTotalUnitsInput')) {
                         document.getElementById('adminTotalUnitsInput').value = parsedList.length;
@@ -1902,7 +1923,6 @@
 
             let found = state.residentsList.find(r => isRoomMatch(roomIn, r.room));
 
-            // Resilient Auto-Registration: If apartment not found in database, instantly auto-register it
             if (!found) {
                 found = {
                     room: roomIn.toUpperCase(),
@@ -1916,8 +1936,7 @@
                     relation: "Chủ hộ"
                 };
                 state.residentsList.push(found);
-                localStorage.setItem('ecohome_residents_cache_v2', JSON.stringify(state.residentsList));
-                saveToIndexedDB('residentStore', 'residents_list', state.residentsList).catch(() => {});
+                persistResidentsEverywhere([found]);
             }
 
             syncVerificationAcrossTabs(found);
@@ -1951,7 +1970,6 @@
 
             let found = state.residentsList.find(r => isRoomMatch(roomIn, r.room));
 
-            // Resilient Auto-Registration for Evaluation
             if (!found) {
                 found = {
                     room: roomIn.toUpperCase(),
@@ -1965,8 +1983,7 @@
                     relation: "Chủ hộ"
                 };
                 state.residentsList.push(found);
-                localStorage.setItem('ecohome_residents_cache_v2', JSON.stringify(state.residentsList));
-                saveToIndexedDB('residentStore', 'residents_list', state.residentsList).catch(() => {});
+                persistResidentsEverywhere([found]);
             }
 
             syncVerificationAcrossTabs(found);
@@ -2316,12 +2333,6 @@
         window.renderHomeEvalAnalytics = function(period = null) {
             const filterEl = document.getElementById('homeEvalPeriodFilter');
             const activePeriod = period !== null ? period : (filterEl?.value || 'ALL');
-
-            let lsPrimary = [];
-            try { lsPrimary = JSON.parse(localStorage.getItem(EVAL_LS_PRIMARY_KEY) || '[]'); } catch (e) {}
-            if (lsPrimary.length > state.evaluations.length) {
-                state.evaluations = mergeEvaluationLists(state.evaluations, lsPrimary);
-            }
 
             let list = state.evaluations || [];
             if (activePeriod !== 'ALL') {
@@ -3055,9 +3066,13 @@
             }
 
             // Load residents from IndexedDB / LocalStorage first for instant boot
-            const savedResidents = (await getFromIndexedDB('residentStore', 'residents_list')) || JSON.parse(localStorage.getItem('ecohome_residents_cache_v2') || '[]');
-            if (savedResidents && savedResidents.length > 0) {
-                state.residentsList = savedResidents;
+            let localResidents = [];
+            try {
+                localResidents = (await getFromIndexedDB('residentStore', 'residents_list')) || JSON.parse(localStorage.getItem(RESIDENT_LS_KEY) || '[]');
+            } catch (e) {}
+
+            if (localResidents.length > 0) {
+                state.residentsList = mergeResidentLists(DEFAULT_SAMPLE_RESIDENTS, localResidents);
             } else {
                 state.residentsList = JSON.parse(JSON.stringify(DEFAULT_SAMPLE_RESIDENTS));
             }
@@ -3098,16 +3113,13 @@
 
             if (db) {
                 try {
-                    // Sync online residents master list from cloud
                     onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'residents_db', 'master_list'), (snap) => {
                         if (snap.exists() && Array.isArray(snap.data()?.items) && snap.data().items.length > 0) {
                             const cloudResidents = snap.data().items;
-                            if (cloudResidents.length >= state.residentsList.length) {
-                                state.residentsList = cloudResidents;
-                                localStorage.setItem('ecohome_residents_cache_v2', JSON.stringify(cloudResidents));
-                                saveToIndexedDB('residentStore', 'residents_list', cloudResidents).catch(() => {});
-                                renderAdminResidentTable();
-                            }
+                            state.residentsList = mergeResidentLists(state.residentsList, cloudResidents);
+                            localStorage.setItem(RESIDENT_LS_KEY, JSON.stringify(state.residentsList));
+                            saveToIndexedDB('residentStore', 'residents_list', state.residentsList).catch(() => {});
+                            renderAdminResidentTable();
                         }
                     }, () => {});
 
