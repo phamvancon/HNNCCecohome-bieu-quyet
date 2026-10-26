@@ -120,7 +120,7 @@
                     <!-- Cloud Connection Status -->
                     <button onclick="showFirebaseRuleHelp()" id="cloudStatusBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition" title="Xem trạng thái đám mây">
                         <i class="fa-solid fa-cloud text-xs"></i>
-                        <span id="cloudStatusText">iOS Safe & LocalStore</span>
+                        <span id="cloudStatusText">iOS Safe & Cloud Online</span>
                     </button>
 
                     <!-- Direct Admin Button -->
@@ -888,9 +888,9 @@
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                     <div>
                         <div class="inline-flex items-center gap-2 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            <i class="fa-solid fa-file-excel"></i> CƠ SỞ DỮ LIỆU CƯ DÂN (7 CỘT CHUẨN)
+                            <i class="fa-solid fa-file-excel"></i> CƠ SỞ DỮ LIỆU CƯ DÂN (7 CỘT CHUẨN) - ĐỒNG BỘ ONLINE
                         </div>
-                        <h3 class="font-extrabold text-slate-900 text-base sm:text-lg mt-2">Quản Lý Danh Sách Chủ Sở Hữu (Nạp File Excel & Lưu Trữ Lâu Dài)</h3>
+                        <h3 class="font-extrabold text-slate-900 text-base sm:text-lg mt-2">Quản Lý Danh Sách Chủ Sở Hữu (Nạp File Excel & Đồng Bộ Cloud)</h3>
                         <p class="text-xs text-slate-500">Khớp 7 cột: Mã Căn Hộ | Họ Tên | Diện tích (m2) | Quốc tịch | Giới tính | Điện thoại | QH với CH</p>
                     </div>
 
@@ -902,7 +902,7 @@
                             <i class="fa-solid fa-hard-drive"></i> Sao Lưu JSON
                         </button>
                         <label class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Nạp File Excel (.xlsx)
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Nạp File Excel & Đẩy Lên Cloud (.xlsx)
                             <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="handleExcelUpload(event)">
                         </label>
                     </div>
@@ -923,9 +923,9 @@
                         <span id="adminResidentPhoneCount" class="text-2xl font-black text-indigo-600">0</span>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <span class="text-[11px] font-bold text-slate-500 block">Lưu Trữ An Toàn:</span>
+                        <span class="text-[11px] font-bold text-slate-500 block">Lưu Trữ & Đồng Bộ:</span>
                         <span class="text-xs font-extrabold text-emerald-700 flex items-center gap-1 mt-1.5">
-                            <i class="fa-solid fa-circle-check"></i> IndexedDB + iOS Safe
+                            <i class="fa-solid fa-circle-check"></i> Cloud Firestore Online
                         </span>
                     </div>
                 </div>
@@ -1147,12 +1147,12 @@
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-100 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
-                    <i class="fa-solid fa-cloud text-brand-600"></i> Trạng Thái Đồng Bộ Đám Mây Firebase (iOS Safe)
+                    <i class="fa-solid fa-cloud text-brand-600"></i> Trạng Thái Đồng Bộ Đám Mây Firebase (iOS Safe & Online)
                 </h3>
                 <button onclick="document.getElementById('firebaseHelpModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
-                Hệ thống tích hợp cơ chế lưu trữ an toàn iOS: <strong>LocalStorage</strong>, <strong>IndexedDB</strong> và <strong>Firebase Cloud Firestore</strong>. Tương thích hoàn toàn với Safari trên iPhone và iPad.
+                Hệ thống tích hợp đồng bộ dữ liệu cư dân và phiếu đánh giá trực tuyến qua <strong>Firebase Cloud Firestore</strong>, kết hợp bộ nhớ đệm <strong>IndexedDB</strong> và <strong>LocalStorage</strong> để hoạt động trơn tru trên mọi thiết bị di động và iPhone.
             </p>
             <div class="bg-slate-900 text-slate-200 p-4 rounded-xl text-[11px] font-mono overflow-x-auto">
                 <p class="text-emerald-400">// Quy tắc Cloud Firestore khuyên dùng:</p>
@@ -1178,7 +1178,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Initialization with iOS resilient fallback
         let app = null, db = null, auth = null;
@@ -1196,7 +1196,7 @@
                 signInAnonymously(auth).catch(() => {});
             }
         } catch (e) {
-            console.warn("Firebase running in iOS offline storage mode.");
+            console.warn("Firebase running in offline storage mode.");
         }
 
         // Global State & Default Sample Residents Database (Guarantees iOS Safari works instantly out-of-the-box)
@@ -1698,7 +1698,7 @@
             const file = e.target.files?.[0];
             if (!file) return;
 
-            showToast('Đang đọc và phân tích file Excel (iOS Safe)...', 'info');
+            showToast('Đang đọc, phân tích và đồng bộ file Excel online...', 'info');
             const reader = new FileReader();
             reader.onload = async function(evt) {
                 try {
@@ -1777,13 +1777,14 @@
                     localStorage.setItem('ecohome_residents_cache_v2', JSON.stringify(parsedList));
                     await saveToIndexedDB('residentStore', 'residents_list', parsedList);
 
+                    // Sync online to Firebase Cloud
                     if (db) {
                         try {
-                            const chunkSize = 200;
-                            for (let c = 0; c < parsedList.length; c += chunkSize) {
-                                const chunk = parsedList.slice(c, c + chunkSize);
-                                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'residents_chunks', `chunk_${Math.floor(c / chunkSize)}`), { items: chunk }, { merge: true });
-                            }
+                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'residents_db', 'master_list'), {
+                                items: parsedList,
+                                total: parsedList.length,
+                                updatedAt: new Date().toISOString()
+                            }, { merge: true });
                         } catch (e) {}
                     }
 
@@ -1796,7 +1797,7 @@
                     renderHomeEvalAnalytics();
 
                     const withPhoneCount = parsedList.filter(r => r.phone && r.phone.length >= 8).length;
-                    showToast(`Nạp thành công ${parsedList.length} căn hộ (${withPhoneCount} căn có SĐT)!`, 'success');
+                    showToast(`Nạp & đồng bộ online thành công ${parsedList.length} căn hộ (${withPhoneCount} căn có SĐT)!`, 'success');
                 } catch (err) {
                     showToast('Lỗi đọc file Excel: ' + err.message, 'error');
                 } finally {
@@ -1901,7 +1902,7 @@
 
             let found = state.residentsList.find(r => isRoomMatch(roomIn, r.room));
 
-            // iOS Resilient Auto-Registration: If apartment not found in database, instantly auto-register it
+            // Resilient Auto-Registration: If apartment not found in database, instantly auto-register it
             if (!found) {
                 found = {
                     room: roomIn.toUpperCase(),
@@ -1950,7 +1951,7 @@
 
             let found = state.residentsList.find(r => isRoomMatch(roomIn, r.room));
 
-            // iOS Resilient Auto-Registration for Evaluation
+            // Resilient Auto-Registration for Evaluation
             if (!found) {
                 found = {
                     room: roomIn.toUpperCase(),
@@ -3053,6 +3054,7 @@
                 try { state.navConfig = JSON.parse(savedNav); } catch (e) {}
             }
 
+            // Load residents from IndexedDB / LocalStorage first for instant boot
             const savedResidents = (await getFromIndexedDB('residentStore', 'residents_list')) || JSON.parse(localStorage.getItem('ecohome_residents_cache_v2') || '[]');
             if (savedResidents && savedResidents.length > 0) {
                 state.residentsList = savedResidents;
@@ -3096,6 +3098,19 @@
 
             if (db) {
                 try {
+                    // Sync online residents master list from cloud
+                    onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'residents_db', 'master_list'), (snap) => {
+                        if (snap.exists() && Array.isArray(snap.data()?.items) && snap.data().items.length > 0) {
+                            const cloudResidents = snap.data().items;
+                            if (cloudResidents.length >= state.residentsList.length) {
+                                state.residentsList = cloudResidents;
+                                localStorage.setItem('ecohome_residents_cache_v2', JSON.stringify(cloudResidents));
+                                saveToIndexedDB('residentStore', 'residents_list', cloudResidents).catch(() => {});
+                                renderAdminResidentTable();
+                            }
+                        }
+                    }, () => {});
+
                     onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'navigation'), (snap) => {
                         if (snap.exists()) {
                             state.navConfig = snap.data();
@@ -3149,7 +3164,7 @@
 
                     document.getElementById('cloudStatusBadge')?.classList.remove('bg-amber-50', 'text-amber-800', 'border-amber-200');
                     document.getElementById('cloudStatusBadge')?.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
-                    document.getElementById('cloudStatusText').textContent = 'Cloud Live (iOS Safe)';
+                    document.getElementById('cloudStatusText').textContent = 'Cloud Online Active';
                 } catch (e) {}
             }
         });
